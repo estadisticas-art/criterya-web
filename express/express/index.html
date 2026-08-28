@@ -1,0 +1,2105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Diagnóstico de Gestión · Criterya</title>
+<meta name="description" content="Autodiagnóstico de gestión para distribuidoras: 18 preguntas sobre 8 áreas, con puntaje por área y las cinco acciones de mayor impacto. Gratuito, 6 a 8 minutos.">
+<link rel="canonical" href="https://criterya.com.ar/express/">
+<link rel="icon" href="/logomark.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Criterya">
+<meta property="og:locale" content="es_AR">
+<meta property="og:url" content="https://criterya.com.ar/express/">
+<meta property="og:title" content="¿Dónde está parada tu empresa? Diagnóstico en 18 preguntas">
+<meta property="og:description" content="Ocho áreas de gestión, puntaje por área y las cinco acciones de mayor impacto. Seis minutos, sin registro.">
+<meta property="og:image" content="https://criterya.com.ar/logo.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="robots" content="index,follow">
+<meta name="theme-color" content="#043760">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#043760; --teal:#0D475A; --cyan:#2F8FA0; --ink:#0A1B2A;
+  --paper:#F1F4F6; --card:#FFFFFF; --line:#DBE3E8; --muted:#657A8B;
+  --n0:#9A3B2C; --n1:#B5822C; --n2:#2F8FA0; --n3:#043760;
+  --disp:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --body:"IBM Plex Sans",-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+  --sh:0 1px 2px rgba(4,55,96,.05),0 8px 24px -12px rgba(4,55,96,.18);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:var(--body); font-size:16px; line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+button{font-family:inherit; cursor:pointer}
+:focus-visible{outline:2.5px solid var(--cyan); outline-offset:3px; border-radius:3px}
+
+/* ---------- primitivas ---------- */
+.eyebrow{
+  font-family:var(--disp); font-weight:600; font-size:.66rem;
+  letter-spacing:.19em; text-transform:uppercase; color:var(--cyan);
+}
+.wrap{max-width:760px; margin:0 auto; padding:0 22px}
+.mono{font-family:var(--mono); font-variant-numeric:tabular-nums}
+.hidden{display:none !important}
+
+/* ---------- pantalla de inicio ---------- */
+.intro{min-height:100vh; display:flex; flex-direction:column}
+.intro__body{flex:1; display:flex; align-items:center; padding:56px 0 40px}
+.intro__logo{width:250px; max-width:64vw; height:auto; display:block; margin-bottom:38px}
+.intro h1{
+  font-family:var(--disp); font-weight:700; font-size:clamp(1.85rem,5.2vw,2.9rem);
+  line-height:1.1; letter-spacing:-.022em; color:var(--navy); margin:.35em 0 0;
+  max-width:19ch;
+}
+.intro__lead{color:var(--muted); font-size:1.02rem; max-width:56ch; margin:20px 0 0}
+.facts{
+  list-style:none; padding:0; margin:34px 0 0;
+  border-top:1px solid var(--line);
+}
+.facts li{
+  display:flex; gap:16px; align-items:baseline;
+  padding:13px 0; border-bottom:1px solid var(--line); font-size:.94rem;
+}
+.facts b{
+  font-family:var(--mono); font-weight:600; color:var(--teal);
+  font-size:.82rem; min-width:5.4em; letter-spacing:-.02em;
+}
+.form{margin-top:34px; display:grid; gap:16px; grid-template-columns:1fr 1fr}
+.field{display:flex; flex-direction:column; gap:7px}
+.field label{
+  font-family:var(--disp); font-weight:600; font-size:.66rem;
+  letter-spacing:.15em; text-transform:uppercase; color:var(--muted);
+}
+.field input{
+  font:inherit; font-size:.96rem; padding:11px 13px; border:1px solid var(--line);
+  border-radius:5px; background:var(--card); color:var(--ink); width:100%;
+}
+.field input:focus{border-color:var(--cyan); outline:none; box-shadow:0 0 0 3px rgba(47,143,160,.15)}
+.rubros{grid-column:1/-1; display:flex; gap:9px; flex-wrap:wrap; margin-top:2px}
+.rubro{
+  border:1px solid var(--line); background:var(--card); border-radius:5px;
+  padding:9px 15px; font-size:.88rem; color:var(--ink); font-weight:500;
+  display:flex; align-items:center; gap:9px;
+}
+.rubro[aria-pressed=true]{
+  border-color:var(--navy); background:var(--navy); color:#fff;
+  box-shadow:0 0 0 3px rgba(4,55,96,.12);
+}
+.rubro[disabled]{opacity:.42; cursor:not-allowed}
+.rubro small{font-family:var(--mono); font-size:.66rem; letter-spacing:.04em; opacity:.75}
+.cta{
+  margin-top:30px; display:inline-flex; align-items:center; gap:13px;
+  background:var(--navy); color:#fff; border:none; border-radius:6px;
+  font-family:var(--disp); font-weight:600; font-size:1rem;
+  letter-spacing:.01em; padding:15px 26px; box-shadow:var(--sh);
+  transition:background .18s, transform .18s;
+}
+.cta:hover{background:#052c4c; transform:translateY(-1px)}
+.cta svg{transition:transform .18s}
+.cta:hover svg{transform:translateX(3px)}
+.note{margin-top:18px; font-size:.8rem; color:var(--muted); max-width:52ch}
+
+/* ---------- barra superior del cuestionario ---------- */
+.bar{
+  position:sticky; top:0; z-index:20; background:rgba(241,244,246,.93);
+  backdrop-filter:blur(9px); border-bottom:1px solid var(--line);
+}
+.bar__in{
+  max-width:760px; margin:0 auto; padding:12px 22px;
+  display:flex; align-items:center; gap:18px;
+}
+.bar__mark{width:31px; height:auto; display:block; flex:none}
+.bar__meta{flex:1; min-width:0}
+.bar__count{
+  font-family:var(--mono); font-size:.76rem; font-weight:600; color:var(--navy);
+  letter-spacing:.02em;
+}
+.bar__count span{color:var(--muted); font-weight:400}
+.bar__area{
+  font-family:var(--disp); font-weight:600; font-size:.63rem; letter-spacing:.17em;
+  text-transform:uppercase; color:var(--muted); margin-top:2px;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.dial{width:44px; height:44px; flex:none}
+.dial path{transition:stroke .3s}
+.track{height:2px; background:var(--line)}
+.track__fill{height:100%; background:var(--navy); width:0; transition:width .32s cubic-bezier(.4,0,.2,1)}
+
+/* ---------- pregunta ---------- */
+.q{padding:46px 0 90px; animation:qin .3s cubic-bezier(.2,0,.2,1)}
+@keyframes qin{from{opacity:0; transform:translateY(9px)} to{opacity:1; transform:none}}
+.q__code{
+  font-family:var(--mono); font-weight:600; font-size:.78rem; color:#fff;
+  background:var(--teal); padding:2px 8px; border-radius:3px; letter-spacing:.03em;
+}
+.q__flag{
+  font-family:var(--disp); font-size:.63rem; font-weight:600; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--n1); border:1px solid currentColor;
+  padding:2px 7px; border-radius:3px; margin-left:9px;
+}
+.q h2{
+  font-family:var(--disp); font-weight:700; font-size:clamp(1.4rem,4.4vw,2rem);
+  line-height:1.18; letter-spacing:-.02em; color:var(--navy); margin:16px 0 6px;
+}
+.q__hint{color:var(--muted); font-size:.87rem; margin:0 0 26px}
+.opts{display:grid; gap:9px}
+.opt{
+  display:grid; grid-template-columns:38px 1fr; align-items:start; gap:14px;
+  text-align:left; width:100%; background:var(--card); border:1px solid var(--line);
+  border-radius:7px; padding:15px 17px; font-size:.97rem; line-height:1.48;
+  color:var(--ink); transition:border-color .15s, box-shadow .15s, transform .15s;
+}
+.opt:hover{border-color:var(--cyan); transform:translateX(3px)}
+.opt__n{
+  font-family:var(--mono); font-weight:600; font-size:.82rem;
+  width:26px; height:26px; border-radius:50%; display:grid; place-items:center;
+  background:var(--paper); color:var(--muted); border:1px solid var(--line);
+  transition:all .15s;
+}
+.opt:hover .opt__n{border-color:var(--cyan); color:var(--teal)}
+.opt[aria-pressed=true]{
+  border-color:var(--navy); box-shadow:0 0 0 3px rgba(4,55,96,.11);
+}
+.opt[aria-pressed=true] .opt__n{background:var(--navy); border-color:var(--navy); color:#fff}
+.nav{display:flex; justify-content:space-between; align-items:center; margin-top:28px}
+.back{
+  background:none; border:none; color:var(--muted); font-size:.88rem;
+  padding:8px 0; display:inline-flex; align-items:center; gap:7px;
+}
+.back:hover{color:var(--navy)}
+.keys{font-family:var(--mono); font-size:.72rem; color:var(--muted)}
+.keys kbd{
+  background:var(--card); border:1px solid var(--line); border-bottom-width:2px;
+  border-radius:3px; padding:1px 5px; font-family:inherit; font-size:.68rem;
+}
+
+/* ---------- resultados ---------- */
+.res{padding:0 0 60px}
+.res__hero{
+  background:var(--navy); color:#fff; padding:44px 0 40px; margin-bottom:44px;
+  background-image:radial-gradient(circle at 82% -10%, rgba(47,143,160,.34), transparent 58%);
+}
+.res__hero .eyebrow{color:rgba(255,255,255,.55)}
+.res__hero h1{
+  font-family:var(--disp); font-weight:700; font-size:clamp(1.5rem,4.4vw,2.1rem);
+  letter-spacing:-.02em; margin:.3em 0 0; line-height:1.15;
+}
+.res__sub{color:rgba(255,255,255,.62); font-size:.87rem; margin:8px 0 0}
+.gauge{
+  display:flex; align-items:center; gap:clamp(20px,5vw,44px); margin-top:34px;
+  flex-wrap:wrap;
+}
+.gauge__ring{width:clamp(170px,42vw,208px); height:clamp(170px,42vw,208px); flex:none; position:relative}
+.gauge__ring svg{width:100%; height:100%; display:block}
+.gauge__ctr{
+  position:absolute; inset:0; display:grid; place-content:center; text-align:center;
+}
+.gauge__score{
+  font-family:var(--disp); font-weight:700; font-size:clamp(2.5rem,9vw,3.5rem);
+  line-height:.92; letter-spacing:-.045em; font-variant-numeric:tabular-nums;
+}
+.gauge__of{font-family:var(--mono); font-size:.68rem; color:rgba(255,255,255,.5); letter-spacing:.1em}
+.gauge__lvl{flex:1; min-width:190px}
+.gauge__lvlname{
+  font-family:var(--disp); font-weight:700; font-size:clamp(1.35rem,4.4vw,1.85rem);
+  letter-spacing:-.02em; line-height:1.1;
+}
+.gauge__lvldesc{color:rgba(255,255,255,.68); font-size:.93rem; margin-top:9px; max-width:34ch}
+.scale{list-style:none; padding:0; margin:22px 0 0; display:grid; gap:1px}
+.scale li{
+  display:flex; align-items:center; gap:11px; font-size:.78rem;
+  color:rgba(255,255,255,.44); font-family:var(--mono); padding:3px 0;
+}
+.scale li[data-on]{color:#fff}
+.scale i{width:22px; height:4px; border-radius:2px; background:currentColor; flex:none; opacity:.55}
+.scale li[data-on] i{opacity:1}
+
+h3.sect{
+  font-family:var(--disp); font-weight:700; font-size:1.15rem; color:var(--navy);
+  letter-spacing:-.012em; margin:0 0 4px; padding-top:8px;
+}
+.sect__note{color:var(--muted); font-size:.86rem; margin:0 0 22px; max-width:62ch}
+.block{margin-bottom:48px}
+
+/* barras por área */
+.ascale{display:grid; grid-template-columns:1fr 104px; gap:14px; align-items:end; margin-bottom:22px}
+.ascale__strip{position:relative; display:flex; gap:0; padding-bottom:17px}
+.ascale__strip span{
+  font-family:var(--disp); font-weight:600; font-size:.58rem; letter-spacing:.11em;
+  text-transform:uppercase; color:#fff; padding:4px 7px; white-space:nowrap;
+  overflow:hidden; text-overflow:clip; min-width:0;
+  box-shadow:inset -1px 0 0 rgba(255,255,255,.55);
+}
+.ascale__strip span:first-child{border-radius:3px 0 0 3px}
+.ascale__strip span:last-child{border-radius:0 3px 3px 0; box-shadow:none}
+.ascale__strip em{
+  position:absolute; bottom:0; transform:translateX(-50%); font-family:var(--mono);
+  font-size:.66rem; font-style:normal; color:var(--muted);
+}
+.ascale__strip em:nth-last-child(2){transform:none}
+.ascale__strip em:last-child{transform:translateX(-100%)}
+.ascale__lbl{
+  font-family:var(--disp); font-weight:600; font-size:.58rem; letter-spacing:.13em;
+  text-transform:uppercase; color:var(--muted); text-align:right; padding-bottom:17px;
+}
+.ascale__legend{display:none}
+
+.areas{display:grid; gap:2px}
+.arow{
+  display:grid; grid-template-columns:1fr 104px; gap:14px; align-items:center;
+  padding:12px 0; border-bottom:1px solid var(--line);
+}
+.arow__top{display:flex; align-items:baseline; gap:9px; margin-bottom:8px; flex-wrap:wrap}
+.arow__name{font-weight:600; font-size:.95rem; color:var(--ink)}
+.arow__w{
+  font-family:var(--mono); font-size:.68rem; color:var(--muted);
+  border:1px solid var(--line); border-radius:3px; padding:0 5px; white-space:nowrap;
+}
+.arow__q{font-family:var(--mono); font-size:.68rem; color:#9AAAB6; letter-spacing:.03em}
+.arow__bar{
+  position:relative; height:9px; background:var(--paper); border-radius:4px;
+  box-shadow:inset 0 0 0 1px var(--line);
+}
+.arow__bar .tick{
+  position:absolute; top:-2px; bottom:-2px; width:1px; background:var(--line); z-index:1;
+}
+.arow__fill{
+  position:relative; z-index:2; height:100%; border-radius:4px; width:0;
+  transition:width .8s cubic-bezier(.3,0,.2,1);
+}
+.arow__num{text-align:right; line-height:1.1}
+.arow__num b{
+  display:block; font-family:var(--disp); font-weight:700; font-size:1.42rem;
+  font-variant-numeric:tabular-nums; letter-spacing:-.035em;
+}
+.arow__num span{
+  font-family:var(--disp); font-weight:600; font-size:.56rem; letter-spacing:.11em;
+  text-transform:uppercase; opacity:.85;
+}
+
+/* avisos de coherencia */
+.warn{
+  background:#FDF8EF; border:1px solid #EBD9B4; border-left:3px solid var(--n1);
+  border-radius:6px; padding:15px 18px; margin-bottom:10px;
+}
+.warn__h{
+  font-family:var(--disp); font-weight:600; font-size:.68rem; letter-spacing:.15em;
+  text-transform:uppercase; color:#8A6420; margin-bottom:6px;
+}
+.warn p{margin:0; font-size:.92rem; color:#4A3D22}
+
+/* plan de acción */
+.plan__group{margin-bottom:30px}
+.plan__gh{
+  display:flex; align-items:center; gap:12px; margin-bottom:14px;
+  padding-bottom:9px; border-bottom:2px solid var(--navy);
+}
+.plan__gh h4{
+  font-family:var(--disp); font-weight:700; font-size:1rem; color:var(--navy);
+  margin:0; letter-spacing:-.01em;
+}
+.plan__gh span{font-family:var(--mono); font-size:.74rem; color:var(--muted)}
+.act{
+  background:var(--card); border:1px solid var(--line); border-radius:8px;
+  padding:19px 21px; margin-bottom:11px; box-shadow:var(--sh);
+  display:grid; grid-template-columns:30px 1fr; gap:16px;
+}
+.act__rank{
+  font-family:var(--disp); font-weight:700; font-size:1.32rem; color:var(--cyan);
+  line-height:1; letter-spacing:-.04em;
+}
+.act__top{display:flex; align-items:center; gap:9px; flex-wrap:wrap; margin-bottom:9px}
+.act__code{
+  font-family:var(--mono); font-weight:600; font-size:.7rem; color:#fff;
+  background:var(--teal); padding:2px 7px; border-radius:3px;
+}
+.act__q{font-weight:600; font-size:.95rem; color:var(--navy)}
+.act__ans{
+  font-size:.8rem; color:var(--muted); margin:0 0 11px; padding-left:11px;
+  border-left:2px solid var(--line); font-style:italic;
+}
+.act__do{margin:0 0 14px; font-size:.95rem; line-height:1.55}
+.act__meta{
+  display:flex; flex-wrap:wrap; gap:0 22px; padding-top:12px;
+  border-top:1px solid var(--line);
+}
+.act__meta div{font-size:.78rem}
+.act__meta dt{
+  font-family:var(--disp); font-weight:600; font-size:.6rem; letter-spacing:.13em;
+  text-transform:uppercase; color:var(--muted); margin-bottom:1px;
+}
+.act__meta dd{margin:0; font-weight:500; color:var(--ink); text-transform:capitalize}
+
+.empty{
+  border:1px dashed var(--line); border-radius:8px; padding:26px 24px;
+  background:var(--card);
+}
+.empty h4{
+  font-family:var(--disp); font-weight:700; font-size:1rem; color:var(--navy);
+  margin:0 0 8px; letter-spacing:-.01em;
+}
+.empty p{margin:0; font-size:.92rem; color:var(--muted); max-width:58ch}
+
+/* respuestas registradas */
+details.log{border-top:1px solid var(--line)}
+details.log summary{
+  padding:15px 0; font-family:var(--disp); font-weight:600; font-size:.92rem;
+  color:var(--navy); cursor:pointer; list-style:none; display:flex;
+  justify-content:space-between; align-items:center;
+}
+details.log summary::-webkit-details-marker{display:none}
+details.log summary::after{content:"+"; font-family:var(--mono); color:var(--cyan); font-size:1.2rem}
+details.log[open] summary::after{content:"–"}
+.log__t{width:100%; border-collapse:collapse; font-size:.86rem; margin-bottom:18px}
+.log__t td{padding:8px 10px 8px 0; border-bottom:1px solid var(--line); vertical-align:top}
+.log__t td:first-child{font-family:var(--mono); font-size:.74rem; color:var(--muted); width:38px}
+.log__t td:last-child{width:30px; text-align:right; font-family:var(--mono); font-weight:600}
+
+.actions{display:flex; gap:11px; flex-wrap:wrap; margin-top:8px}
+.btn{
+  border:1px solid var(--navy); background:var(--card); color:var(--navy);
+  border-radius:6px; padding:12px 20px; font-family:var(--disp); font-weight:600;
+  font-size:.88rem; transition:all .16s;
+}
+.btn:hover{background:var(--navy); color:#fff}
+.btn--ghost{border-color:var(--line); color:var(--muted)}
+.btn--ghost:hover{background:var(--paper); color:var(--navy); border-color:var(--muted)}
+
+.foot{
+  border-top:1px solid var(--line); margin-top:16px; padding:32px 0 0;
+  display:flex; gap:26px; align-items:flex-start; flex-wrap:wrap;
+}
+.foot img{width:150px; height:auto; flex:none; opacity:.9}
+.foot p{margin:0; font-size:.78rem; color:var(--muted); max-width:52ch; line-height:1.6}
+
+/* ---------- responsive ---------- */
+@media (max-width:620px){
+  .form{grid-template-columns:1fr}
+  .opt{grid-template-columns:32px 1fr; gap:11px; padding:13px 14px; font-size:.93rem}
+  .dial{width:38px; height:38px}
+  .act{grid-template-columns:1fr; gap:8px}
+  .act__rank{font-size:1.1rem}
+  .keys{display:none}
+  .intro__body{padding:34px 0 30px}
+  .ascale{grid-template-columns:1fr; gap:0; margin-bottom:14px}
+  .ascale__strip span{font-size:0; padding:0; height:6px}
+  .ascale__strip{padding-bottom:16px}
+  .ascale__lbl{display:none}
+  .ascale__legend{
+    display:flex; flex-wrap:wrap; gap:4px 15px; margin-bottom:18px;
+  }
+  .ascale__legend span{
+    display:inline-flex; align-items:center; gap:6px; font-family:var(--disp);
+    font-weight:600; font-size:.6rem; letter-spacing:.09em; text-transform:uppercase;
+    color:var(--muted);
+  }
+  .ascale__legend i{width:11px; height:11px; border-radius:2px; flex:none}
+  .arow{grid-template-columns:1fr 74px; gap:11px}
+  .arow__q{display:none}
+  .arow__num b{font-size:1.2rem}
+  .arow__num span{font-size:.52rem; letter-spacing:.08em}
+}
+
+/* ---------- movimiento reducido ---------- */
+@media (prefers-reduced-motion:reduce){
+  *{animation:none !important; transition:none !important}
+  .gauge__ring path{stroke-dashoffset:0 !important}
+}
+
+/* ---------- volver / contacto ---------- */
+.topback{
+  display:inline-flex; align-items:center; gap:7px; text-decoration:none;
+  font-family:var(--disp); font-weight:600; font-size:.78rem; color:var(--muted);
+  padding:6px 0; margin-bottom:22px; transition:color .15s;
+}
+.topback:hover{color:var(--navy)}
+.topback svg{flex:none}
+.bar__back{
+  display:inline-flex; align-items:center; justify-content:center; flex:none;
+  width:30px; height:30px; border-radius:6px; text-decoration:none;
+  color:var(--muted); border:1px solid var(--line); background:var(--card);
+  transition:color .15s, border-color .15s;
+}
+.bar__back:hover{color:var(--navy); border-color:var(--muted)}
+
+.next{
+  background:var(--navy); color:#fff; border-radius:9px; padding:28px 30px;
+  margin-top:26px;
+  background-image:radial-gradient(circle at 88% -20%, rgba(47,143,160,.38), transparent 62%);
+}
+.next__t{
+  font-family:var(--disp); font-weight:700; font-size:1.12rem;
+  letter-spacing:-.015em; margin-bottom:9px;
+}
+.next p{margin:0 0 18px; font-size:.93rem; line-height:1.6; color:rgba(255,255,255,.8); max-width:58ch}
+.next__links{display:flex; flex-wrap:wrap; gap:10px}
+.next__links a{
+  display:inline-flex; align-items:center; gap:9px; text-decoration:none;
+  border:1px solid rgba(255,255,255,.3); border-radius:6px; padding:11px 17px;
+  font-family:var(--disp); font-weight:600; font-size:.86rem; color:#fff;
+  transition:background .16s, border-color .16s;
+}
+.next__links a:hover{background:rgba(255,255,255,.12); border-color:rgba(255,255,255,.6)}
+.next__links a svg{flex:none; opacity:.8}
+@media (max-width:520px){
+  .next{padding:24px 21px}
+  .next__links{flex-direction:column}
+  .next__links a{justify-content:center}
+}
+
+/* ---------- impresión ---------- */
+@media print{
+  @page{margin:14mm}
+  body{background:#fff; font-size:10.5pt}
+  *{-webkit-print-color-adjust:exact !important; print-color-adjust:exact !important}
+  .bar,.actions,.keys,.nav,.topback,.bar__back{display:none !important}
+  .next{
+    background:#fff !important; color:var(--ink); border:1px solid var(--line);
+    border-left:3px solid var(--navy); border-radius:0; padding:16px 18px;
+    break-inside:avoid;
+  }
+  .next__t{color:var(--navy)}
+  .next p{color:var(--muted); margin-bottom:8px}
+  .next__links{gap:0 18px}
+  .next__links a{
+    border:none; padding:0; color:var(--navy); font-size:.85rem;
+  }
+  .next__links a svg{display:none}
+  .res__hero{
+    background:#fff !important; color:var(--ink); padding:0 0 22px;
+    border-bottom:3px solid var(--navy); margin-bottom:28px;
+  }
+  .res__hero .eyebrow{color:var(--cyan)}
+  .res__sub{color:var(--muted)}
+  .gauge__of,.gauge__lvldesc{color:var(--muted)}
+  .scale li{color:#999}
+  .scale li[data-on]{color:var(--navy)}
+  .act,.warn,.block{break-inside:avoid; box-shadow:none}
+  details.log{display:none}
+  .wrap{max-width:none; padding:0}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ INICIO ============ -->
+<section id="intro" class="intro">
+  <div class="intro__body"><div class="wrap">
+    <a class="topback" href="/">
+      <svg width="15" height="10" viewBox="0 0 15 10" fill="none" aria-hidden="true">
+        <path d="M14 5H1M5 1 1 5l4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Volver a Criterya
+    </a>
+    <img class="intro__logo" src="data:image/png;base64,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" alt="Criterya · Consultora de gestión empresarial">
+    <div class="eyebrow">Diagnóstico de gestión · Distribuidora</div>
+    <h1>Dónde está parada su empresa, en 18 preguntas</h1>
+    <p class="intro__lead">
+      Cada pregunta tiene cuatro respuestas posibles. Elija la que describe cómo se trabaja
+      hoy, no la que debería ser: el resultado vale en la medida en que refleje la práctica real.
+    </p>
+    <ul class="facts">
+      <li><b>6–8 min</b><span>Dieciocho preguntas, una por pantalla.</span></li>
+      <li><b>8 áreas</b><span>Cada una pesa distinto según su incidencia en una distribuidora.</span></li>
+      <li><b>5 acciones</b><span>El resultado incluye las medidas de mayor impacto sobre las brechas detectadas.</span></li>
+    </ul>
+    <div class="form">
+      <div class="field">
+        <label for="f-emp">Empresa</label>
+        <input id="f-emp" type="text" placeholder="Opcional" autocomplete="organization">
+      </div>
+      <div class="field">
+        <label for="f-per">Quién responde</label>
+        <input id="f-per" type="text" placeholder="Nombre y cargo (opcional)" autocomplete="name">
+      </div>
+      <div class="rubros" role="group" aria-label="Rubro de la empresa">
+        <button class="rubro" type="button" aria-pressed="true">Distribuidora</button>
+        <button class="rubro" type="button" disabled>Comercio <small>en preparación</small></button>
+        <button class="rubro" type="button" disabled>Industria <small>en preparación</small></button>
+      </div>
+    </div>
+    <button id="start" class="cta" type="button">
+      Comenzar el diagnóstico
+      <svg width="17" height="11" viewBox="0 0 17 11" fill="none" aria-hidden="true">
+        <path d="M1 5.5h14M11 1l4.5 4.5L11 10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <p class="note">
+      Las respuestas se procesan en este dispositivo y no se envían a ningún servidor.
+      Al terminar puede imprimir el resultado o guardarlo en PDF.
+    </p>
+  </div></div>
+</section>
+
+<!-- ============ CUESTIONARIO ============ -->
+<div id="quiz" class="hidden">
+  <div class="bar">
+    <div class="bar__in">
+      <img class="bar__mark" src="data:image/png;base64,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" alt="Criterya">
+      <div class="bar__meta">
+        <div class="bar__count mono" id="q-count"></div>
+        <div class="bar__area" id="q-area"></div>
+      </div>
+      <svg class="dial" id="q-dial" viewBox="0 0 100 100" aria-hidden="true"></svg>
+      <a class="bar__back" href="/" title="Salir del diagnóstico y volver al inicio" aria-label="Salir del diagnóstico y volver al inicio">
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+          <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+        </svg>
+      </a>
+    </div>
+    <div class="track"><div class="track__fill" id="q-track"></div></div>
+  </div>
+  <div class="wrap">
+    <div class="q" id="q-body"></div>
+  </div>
+</div>
+
+<!-- ============ RESULTADOS ============ -->
+<div id="res" class="res hidden"></div>
+
+<script>
+const DATA = {
+ "preguntas": {
+  "A1": {
+   "cod": "A1",
+   "titulo": "Metas y planificación",
+   "nota": null,
+   "opciones": [
+    {
+     "nivel": 0,
+     "texto": "No tenemos metas escritas; vamos resolviendo el día a día."
+    },
+    {
+     "nivel": 1,
+     "texto": "Tengo las metas en la cabeza, pero no están escritas ni compartidas con el equipo."
+    },
+    {
+     "nivel": 2,
+     "texto": "Hay metas anuales de venta escritas y comunicadas al equipo."
+    },
+    {
+     "nivel": 3,
+     "texto": "Metas anuales por área, con seguimiento mensual y corrección de desvíos."
+    }
+   ]
+  },
+  "A2": {
+   "cod": "A2",
+   "titulo": "Dependencia del dueño",
+   "nota": null,
+   "opciones": [
+    {
+     "nivel": 0,
+     "texto": "Si falto una semana, el negocio se frena."
+    },
+    {
+     "nivel": 1,
+     "texto": "Puedo faltar una semana, pero al volver tengo que resolver todo lo que quedó pendiente."
+    },
+    {
+     "nivel": 2,
+     "texto": "Hay responsables por área que deciden dentro de su alcance sin consultarme."
+    },
+    {
+     "nivel": 3,
+     "texto": "El negocio opera sin mí; yo dedico mi tiempo a decisiones de mediano plazo."
+    }
+   ]
+  },
+  "B1": {
+   "cod": "B1",
+   "titulo": "Conocimiento de la cartera",
+   "nota": null,
+   "opciones": [
+    {
+     "nivel": 0,
+     "texto": "No sé qué porcentaje de mi facturación hacen mis 10 mejores clientes."
+    },
+    {
+     "nivel": 1,
+     "texto": "Lo sé de forma aproximada, pero no lo mido."
+    },
+    {
+     "nivel": 2,
+     "texto": "Lo mido y conozco mi nivel de concentración de ventas."
+    },
+    {
+     "nivel": 3,
+     "texto": "Lo mido y tengo acciones concretas para clientes clave y para reducir la concentración."
+    }
+   ]
+  },
+  "B2": {
+   "cod": "B2",
+   "titulo": "Gestión de la venta",
+   "nota": null,
+   "opciones": [
+    {
+     "nivel": 0,
+     "texto": "Vendemos a quien viene o llama; no salimos a buscar clientes."
+    },
+    {
+     "nivel": 1,
+     "texto": "Tenemos vendedores, pero sin objetivos ni recorrido definido."
+    },
+    {
+     "nivel": 2,
+     "texto": "Vendedores con cartera asignada y objetivos de venta."
+    },
+    {
+     "nivel": 3,
+     "texto": "Cartera con objetivos, seguimiento de clientes inactivos y registro de visitas/contactos."
+    }
+   ]
+  },
+  "C1": {
+   "cod": "C1",
+   "titulo": "Resultado mensual",
+   "nota": "pregunta factual",
+   "opciones": [
+    {
+     "nivel": 0,
+     "texto": "Me entero del resultado cuando lo informa el contador, meses después."
+    },
+    {
+     "nivel": 1,
+     "texto": "Lo estimo mirando el movimiento de caja y de banco."
+    },
+    {
+     "nivel": 2,
+     "texto": "Tengo resultado mensual, pero lo cierro con más de 30 días de atraso."
+    },
+    {
+     "nivel": 3,
+     "texto": "Cierro el mes en menos de 15 días y lo comparo contra el mes y el año anterior."
+    }
+   ]
+  },
+  "C2": {
+   "cod": "C2",
+   "titulo": "Cobranza y capital de trabajo",
+   "nota": null,
+   "opciones": [
+    {
+     "nivel": 0,
+     "texto": "No sé con precisión cuánto tengo en la calle ni cuál es mi mora."
+    },
+    {
+     "nivel": 1,
+     "texto": "Sé el total a cobrar, pero no su antigüedad."
+    },
+    {
+     "nivel": 2,
+     "texto": "Tengo deuda por cliente y antigüedad; reclamo cuando el problema ya apareció."
+    },
+    {
+     "nivel": 3,
+     "texto": "Control de vencimientos, límite de crédito por cliente y gestión preventiva de la mora."
+    }
+   ]
+  },
+  "D1": {
+   "cod": "D1",
+   "titulo": "Roles y responsabilidades",
+   "nota": null,
+   "opciones": [
+    {
+     "nivel": 0,
+     "texto": "Cada uno hace lo que hace falta; no hay funciones definidas."
+    },
+    {
+     "nivel": 1,
+     "texto": "Están claras por costumbre, pero no escritas."
+    },
+    {
+     "nivel": 2,
+     "texto": "Hay funciones escritas por puesto."
+    },
+    {
+     "nivel": 3,
+     "texto": "Funciones escritas y evaluación periódica de desempeño."
+    }
+   ]
+  },
+  "D2": {
+   "cod": "D2",
+   "titulo": "Formación técnica del personal",
+   "nota": null,
+   "opciones": [
+    {
+     "nivel": 0,
+     "texto": "El personal aprende sobre la marcha, sin formación en producto."
+    },
+    {
+     "nivel": 1,
+     "texto": "La formación es informal: los más antiguos le enseñan a los nuevos."
+    },
+    {
+     "nivel": 2,
+     "texto": "Aprovechamos las capacitaciones de proveedores cuando se ofrecen."
+    },
+    {
+     "nivel": 3,
+     "texto": "Plan de formación propio, con registro de quién se capacitó en qué."
+    }
+   ]
+  },
+  "E1": {
+   "cod": "E1",
+   "titulo": "Sistema de gestión",
+   "nota": null,
+   "opciones": [
+    {
+     "nivel": 0,
+     "texto": "Facturación por un lado y planillas de Excel sueltas por otro."
+    },
+    {
+     "nivel": 1,
+     "texto": "Tenemos sistema de facturación, pero stock y cuentas corrientes no siempre coinciden."
+    },
+    {
+     "nivel": 2,
+     "texto": "Sistema integrado (ventas, stock, cuentas corrientes) y confiable."
+    },
+    {
+     "nivel": 3,
+     "texto": "Sistema integrado más reportes de gestión que efectivamente uso para decidir."
+    }
+   ]
+  },
+  "E2": {
+   "cod": "E2",
+   "titulo": "Indicadores",
+   "nota": null,
+   "opciones": [
+    {
+     "nivel": 0,
+     "texto": "No miramos indicadores."
+    },
+    {
+     "nivel": 1,
+     "texto": "Miramos la facturación del mes."
+    },
+    {
+     "nivel": 2,
+     "texto": "Tenemos un tablero de 5 a 10 indicadores que se revisa mensualmente."
+    },
+    {
+     "nivel": 3,
+     "texto": "Tablero por área con metas, revisado en reunión periódica con los responsables."
+    }
+   ]
+  },
+  "F1": {
+   "cod": "F1",
+   "titulo": "Procedimientos",
+   "nota": null,
+   "opciones": [
+    {
+     "nivel": 0,
+     "texto": "Todo depende de quién esté; no hay procedimientos escritos."
+    },
+    {
+     "nivel": 1,
+     "texto": "Hay algunos instructivos, pero desactualizados."
+    },
+    {
+     "nivel": 2,
+     "texto": "Los procesos críticos están documentados (venta, compra, cobranza, despacho)."
+    },
+    {
+     "nivel": 3,
+     "texto": "Documentados, actualizados y con controles cruzados entre personas distintas."
+    }
+   ]
+  },
+  "F2": {
+   "cod": "F2",
+   "titulo": "Separación de funciones",
+   "nota": null,
+   "opciones": [
+    {
+     "nivel": 0,
+     "texto": "La misma persona vende, cobra, registra y controla la caja."
+    },
+    {
+     "nivel": 1,
+     "texto": "Hay control de caja, pero lo hace quien la maneja."
+    },
+    {
+     "nivel": 2,
+     "texto": "El arqueo lo hace una persona distinta de quien cobra."
+    },
+    {
+     "nivel": 3,
+     "texto": "Separación de funciones y revisión periódica documentada."
+    }
+   ]
+  },
+  "G1": {
+   "cod": "G1",
+   "titulo": "Exactitud de stock",
+   "nota": "pregunta factual",
+   "opciones": [
+    {
+     "nivel": 0,
+     "texto": "El sistema y el depósito no coinciden; no hacemos inventario."
+    },
+    {
+     "nivel": 1,
+     "texto": "Hacemos inventario general una vez al año y aparecen diferencias importantes."
+    },
+    {
+     "nivel": 2,
+     "texto": "Hacemos inventarios rotativos periódicos y las diferencias son acotadas."
+    },
+    {
+     "nivel": 3,
+     "texto": "Inventarios rotativos, análisis de causa de las diferencias y corrección del proceso."
+    }
+   ]
+  },
+  "G2": {
+   "cod": "G2",
+   "titulo": "Capital inmovilizado en stock",
+   "nota": null,
+   "opciones": [
+    {
+     "nivel": 0,
+     "texto": "No sé qué porcentaje de mi stock no tuvo movimiento en los últimos 12 meses."
+    },
+    {
+     "nivel": 1,
+     "texto": "Sé que tengo material dormido, pero no lo tengo cuantificado."
+    },
+    {
+     "nivel": 2,
+     "texto": "Tengo el stock clasificado por rotación (ABC)."
+    },
+    {
+     "nivel": 3,
+     "texto": "Clasificación ABC, política de reposición por categoría y acciones sobre el obsoleto."
+    }
+   ]
+  },
+  "G3": {
+   "cod": "G3",
+   "titulo": "Reposición y quiebres",
+   "nota": null,
+   "opciones": [
+    {
+     "nivel": 0,
+     "texto": "Compro cuando veo que falta o cuando el cliente me lo pide."
+    },
+    {
+     "nivel": 1,
+     "texto": "Reviso el depósito a ojo y armo el pedido."
+    },
+    {
+     "nivel": 2,
+     "texto": "Uso puntos de pedido en el sistema para los artículos principales."
+    },
+    {
+     "nivel": 3,
+     "texto": "Puntos de pedido ajustados por estacionalidad y plazo de entrega, y mido venta perdida por faltante."
+    }
+   ]
+  },
+  "G4": {
+   "cod": "G4",
+   "titulo": "Política de precios y descuentos",
+   "nota": null,
+   "opciones": [
+    {
+     "nivel": 0,
+     "texto": "Fijo precio aplicando un margen general sobre la lista del proveedor."
+    },
+    {
+     "nivel": 1,
+     "texto": "Uso márgenes distintos por rubro, definidos hace tiempo."
+    },
+    {
+     "nivel": 2,
+     "texto": "Reviso los márgenes por línea periódicamente, según competencia y rotación."
+    },
+    {
+     "nivel": 3,
+     "texto": "Política de precios por línea más control de los descuentos que autoriza cada vendedor."
+    }
+   ]
+  },
+  "G5": {
+   "cod": "G5",
+   "titulo": "Gestión de proveedores",
+   "nota": null,
+   "opciones": [
+    {
+     "nivel": 0,
+     "texto": "Compro a precio de lista, sin acuerdos negociados."
+    },
+    {
+     "nivel": 1,
+     "texto": "Tengo descuentos negociados, pero no controlo si se cumplen."
+    },
+    {
+     "nivel": 2,
+     "texto": "Tengo acuerdos con escalas de descuento o rebate y controlo su cumplimiento."
+    },
+    {
+     "nivel": 3,
+     "texto": "Además mido rentabilidad por proveedor, incluyendo rebate y costo financiero del plazo."
+    }
+   ]
+  },
+  "G6": {
+   "cod": "G6",
+   "titulo": "Logística de entrega",
+   "nota": null,
+   "opciones": [
+    {
+     "nivel": 0,
+     "texto": "Entregamos como se puede; no medimos costo ni cumplimiento."
+    },
+    {
+     "nivel": 1,
+     "texto": "Reparto con recorrido fijo, sin medir el costo por entrega."
+    },
+    {
+     "nivel": 2,
+     "texto": "Recorridos planificados y conocemos el costo de reparto."
+    },
+    {
+     "nivel": 3,
+     "texto": "Medimos costo por entrega y por zona, y el cumplimiento del plazo prometido."
+    }
+   ]
+  }
+ },
+ "fichas": {
+  "G1-0": {
+   "cod": "G1",
+   "nivel": 0,
+   "eco": "el sistema y el depósito no coinciden; no hacemos inventario",
+   "accion": "Antes de encarar un inventario general, dimensionar el problema: contar físicamente una sola familia —la de mayor facturación— y comparar contra el saldo del sistema. Valorizar la diferencia a costo y calcular el porcentaje de error. Ese número define si lo que sigue es un ajuste puntual o una recuperación completa del inventario.",
+   "responsable": "encargado de depósito + administración",
+   "plazo": "30 días",
+   "esfuerzo": "medio",
+   "impacto": "alto"
+  },
+  "G1-1": {
+   "cod": "G1",
+   "nivel": 1,
+   "eco": "inventario general anual con diferencias importantes",
+   "accion": "Reemplazar el inventario anual por conteos cíclicos: 20 a 30 códigos de clase A por semana. El objetivo no es corregir el saldo sino identificar la causa de cada diferencia (error de carga, remito no facturado, unidad de medida mal definida, picking equivocado, faltante). El inventario anual detecta el síntoma tarde; el conteo cíclico lo detecta cuando la causa todavía es rastreable.",
+   "responsable": "encargado de depósito",
+   "plazo": "45 días",
+   "esfuerzo": "medio",
+   "impacto": "alto"
+  },
+  "G1-2": {
+   "cod": "G1",
+   "nivel": 2,
+   "eco": "inventarios rotativos con diferencias acotadas",
+   "accion": "Registrar la causa de cada diferencia en una planilla con categorías fijas y revisar mensualmente cuál concentra más casos. La corrección tiene que ir al proceso, no al saldo: si el 60% de las diferencias son de unidad de medida, el problema está en la carga de artículos, no en el depósito.",
+   "responsable": "encargado de depósito",
+   "plazo": "60 días",
+   "esfuerzo": "bajo",
+   "impacto": "medio"
+  },
+  "G2-0": {
+   "cod": "G2",
+   "nivel": 0,
+   "eco": "no sé qué porcentaje de mi stock no rotó",
+   "accion": "Extraer del sistema el listado de artículos sin movimiento en los últimos 12 meses y valorizarlo a costo. Objetivo: cuantificar el capital inmovilizado antes de decidir qué hacer con él.",
+   "responsable": "administración",
+   "plazo": "15 días",
+   "esfuerzo": "bajo",
+   "impacto": "alto"
+  },
+  "G2-1": {
+   "cod": "G2",
+   "nivel": 1,
+   "eco": "sé que tengo material dormido, no lo tengo cuantificado",
+   "accion": "Valorizar el stock dormido y expresarlo de dos formas: como porcentaje del stock total y como equivalente en días de venta. Definir un umbral de tolerancia y una meta de reducción a 6 meses. Mientras el inmovilizado no tenga un número asociado, no compite con ninguna otra decisión de uso del capital.",
+   "responsable": "dueño + administración",
+   "plazo": "30 días",
+   "esfuerzo": "bajo",
+   "impacto": "alto"
+  },
+  "G2-2": {
+   "cod": "G2",
+   "nivel": 2,
+   "eco": "tengo el stock clasificado por rotación",
+   "accion": "Convertir la clasificación ABC en política de reposición diferenciada: los A con reposición frecuente y stock de seguridad, los B con reposición programada, los C contra pedido o sin stock. Definir en paralelo el canal de salida del obsoleto: devolución al proveedor, promoción, traslado a otra boca de la red o descarte contable.",
+   "responsable": "dueño + compras",
+   "plazo": "90 días",
+   "esfuerzo": "medio",
+   "impacto": "alto"
+  },
+  "G3-0": {
+   "cod": "G3",
+   "nivel": 0,
+   "eco": "compro cuando veo que falta",
+   "accion": "Definir puntos de pedido para los 50 artículos de mayor venta, con un cálculo simple: venta promedio semanal × semanas de plazo de entrega del proveedor, más una semana de seguridad. No requiere sistema; se puede sostener en planilla hasta que el criterio esté probado.",
+   "responsable": "compras",
+   "plazo": "30 días",
+   "esfuerzo": "bajo",
+   "impacto": "alto"
+  },
+  "G3-1": {
+   "cod": "G3",
+   "nivel": 1,
+   "eco": "reviso el depósito a ojo y armo el pedido",
+   "accion": "Cargar los puntos de pedido en el sistema para que la sugerencia de compra se genere sola, empezando por las tres familias de mayor rotación. La recorrida visual del depósito detecta lo que está vacío, no lo que está por vaciarse.",
+   "responsable": "compras + sistemas",
+   "plazo": "60 días",
+   "esfuerzo": "medio",
+   "impacto": "alto"
+  },
+  "G3-2": {
+   "cod": "G3",
+   "nivel": 2,
+   "eco": "uso puntos de pedido en los artículos principales",
+   "accion": "Empezar a registrar la venta perdida por faltante: una planilla en mostrador donde se anote código y cantidad que no se pudo vender. Con dos o tres meses de registro se corrigen los puntos de pedido con datos reales y aparecen los quiebres que hoy son invisibles porque el cliente no vuelve a pedir lo que ya sabe que no hay. Ajustar además los puntos de pedido por estacionalidad y por plazo real de entrega de cada proveedor.",
+   "responsable": "mostrador + compras",
+   "plazo": "90 días",
+   "esfuerzo": "medio",
+   "impacto": "alto"
+  },
+  "G4-0": {
+   "cod": "G4",
+   "nivel": 0,
+   "eco": "margen general único sobre la lista del proveedor",
+   "accion": "Separar el margen por familia de producto. Agrupar en cuatro o cinco familias y asignar margen según rotación y exposición competitiva: los artículos marcadores de precio, los que el cliente compara antes de comprar, soportan menos margen que los accesorios de baja comparabilidad. Un margen único deja plata sobre la mesa en unos y saca competitividad en otros.",
+   "responsable": "dueño",
+   "plazo": "30 días",
+   "esfuerzo": "bajo",
+   "impacto": "alto"
+  },
+  "G4-1": {
+   "cod": "G4",
+   "nivel": 1,
+   "eco": "márgenes por rubro definidos hace tiempo",
+   "accion": "Recalcular los márgenes vigentes contra el costo de reposición actual y no contra el costo de compra histórico. Fijar además una frecuencia de revisión de precios atada a la del proveedor: si la lista del proveedor se actualiza y la propia no, el margen se licúa sin que nada lo indique.",
+   "responsable": "dueño + administración",
+   "plazo": "30 días",
+   "esfuerzo": "medio",
+   "impacto": "alto"
+  },
+  "G4-2": {
+   "cod": "G4",
+   "nivel": 2,
+   "eco": "reviso los márgenes por línea periódicamente",
+   "accion": "Implementar control de descuentos por vendedor: reporte mensual de descuento promedio otorgado y margen resultante, por vendedor y por cliente. Definir topes autorizados y qué casos requieren aprobación. La política de precios se define en la lista, pero se define de nuevo en cada operación cuando el descuento no tiene límite.",
+   "responsable": "dueño + sistemas",
+   "plazo": "60 días",
+   "esfuerzo": "medio",
+   "impacto": "alto"
+  },
+  "G5-0": {
+   "cod": "G5",
+   "nivel": 0,
+   "eco": "compro a precio de lista, sin acuerdos",
+   "accion": "Consolidar la compra anual por proveedor y usarla como base de negociación: pedir escala de descuento por volumen y condiciones de pago. Un proveedor que ve el volumen agregado del año negocia distinto que frente a un pedido aislado.",
+   "responsable": "dueño",
+   "plazo": "45 días",
+   "esfuerzo": "bajo",
+   "impacto": "alto"
+  },
+  "G5-1": {
+   "cod": "G5",
+   "nivel": 1,
+   "eco": "tengo descuentos negociados, no controlo si se cumplen",
+   "accion": "Armar un control de cumplimiento: por cada acuerdo, registrar el descuento pactado y verificarlo contra el efectivamente aplicado en factura. Los incumplimientos por escala mal aplicada o rebate no liquidado son frecuentes y no se detectan sin este cruce. Un acuerdo sin control es una expectativa.",
+   "responsable": "administración + compras",
+   "plazo": "45 días",
+   "esfuerzo": "medio",
+   "impacto": "alto"
+  },
+  "G5-2": {
+   "cod": "G5",
+   "nivel": 2,
+   "eco": "acuerdos con escalas y control de cumplimiento",
+   "accion": "Incorporar el costo financiero del plazo a la comparación entre proveedores. Un precio 5% mayor a 60 días puede resultar mejor que el más barato al contado. Armar la comparativa expresando todas las ofertas a valor contado equivalente e incluyendo el rebate esperado.",
+   "responsable": "dueño + administración",
+   "plazo": "60 días",
+   "esfuerzo": "medio",
+   "impacto": "medio"
+  },
+  "G6-0": {
+   "cod": "G6",
+   "nivel": 0,
+   "eco": "entregamos como se puede; no medimos costo ni cumplimiento",
+   "accion": "Empezar por el registro: planilla con fecha de pedido, fecha de entrega y zona para cada envío. Sin ese dato no hay forma de saber si el problema es de costo, de capacidad del vehículo o de organización del recorrido.",
+   "responsable": "depósito",
+   "plazo": "30 días",
+   "esfuerzo": "bajo",
+   "impacto": "medio"
+  },
+  "G6-1": {
+   "cod": "G6",
+   "nivel": 1,
+   "eco": "recorrido fijo, sin medir el costo por entrega",
+   "accion": "Calcular el costo mensual del reparto —combustible, mantenimiento, amortización del vehículo, sueldo del chofer— y dividirlo por cantidad de entregas y por zona. Con ese número se puede decidir mínimo de facturación para entrega sin cargo, tercerización o cargo diferenciado por zona.",
+   "responsable": "administración",
+   "plazo": "45 días",
+   "esfuerzo": "medio",
+   "impacto": "alto"
+  },
+  "G6-2": {
+   "cod": "G6",
+   "nivel": 2,
+   "eco": "recorridos planificados y costo conocido",
+   "accion": "Medir el cumplimiento del plazo prometido: porcentaje de entregas realizadas en la fecha comprometida. Es el indicador de servicio que el cliente efectivamente percibe y suele explicar pérdidas de cartera que se atribuyen a precio.",
+   "responsable": "depósito + comercial",
+   "plazo": "60 días",
+   "esfuerzo": "bajo",
+   "impacto": "alto"
+  },
+  "A1-0": {
+   "cod": "A1",
+   "nivel": 0,
+   "eco": "no tenemos metas escritas",
+   "accion": "Fijar una única meta anual de facturación, desagregada por mes, escrita y comunicada. No hace falta un plan completo: una meta con seguimiento mensual ya cambia la conversación del \"cómo venimos\" al \"cuánto falta\".",
+   "responsable": "dueño",
+   "plazo": "30 días",
+   "esfuerzo": "bajo",
+   "impacto": "alto"
+  },
+  "A1-1": {
+   "cod": "A1",
+   "nivel": 1,
+   "eco": "las metas están en mi cabeza",
+   "accion": "Escribirlas y bajarlas a objetivos por área: facturación para comercial, mora máxima para administración, nivel de servicio para depósito. Una meta que sólo conoce el dueño no orienta ninguna decisión de los demás.",
+   "responsable": "dueño",
+   "plazo": "30 días",
+   "esfuerzo": "bajo",
+   "impacto": "alto"
+  },
+  "A1-2": {
+   "cod": "A1",
+   "nivel": 2,
+   "eco": "metas anuales escritas y comunicadas",
+   "accion": "Instalar una reunión mensual de seguimiento con los responsables de área: real contra meta, desvío identificado y corrección acordada. Media hora con agenda fija. El valor no está en la meta sino en la corrección temprana.",
+   "responsable": "dueño",
+   "plazo": "60 días",
+   "esfuerzo": "bajo",
+   "impacto": "alto"
+  },
+  "A2-0": {
+   "cod": "A2",
+   "nivel": 0,
+   "eco": "si falto una semana, el negocio se frena",
+   "accion": "Identificar las tres decisiones que hoy sólo puede tomar el dueño y que frenan la operación cuando no está —autorizar un descuento, habilitar una venta a cuenta corriente, aprobar una compra— y definir para cada una un criterio escrito con un límite dentro del cual otra persona pueda resolver.",
+   "responsable": "dueño",
+   "plazo": "45 días",
+   "esfuerzo": "bajo",
+   "impacto": "alto"
+  },
+  "A2-1": {
+   "cod": "A2",
+   "nivel": 1,
+   "eco": "puedo faltar, pero al volver resuelvo todo lo acumulado",
+   "accion": "Delegar decisión y no sólo tarea: cada área debería tener definido qué resuelve sola, qué resuelve e informa, y qué consulta antes. La acumulación de pendientes durante la ausencia indica que se delegó la ejecución pero no el criterio.",
+   "responsable": "dueño",
+   "plazo": "60 días",
+   "esfuerzo": "medio",
+   "impacto": "alto"
+  },
+  "A2-2": {
+   "cod": "A2",
+   "nivel": 2,
+   "eco": "hay responsables por área que deciden en su alcance",
+   "accion": "Pasar de responsables operativos a responsables con indicadores: dos o tres métricas propias por área y autonomía para actuar sobre ellas. Es el paso que libera el tiempo del dueño hacia las decisiones de mediano plazo.",
+   "responsable": "dueño",
+   "plazo": "90 días",
+   "esfuerzo": "medio",
+   "impacto": "alto"
+  },
+  "B1-0": {
+   "cod": "B1",
+   "nivel": 0,
+   "eco": "no sé qué porcentaje hacen mis 10 mejores clientes",
+   "accion": "Extraer el ranking de clientes por facturación de los últimos 12 meses y calcular qué porcentaje representan los primeros 10 y los primeros 20. Es un cálculo de una hora que suele modificar la percepción del riesgo del negocio.",
+   "responsable": "administración",
+   "plazo": "15 días",
+   "esfuerzo": "bajo",
+   "impacto": "alto"
+  },
+  "B1-1": {
+   "cod": "B1",
+   "nivel": 1,
+   "eco": "lo sé de forma aproximada",
+   "accion": "Convertir el dato en seguimiento: ranking mensual con variación contra el mismo período del año anterior. Permite detectar la caída de un cliente importante cuando todavía se puede actuar, en lugar de descubrirla al cierre del ejercicio.",
+   "responsable": "administración",
+   "plazo": "30 días",
+   "esfuerzo": "bajo",
+   "impacto": "alto"
+  },
+  "B1-2": {
+   "cod": "B1",
+   "nivel": 2,
+   "eco": "lo mido y conozco mi concentración",
+   "accion": "Definir acciones diferenciadas: plan de contacto y condiciones específicas para los clientes clave, y una meta de captación para reducir la dependencia. Cuando un cliente concentra una porción alta de la facturación, su pérdida deja de ser un problema comercial y pasa a ser estructural.",
+   "responsable": "dueño + comercial",
+   "plazo": "90 días",
+   "esfuerzo": "medio",
+   "impacto": "alto"
+  },
+  "B2-0": {
+   "cod": "B2",
+   "nivel": 0,
+   "eco": "vendemos a quien viene o llama",
+   "accion": "Armar el padrón de clientes inactivos: los que compraron en los últimos 24 meses y no compraron en los últimos 6. Es la lista de contactos con mayor tasa de respuesta que tiene el negocio y no requiere ninguna inversión en captación.",
+   "responsable": "administración + mostrador",
+   "plazo": "30 días",
+   "esfuerzo": "bajo",
+   "impacto": "alto"
+  },
+  "B2-1": {
+   "cod": "B2",
+   "nivel": 1,
+   "eco": "hay vendedores, sin objetivos ni recorrido definido",
+   "accion": "Asignar cartera por vendedor y fijar objetivo mensual de facturación y de cantidad de clientes activos. Sin asignación de cartera, nadie responde por que un cliente deje de comprar.",
+   "responsable": "dueño",
+   "plazo": "45 días",
+   "esfuerzo": "bajo",
+   "impacto": "alto"
+  },
+  "B2-2": {
+   "cod": "B2",
+   "nivel": 2,
+   "eco": "cartera asignada con objetivos",
+   "accion": "Incorporar seguimiento de actividad y no sólo de resultado: registro de visitas o contactos y alerta de clientes de la cartera sin compra en los últimos 60 días. El objetivo de facturación se puede cumplir con dos clientes grandes mientras la cartera se vacía por detrás.",
+   "responsable": "comercial",
+   "plazo": "60 días",
+   "esfuerzo": "medio",
+   "impacto": "alto"
+  },
+  "C1-0": {
+   "cod": "C1",
+   "nivel": 0,
+   "eco": "me entero cuando lo informa el contador",
+   "accion": "Armar un resultado mensual simplificado de cuatro líneas: ventas, costo de mercadería vendida, gastos fijos y gastos variables. No necesita precisión contable; necesita estar disponible el día 10 del mes siguiente.",
+   "responsable": "dueño + administración",
+   "plazo": "45 días",
+   "esfuerzo": "medio",
+   "impacto": "alto"
+  },
+  "C1-1": {
+   "cod": "C1",
+   "nivel": 1,
+   "eco": "lo estimo mirando caja y banco",
+   "accion": "Separar el resultado del flujo de fondos. Un mes con buena caja puede ser un mes con pérdida si se cobró venta vieja o se estiró el pago a proveedores. Incorporar al cálculo el costo de mercadería vendida y la variación de stock.",
+   "responsable": "dueño + administración",
+   "plazo": "60 días",
+   "esfuerzo": "medio",
+   "impacto": "alto"
+  },
+  "C1-2": {
+   "cod": "C1",
+   "nivel": 2,
+   "eco": "resultado mensual con más de 30 días de atraso",
+   "accion": "Reducir el plazo de cierre a 15 días identificando qué información llega tarde y por qué: habitualmente facturas de compra sin cargar o gastos sin rendir. Un resultado que llega a los 45 días ya no permite corregir nada.",
+   "responsable": "administración",
+   "plazo": "60 días",
+   "esfuerzo": "medio",
+   "impacto": "alto"
+  },
+  "C2-0": {
+   "cod": "C2",
+   "nivel": 0,
+   "eco": "no sé cuánto tengo en la calle ni cuál es mi mora",
+   "accion": "Emitir el listado de deuda por cliente con antigüedad: corriente, 30, 60, 90 y más de 90 días. Es el primer paso y suele revelar deuda vieja que ya nadie estaba reclamando.",
+   "responsable": "administración",
+   "plazo": "15 días",
+   "esfuerzo": "bajo",
+   "impacto": "alto"
+  },
+  "C2-1": {
+   "cod": "C2",
+   "nivel": 1,
+   "eco": "sé el total a cobrar, no su antigüedad",
+   "accion": "Instalar la revisión semanal del listado por antigüedad con una acción asignada para cada caso vencido. El total a cobrar no distingue entre una venta de la semana pasada y una deuda de seis meses, que son dos problemas distintos.",
+   "responsable": "administración",
+   "plazo": "30 días",
+   "esfuerzo": "bajo",
+   "impacto": "alto"
+  },
+  "C2-2": {
+   "cod": "C2",
+   "nivel": 2,
+   "eco": "tengo antigüedad, reclamo cuando el problema apareció",
+   "accion": "Pasar de gestión reactiva a preventiva: límite de crédito por cliente cargado en el sistema, bloqueo al superarlo y aviso de vencimiento antes de la fecha. La mora se evita en el momento de la venta, no en el del reclamo.",
+   "responsable": "administración + comercial",
+   "plazo": "60 días",
+   "esfuerzo": "medio",
+   "impacto": "alto"
+  },
+  "D1-0": {
+   "cod": "D1",
+   "nivel": 0,
+   "eco": "cada uno hace lo que hace falta",
+   "accion": "Escribir, en una carilla por puesto, las tres o cuatro responsabilidades principales de cada persona. No es un manual de funciones: es dejar por escrito quién responde por qué, que es lo que hoy no existe.",
+   "responsable": "dueño",
+   "plazo": "45 días",
+   "esfuerzo": "bajo",
+   "impacto": "medio"
+  },
+  "D1-1": {
+   "cod": "D1",
+   "nivel": 1,
+   "eco": "están claras por costumbre, no escritas",
+   "accion": "Formalizar lo que ya funciona de hecho y usar el ejercicio para detectar las zonas grises: tareas que hacen dos personas o ninguna. Esas zonas generan los errores que después no tienen responsable.",
+   "responsable": "dueño",
+   "plazo": "45 días",
+   "esfuerzo": "bajo",
+   "impacto": "medio"
+  },
+  "D1-2": {
+   "cod": "D1",
+   "nivel": 2,
+   "eco": "hay funciones escritas por puesto",
+   "accion": "Incorporar una conversación de desempeño semestral por persona, con dos o tres puntos concretos de lo que se espera para el período siguiente. No requiere un sistema formal de evaluación.",
+   "responsable": "dueño",
+   "plazo": "90 días",
+   "esfuerzo": "medio",
+   "impacto": "medio"
+  },
+  "D2-0": {
+   "cod": "D2",
+   "nivel": 0,
+   "eco": "aprenden sobre la marcha, sin formación en producto",
+   "accion": "Aprovechar las capacitaciones que los proveedores ya ofrecen y que son gratuitas: pedir a los dos o tres principales una jornada de producto para el personal de mostrador. En materiales eléctricos, el vendedor que no puede resolver una consulta técnica pierde la venta completa, no el artículo.",
+   "responsable": "dueño",
+   "plazo": "60 días",
+   "esfuerzo": "bajo",
+   "impacto": "alto"
+  },
+  "D2-1": {
+   "cod": "D2",
+   "nivel": 1,
+   "eco": "formación informal entre pares",
+   "accion": "Ordenar lo informal: definir quién es el referente técnico por familia de producto y asignarle tiempo para formar a los demás. La transmisión entre pares funciona, pero sin asignación explícita depende de la voluntad del que sabe.",
+   "responsable": "dueño",
+   "plazo": "60 días",
+   "esfuerzo": "bajo",
+   "impacto": "medio"
+  },
+  "D2-2": {
+   "cod": "D2",
+   "nivel": 2,
+   "eco": "aprovechamos las capacitaciones de proveedores",
+   "accion": "Armar un registro de quién se capacitó en qué y detectar los huecos: familias de producto donde nadie tiene formación. Con ese mapa la capacitación deja de depender de qué proveedor ofreció una jornada.",
+   "responsable": "dueño",
+   "plazo": "90 días",
+   "esfuerzo": "bajo",
+   "impacto": "medio"
+  },
+  "E1-0": {
+   "cod": "E1",
+   "nivel": 0,
+   "eco": "facturación por un lado y planillas sueltas por otro",
+   "accion": "Antes de evaluar un sistema, listar qué información se necesita para decidir y quién la usa. La mayoría de las implementaciones fracasan por no haber definido eso antes de elegir la herramienta.",
+   "responsable": "dueño",
+   "plazo": "45 días",
+   "esfuerzo": "bajo",
+   "impacto": "alto"
+  },
+  "E1-1": {
+   "cod": "E1",
+   "nivel": 1,
+   "eco": "hay sistema, pero stock y cuentas corrientes no coinciden",
+   "accion": "Identificar dónde se rompe la integración: habitualmente remitos sin facturar, facturas de compra cargadas sin ingreso a stock o ajustes manuales sin registro. Corregir el circuito de carga antes de agregar funcionalidad.",
+   "responsable": "administración + sistemas",
+   "plazo": "60 días",
+   "esfuerzo": "medio",
+   "impacto": "alto"
+  },
+  "E1-2": {
+   "cod": "E1",
+   "nivel": 2,
+   "eco": "sistema integrado y confiable",
+   "accion": "Construir sobre lo que ya funciona: definir cinco reportes de gestión que se emitan automáticamente y en fecha fija. Un sistema confiable del que no salen reportes es un buen registro, no una herramienta de gestión.",
+   "responsable": "dueño + sistemas",
+   "plazo": "60 días",
+   "esfuerzo": "medio",
+   "impacto": "alto"
+  },
+  "E2-0": {
+   "cod": "E2",
+   "nivel": 0,
+   "eco": "no miramos indicadores",
+   "accion": "Elegir tres y nada más: facturación mensual, margen bruto y días de cobranza. Medirlos todos los meses con el mismo criterio. Tres indicadores sostenidos valen más que un tablero de veinte que se abandona al tercer mes.",
+   "responsable": "administración",
+   "plazo": "30 días",
+   "esfuerzo": "bajo",
+   "impacto": "alto"
+  },
+  "E2-1": {
+   "cod": "E2",
+   "nivel": 1,
+   "eco": "miramos la facturación del mes",
+   "accion": "Agregar los indicadores que explican el resultado: margen bruto, gasto sobre venta, días de stock y días de cobranza. La facturación puede crecer mientras el resultado cae, y sola no lo muestra.",
+   "responsable": "administración",
+   "plazo": "45 días",
+   "esfuerzo": "bajo",
+   "impacto": "alto"
+  },
+  "E2-2": {
+   "cod": "E2",
+   "nivel": 2,
+   "eco": "tablero de 5 a 10 indicadores revisado mensualmente",
+   "accion": "Asignar cada indicador a un responsable y ponerle meta. Un indicador sin dueño se informa; con dueño y meta, se gestiona.",
+   "responsable": "dueño",
+   "plazo": "60 días",
+   "esfuerzo": "bajo",
+   "impacto": "medio"
+  },
+  "F1-0": {
+   "cod": "F1",
+   "nivel": 0,
+   "eco": "todo depende de quién esté",
+   "accion": "Documentar un solo proceso, el más crítico: el circuito de venta desde el pedido hasta la entrega y la facturación. Una carilla con los pasos, quién hace cada uno y qué se registra. Empezar por uno y terminarlo vale más que iniciar cuatro.",
+   "responsable": "dueño + responsables de área",
+   "plazo": "60 días",
+   "esfuerzo": "medio",
+   "impacto": "medio"
+  },
+  "F1-1": {
+   "cod": "F1",
+   "nivel": 1,
+   "eco": "hay instructivos, desactualizados",
+   "accion": "Revisar los instructivos existentes contra cómo se trabaja hoy y fijar un responsable de actualización. Un procedimiento desactualizado es peor que ninguno: da la falsa seguridad de que hay control.",
+   "responsable": "responsables de área",
+   "plazo": "45 días",
+   "esfuerzo": "bajo",
+   "impacto": "medio"
+  },
+  "F1-2": {
+   "cod": "F1",
+   "nivel": 2,
+   "eco": "procesos críticos documentados",
+   "accion": "Agregar controles cruzados: que el registro de una operación y su control queden en manos distintas en los puntos donde se maneja valor —caja, stock, autorización de descuentos, carga de precios.",
+   "responsable": "dueño",
+   "plazo": "90 días",
+   "esfuerzo": "medio",
+   "impacto": "medio"
+  },
+  "F2-0": {
+   "cod": "F2",
+   "nivel": 0,
+   "eco": "la misma persona vende, cobra, registra y controla la caja",
+   "accion": "Separar la cobranza de la registración. Si la dotación no lo permite, establecer un arqueo semanal sorpresivo realizado por el dueño y que la conciliación bancaria la revise alguien distinto de quien la prepara.",
+   "responsable": "dueño",
+   "plazo": "30 días",
+   "esfuerzo": "bajo",
+   "impacto": "alto"
+  },
+  "F2-1": {
+   "cod": "F2",
+   "nivel": 1,
+   "eco": "hay control de caja, lo hace quien la maneja",
+   "accion": "Reasignar el arqueo a una persona distinta de quien maneja el efectivo, aunque sea el dueño una vez por semana. Un control ejercido por el propio controlado no es un control.",
+   "responsable": "dueño",
+   "plazo": "30 días",
+   "esfuerzo": "bajo",
+   "impacto": "alto"
+  },
+  "F2-2": {
+   "cod": "F2",
+   "nivel": 2,
+   "eco": "el arqueo lo hace una persona distinta de quien cobra",
+   "accion": "Documentar el control: planilla firmada con fecha, saldo teórico, saldo real y diferencia. Extender el criterio a los demás puntos donde se maneja valor: notas de crédito, ajustes de stock y bonificaciones.",
+   "responsable": "dueño",
+   "plazo": "60 días",
+   "esfuerzo": "bajo",
+   "impacto": "medio"
+  }
+ },
+ "areas": [
+  {
+   "id": "stock",
+   "nombre": "Stock y abastecimiento",
+   "corto": "Stock",
+   "peso": 20,
+   "preg": [
+    "G1",
+    "G2",
+    "G3"
+   ]
+  },
+  {
+   "id": "direccion",
+   "nombre": "Dirección y estrategia",
+   "corto": "Dirección",
+   "peso": 16,
+   "preg": [
+    "A1",
+    "A2"
+   ]
+  },
+  {
+   "id": "finanzas",
+   "nombre": "Administración y finanzas",
+   "corto": "Finanzas",
+   "peso": 14,
+   "preg": [
+    "C1",
+    "C2"
+   ]
+  },
+  {
+   "id": "comercial",
+   "nombre": "Comercial y precios",
+   "corto": "Comercial",
+   "peso": 14,
+   "preg": [
+    "B1",
+    "B2",
+    "G4"
+   ]
+  },
+  {
+   "id": "sistemas",
+   "nombre": "Información y sistemas",
+   "corto": "Sistemas",
+   "peso": 12,
+   "preg": [
+    "E1",
+    "E2"
+   ]
+  },
+  {
+   "id": "procesos",
+   "nombre": "Procesos y control interno",
+   "corto": "Procesos",
+   "peso": 8,
+   "preg": [
+    "F1",
+    "F2"
+   ]
+  },
+  {
+   "id": "provlog",
+   "nombre": "Proveedores y logística",
+   "corto": "Proveedores",
+   "peso": 8,
+   "preg": [
+    "G5",
+    "G6"
+   ]
+  },
+  {
+   "id": "personas",
+   "nombre": "Personas",
+   "corto": "Personas",
+   "peso": 8,
+   "preg": [
+    "D1",
+    "D2"
+   ]
+  }
+ ],
+ "coherencia": [
+  {
+   "if": [
+    [
+     "E1",
+     ">=",
+     2
+    ],
+    [
+     "G1",
+     "<=",
+     1
+    ]
+   ],
+   "areas": [
+    "sistemas",
+    "stock"
+   ],
+   "texto": "El sistema se declara confiable pero el stock del sistema no coincide con el depósito. Una de las dos cosas no está siendo así: conviene verificar la exactitud del inventario antes de apoyar decisiones en el sistema."
+  },
+  {
+   "if": [
+    [
+     "G3",
+     ">=",
+     2
+    ],
+    [
+     "G1",
+     "<=",
+     1
+    ]
+   ],
+   "areas": [
+    "stock"
+   ],
+   "texto": "Hay puntos de pedido cargados sobre un stock que no es exacto. El punto de pedido calcula sobre el saldo del sistema, así que si el saldo está mal, la sugerencia de compra también."
+  },
+  {
+   "if": [
+    [
+     "C1",
+     "==",
+     3
+    ],
+    [
+     "G4",
+     "==",
+     0
+    ]
+   ],
+   "areas": [
+    "finanzas",
+    "comercial"
+   ],
+   "texto": "Se declara un cierre mensual rápido y confiable, pero el precio se fija con un margen general único. Sin margen diferenciado por línea, el resultado mensual no permite saber de dónde viene la rentabilidad."
+  },
+  {
+   "if": [
+    [
+     "A2",
+     ">=",
+     2
+    ],
+    [
+     "D1",
+     "==",
+     0
+    ]
+   ],
+   "areas": [
+    "direccion",
+    "personas"
+   ],
+   "texto": "Se declara que hay responsables por área que deciden solos, pero no hay funciones definidas. Sin responsabilidades escritas es difícil sostener que la delegación esté funcionando."
+  },
+  {
+   "if": [
+    [
+     "C2",
+     ">=",
+     2
+    ],
+    [
+     "F2",
+     "==",
+     0
+    ]
+   ],
+   "areas": [
+    "finanzas",
+    "procesos"
+   ],
+   "texto": "Hay control de mora, pero la misma persona cobra y registra. El control de la cobranza pierde valor cuando quien maneja el dinero también registra lo que entró."
+  }
+ ],
+ "niveles": [
+  {
+   "max": 30,
+   "nombre": "Inicial",
+   "desc": "La gestión depende de las personas, no del sistema",
+   "id": "n0"
+  },
+  {
+   "max": 55,
+   "nombre": "En desarrollo",
+   "desc": "Hay herramientas, falta consistencia",
+   "id": "n1"
+  },
+  {
+   "max": 78,
+   "nombre": "Gestionado",
+   "desc": "Se mide y se decide con datos",
+   "id": "n2"
+  },
+  {
+   "max": 100,
+   "nombre": "Optimizado",
+   "desc": "Mejora continua",
+   "id": "n3"
+  }
+ ],
+ "orden": [
+  "A1",
+  "A2",
+  "B1",
+  "B2",
+  "C1",
+  "C2",
+  "D1",
+  "D2",
+  "E1",
+  "E2",
+  "F1",
+  "F2",
+  "G1",
+  "G2",
+  "G3",
+  "G4",
+  "G5",
+  "G6"
+ ]
+};
+const LOGO_FULL = "data:image/png;base64,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";
+
+const R = {emp:"", per:"", resp:{}, idx:0};
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const areaDe = cod => DATA.areas.find(a => a.preg.includes(cod));
+const nivelColor = n => ["var(--n0)","var(--n1)","var(--n2)","var(--n3)"][n];
+const bandaDe = p => DATA.niveles.find(n => p <= n.max) || DATA.niveles[3];
+
+/* ---------- geometría del anillo ---------- */
+function segmentos(){
+  const gG = 5.2, gS = 1.3, nQ = DATA.orden.length, nA = DATA.areas.length;
+  const span = (360 - nA*gG - (nQ-nA)*gS) / nQ;
+  let ang = -90 + gG/2, out = [];
+  DATA.areas.forEach(a => {
+    a.preg.forEach((cod, i) => {
+      out.push({cod, a0:ang, a1:ang+span, area:a.id});
+      ang += span + (i < a.preg.length-1 ? gS : gG);
+    });
+  });
+  return out;
+}
+function arco(cx, cy, r, a0, a1){
+  const p = (a) => [cx + r*Math.cos(a*Math.PI/180), cy + r*Math.sin(a*Math.PI/180)];
+  const [x0,y0] = p(a0), [x1,y1] = p(a1);
+  return `M ${x0.toFixed(2)} ${y0.toFixed(2)} A ${r} ${r} 0 ${a1-a0>180?1:0} 1 ${x1.toFixed(2)} ${y1.toFixed(2)}`;
+}
+function pintarDial(svg, r, w, anim){
+  const segs = segmentos();
+  svg.innerHTML = segs.map((s,i) => {
+    const v = R.resp[s.cod];
+    const col = v === undefined ? (anim ? "rgba(255,255,255,.16)" : "var(--line)") : nivelColor(v);
+    const style = anim
+      ? `stroke-dasharray:100;stroke-dashoffset:100;animation:draw .5s ${0.09*i+0.15}s cubic-bezier(.3,0,.4,1) forwards`
+      : "";
+    return `<path d="${arco(50,50,r,s.a0,s.a1)}" pathLength="100" fill="none"
+      stroke="${col}" stroke-width="${w}" stroke-linecap="butt" style="${style}"><title>${s.cod}</title></path>`;
+  }).join("");
+}
+
+/* ---------- cuestionario ---------- */
+function irA(i){
+  R.idx = Math.max(0, Math.min(DATA.orden.length-1, i));
+  const cod = DATA.orden[R.idx], q = DATA.preguntas[cod], area = areaDe(cod);
+  $("#q-count").innerHTML = `${String(R.idx+1).padStart(2,"0")} <span>/ ${DATA.orden.length}</span>`;
+  $("#q-area").textContent = area.nombre;
+  $("#q-track").style.width = ((R.idx)/DATA.orden.length*100) + "%";
+  pintarDial($("#q-dial"), 42, 9, false);
+
+  const sel = R.resp[cod];
+  $("#q-body").innerHTML = `
+    <div>
+      <span class="q__code">${cod}</span>
+      ${q.nota ? `<span class="q__flag">${esc(q.nota)}</span>` : ""}
+    </div>
+    <h2>${esc(q.titulo)}</h2>
+    <p class="q__hint">Elija la opción que describe la situación actual.</p>
+    <div class="opts" id="opts">
+      ${q.opciones.map(o => `
+        <button class="opt" type="button" data-n="${o.nivel}" aria-pressed="${sel===o.nivel}">
+          <span class="opt__n">${o.nivel}</span>
+          <span>${esc(o.texto)}</span>
+        </button>`).join("")}
+    </div>
+    <div class="nav">
+      <button class="back" type="button" id="prev" ${R.idx===0?"style=visibility:hidden":""}>
+        <svg width="15" height="10" viewBox="0 0 15 10" fill="none" aria-hidden="true">
+          <path d="M14 5H1M5 1L.5 5 5 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg> Pregunta anterior
+      </button>
+      <span class="keys">Teclas <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd><kbd>4</kbd></span>
+    </div>`;
+
+  $("#opts").querySelectorAll(".opt").forEach(b => b.onclick = () => elegir(cod, +b.dataset.n, b));
+  const p = $("#prev"); if (p) p.onclick = () => irA(R.idx-1);
+  window.scrollTo({top:0, behavior:"instant"});
+}
+function elegir(cod, n, btn){
+  R.resp[cod] = n;
+  $("#opts").querySelectorAll(".opt").forEach(b => b.setAttribute("aria-pressed", b === btn));
+  pintarDial($("#q-dial"), 42, 9, false);
+  const wait = matchMedia("(prefers-reduced-motion:reduce)").matches ? 0 : 220;
+  setTimeout(() => {
+    if (R.idx === DATA.orden.length-1) resultados(); else irA(R.idx+1);
+  }, wait);
+}
+document.addEventListener("keydown", e => {
+  if ($("#quiz").classList.contains("hidden")) return;
+  if (["1","2","3","4"].includes(e.key)){
+    const b = $("#opts").querySelector(`.opt[data-n="${+e.key-1}"]`);
+    if (b) b.click();
+  }
+  if (e.key === "ArrowLeft") irA(R.idx-1);
+  if (e.key === "ArrowRight" && R.resp[DATA.orden[R.idx]] !== undefined) irA(R.idx+1);
+});
+
+/* ---------- cálculo ---------- */
+function calcular(){
+  const areas = DATA.areas.map(a => {
+    const suma = a.preg.reduce((s,c) => s + (R.resp[c] ?? 0), 0);
+    const pts = Math.round(suma / (3*a.preg.length) * 100);
+    return {...a, pts, banda: bandaDe(pts)};
+  });
+  const global = Math.round(areas.reduce((s,a) => s + a.pts * a.peso/100, 0));
+  const avisos = DATA.coherencia.filter(c => c.if.every(([cod,op,v]) => {
+    const x = R.resp[cod];
+    return op === ">=" ? x >= v : op === "<=" ? x <= v : x === v;
+  }));
+  const plan = DATA.orden
+    .filter(c => R.resp[c] <= 2)
+    .map(c => {
+      const f = DATA.fichas[`${c}-${R.resp[c]}`], a = areaDe(c);
+      return {...f, area:a, prio: a.peso * (3 - R.resp[c]), titulo: DATA.preguntas[c].titulo};
+    })
+    .sort((x,y) => y.prio - x.prio)
+    .slice(0,5);
+  return {areas, global, avisos, plan, banda: bandaDe(global)};
+}
+
+/* ---------- resultados ---------- */
+function resultados(){
+  const c = calcular();
+  const rapidas = c.plan.filter(p => p.esfuerzo === "bajo");
+  const estruct = c.plan.filter(p => p.esfuerzo !== "bajo");
+  const titulo = R.emp ? esc(R.emp) : "Diagnóstico de gestión";
+  const sub = [R.per && esc(R.per), "Rubro distribuidora",
+    new Date().toLocaleDateString("es-AR",{day:"2-digit",month:"long",year:"numeric"})]
+    .filter(Boolean).join(" · ");
+
+  const ficha = (p, i) => `
+    <article class="act">
+      <div class="act__rank">${i+1}</div>
+      <div>
+        <div class="act__top">
+          <span class="act__code">${p.cod}</span>
+          <span class="act__q">${esc(p.titulo)}</span>
+        </div>
+        <p class="act__ans">Respuesta registrada: nivel ${p.nivel} — ${esc(p.eco)}</p>
+        <p class="act__do">${esc(p.accion)}</p>
+        <div class="act__meta">
+          <div><dt>Responsable</dt><dd>${esc(p.responsable)}</dd></div>
+          <div><dt>Plazo</dt><dd>${esc(p.plazo)}</dd></div>
+          <div><dt>Esfuerzo</dt><dd>${esc(p.esfuerzo)}</dd></div>
+          <div><dt>Impacto</dt><dd>${esc(p.impacto)}</dd></div>
+        </div>
+      </div>
+    </article>`;
+
+  const grupo = (h, n, arr, off) => arr.length ? `
+    <div class="plan__group">
+      <div class="plan__gh"><h4>${h}</h4><span>${n}</span></div>
+      ${arr.map((p,i) => ficha(p, off+i)).join("")}
+    </div>` : "";
+
+  $("#res").innerHTML = `
+    <div class="res__hero"><div class="wrap">
+      <div class="eyebrow">Resultado del diagnóstico</div>
+      <h1>${titulo}</h1>
+      <p class="res__sub">${sub}</p>
+      <div class="gauge">
+        <div class="gauge__ring">
+          <svg id="r-dial" viewBox="0 0 100 100" aria-label="Nivel alcanzado en cada una de las 18 preguntas"></svg>
+          <div class="gauge__ctr">
+            <div class="gauge__score" id="r-score">0</div>
+            <div class="gauge__of">DE 100</div>
+          </div>
+        </div>
+        <div class="gauge__lvl">
+          <div class="gauge__lvlname">${c.banda.nombre}</div>
+          <p class="gauge__lvldesc">${c.banda.desc}</p>
+          <ul class="scale">
+            ${DATA.niveles.map((n,i) => `
+              <li ${n.id===c.banda.id?"data-on":""}><i></i>${n.nombre}
+              <span style="opacity:.6;margin-left:auto">${i===0?0:DATA.niveles[i-1].max+1}–${n.max}</span></li>`).join("")}
+          </ul>
+        </div>
+      </div>
+    </div></div>
+
+    <div class="wrap">
+      <div class="block">
+        <h3 class="sect">Áreas de gestión</h3>
+        <p class="sect__note">Cada área se puntúa de 0 a 100 según las respuestas de sus preguntas
+        y cae en una de las cuatro bandas de la escala. El peso es cuánto incide esa área en el
+        puntaje global. Están ordenadas de menor a mayor puntaje: arriba, lo más débil.</p>
+
+        <div class="ascale">
+          <div class="ascale__strip">
+            ${DATA.niveles.map((n,i) => {
+              const desde = i===0 ? 0 : DATA.niveles[i-1].max+1;
+              return `<span style="flex:${n.max-desde+1} 1 0;background:${nivelColor(i)}">${n.nombre}</span>`;
+            }).join("")}
+            ${[30,55,78].map(v => `<em style="left:${v}%">${v}</em>`).join("")}
+            <em style="left:0">0</em><em style="left:100%">100</em>
+          </div>
+          <div class="ascale__lbl">Puntaje</div>
+        </div>
+        <div class="ascale__legend">
+          ${DATA.niveles.map((n,i) => `<span><i style="background:${nivelColor(i)}"></i>${n.nombre}</span>`).join("")}
+        </div>
+
+        <div class="areas">
+          ${[...c.areas].sort((x,y) => x.pts - y.pts).map(a => {
+            const ci = DATA.niveles.findIndex(n => n.id === a.banda.id), col = nivelColor(ci);
+            return `
+            <div class="arow">
+              <div>
+                <div class="arow__top">
+                  <span class="arow__name">${a.nombre}</span>
+                  <span class="arow__w">${a.peso}% del global</span>
+                  <span class="arow__q">${a.preg.join(" · ")}</span>
+                </div>
+                <div class="arow__bar">
+                  <i class="tick" style="left:30%"></i><i class="tick" style="left:55%"></i><i class="tick" style="left:78%"></i>
+                  <div class="arow__fill" data-w="${a.pts}" style="background:${col}"></div>
+                </div>
+              </div>
+              <div class="arow__num">
+                <b style="color:${col}">${a.pts}</b>
+                <span style="color:${col}">${a.banda.nombre}</span>
+              </div>
+            </div>`;
+          }).join("")}
+        </div>
+      </div>
+
+      ${c.avisos.length ? `
+      <div class="block">
+        <h3 class="sect">Consistencia a verificar</h3>
+        <p class="sect__note">Estas combinaciones de respuestas no suelen darse juntas. No invalidan
+        el diagnóstico, pero conviene revisarlas antes de actuar sobre esas áreas.</p>
+        ${c.avisos.map(a => `
+          <div class="warn">
+            <div class="warn__h">
+              ${a.areas.map(id => DATA.areas.find(x => x.id === id).nombre).join(" · ")}
+              <span class="mono" style="font-weight:400;letter-spacing:.02em;opacity:.65;margin-left:6px;text-transform:none">${a.if.map(x=>x[0]).join(" + ")}</span>
+            </div>
+            <p>${esc(a.texto)}</p>
+          </div>`).join("")}
+      </div>` : ""}
+
+      <div class="block">
+        <h3 class="sect">Plan de acción</h3>
+        <p class="sect__note">Las cinco medidas con mejor relación entre el peso del área y la brecha
+        detectada, en orden de prioridad. Las acciones rápidas se pueden encarar sin recursos adicionales.</p>
+        ${c.plan.length ? `
+          ${grupo("Acciones rápidas", `${rapidas.length} de ${c.plan.length} · esfuerzo bajo`, rapidas, 0)}
+          ${grupo("Cambios estructurales", `${estruct.length} de ${c.plan.length} · requieren organización previa`, estruct, rapidas.length)}
+        ` : `
+          <div class="empty">
+            <h4>No hay brechas para priorizar</h4>
+            <p>Las dieciocho respuestas quedaron en el nivel más alto de la escala. En ese
+            escenario el diagnóstico express llega a su límite: el paso siguiente es un
+            relevamiento por área con indicadores propios de la empresa, en lugar de
+            niveles de madurez.</p>
+          </div>`}
+      </div>
+
+      <details class="log">
+        <summary>Respuestas registradas <span class="mono" style="font-weight:400;color:var(--muted);font-size:.78rem">18 preguntas</span></summary>
+        <table class="log__t">
+          ${DATA.orden.map(cod => `
+            <tr>
+              <td>${cod}</td>
+              <td>${esc(DATA.preguntas[cod].opciones[R.resp[cod]].texto)}</td>
+              <td style="color:${nivelColor(R.resp[cod])}">${R.resp[cod]}</td>
+            </tr>`).join("")}
+        </table>
+      </details>
+
+      <div class="actions">
+        <button class="btn" type="button" onclick="window.print()">Imprimir o guardar en PDF</button>
+        <button class="btn btn--ghost" type="button" id="again">Hacer otro diagnóstico</button>
+        <a class="btn btn--ghost" href="/" style="text-decoration:none">Volver al inicio</a>
+      </div>
+
+      <div class="next">
+        <div class="next__t">El diagnóstico marca las brechas. Trabajarlas es el paso siguiente.</div>
+        <p>Este resultado ordena prioridades sobre respuestas declaradas. Para convertirlo
+        en decisiones hace falta mirar los números propios de la empresa: márgenes, mora,
+        rotación, estructura. Escribinos y vemos juntos por dónde conviene empezar.</p>
+        <div class="next__links">
+          <a href="mailto:contacto@criterya.com.ar?subject=Diagn%C3%B3stico%20express%20-%20quiero%20avanzar">
+            <svg width="15" height="12" viewBox="0 0 16 13" fill="none" aria-hidden="true">
+              <rect x=".9" y=".9" width="14.2" height="11.2" rx="1.6" stroke="currentColor" stroke-width="1.4"/>
+              <path d="M1.6 1.8 8 7l6.4-5.2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            contacto@criterya.com.ar
+          </a>
+          <a href="https://t.me/adrianpages" target="_blank" rel="noopener">
+            <svg width="15" height="13" viewBox="0 0 16 14" fill="none" aria-hidden="true">
+              <path d="M14.6 1.3 1.2 6.4c-.6.2-.6.8 0 1l3.3 1 1.3 3.9c.2.5.5.6.9.2l1.8-1.7 3.4 2.5c.4.3.8.1.9-.4l2.4-11c.1-.5-.2-.8-.6-.6Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+            </svg>
+            Telegram @adrianpages
+          </a>
+        </div>
+      </div>
+
+      <div class="foot">
+        <img src="${LOGO_FULL}" alt="Criterya · Consultora de gestión empresarial">
+        <p>Este diagnóstico es una primera aproximación construida sobre respuestas
+        declaradas. Sirve para ordenar prioridades y decidir por dónde empezar, no para
+        reemplazar el relevamiento de cada área. Las acciones sugeridas son puntos de
+        partida que conviene ajustar al tamaño y la estructura de la empresa.</p>
+      </div>
+    </div>`;
+
+  $("#quiz").classList.add("hidden");
+  $("#res").classList.remove("hidden");
+  window.scrollTo({top:0, behavior:"instant"});
+
+  pintarDial($("#r-dial"), 42, 10, true);
+  const reduce = matchMedia("(prefers-reduced-motion:reduce)").matches;
+  requestAnimationFrame(() => {
+    $("#res").querySelectorAll(".arow__fill").forEach(f =>
+      f.style.width = f.dataset.w === "0" ? "4px" : f.dataset.w + "%");
+  });
+  const el = $("#r-score");
+  if (reduce){ el.textContent = c.global; }
+  else {
+    const t0 = performance.now(), dur = 1150;
+    const tick = t => {
+      const k = Math.min(1, (t-t0)/dur), e = 1 - Math.pow(1-k, 3);
+      el.textContent = Math.round(c.global * e);
+      if (k < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }
+  $("#again").onclick = () => {
+    R.resp = {}; R.idx = 0;
+    $("#res").classList.add("hidden");
+    $("#intro").classList.remove("hidden");
+    window.scrollTo({top:0, behavior:"instant"});
+  };
+}
+
+/* ---------- arranque ---------- */
+$("#start").onclick = () => {
+  R.emp = $("#f-emp").value.trim();
+  R.per = $("#f-per").value.trim();
+  $("#intro").classList.add("hidden");
+  $("#quiz").classList.remove("hidden");
+  irA(0);
+};
+document.querySelectorAll(".rubro:not([disabled])").forEach(b => b.onclick = () => {
+  document.querySelectorAll(".rubro").forEach(x => x.setAttribute("aria-pressed", x === b));
+});
+</script>
+<style>@keyframes draw{to{stroke-dashoffset:0}}</style>
+<!-- criterya-express build 2026-08-27-b -->
+</body>
+</html>
