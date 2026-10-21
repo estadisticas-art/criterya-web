@@ -21,7 +21,8 @@
   /* bandas del instrumento: rojo, ámbar, cian, navy */
   --b0:#9A3B2C; --b1:#B5822C; --b2:#2F8FA0; --b3:#043760;
   /* acento de acción: único color cálido del sistema */
-  --act:#B84A22; --act-h:#993A18;
+  --act:#B84A22; --act-h:#993A18; --act-lt:#E8835A;
+  --deep:#071F36;
   --disp:"Archivo","Helvetica Neue",Arial,sans-serif;
   --body:"IBM Plex Sans",-apple-system,"Segoe UI",Roboto,sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,monospace;
@@ -79,39 +80,59 @@ button{cursor:pointer}
   background:rgba(255,255,255,.2);padding:2px 7px;border-radius:3px}
 
 /* ---------- hero ---------- */
-.hero{padding:60px 0 76px}
+.hero{padding:60px 0 0;background:var(--deep);
+  background-image:radial-gradient(ellipse 70% 90% at 80% -18%,rgba(47,143,160,.34),transparent 62%)}
+.hero__grid{padding-bottom:68px}
 .hero__grid{display:grid;grid-template-columns:1.06fr .94fr;gap:56px;align-items:center}
 .hero__logo{width:206px;margin-bottom:28px}
 .hero h1{font-family:var(--disp);font-weight:800;font-size:clamp(2rem,4.7vw,3.15rem);
-  line-height:1.06;letter-spacing:-.03em;color:var(--navy);margin:.32em 0 0;max-width:15ch}
-.hero h1 em{font-style:normal;color:var(--act)}
-.hero__lead{color:var(--muted);font-size:1.07rem;max-width:47ch;margin:20px 0 0}
+  line-height:1.06;letter-spacing:-.03em;color:#fff;margin:.32em 0 0;max-width:15ch}
+.hero h1 em{font-style:normal;color:var(--act-lt)}
+.hero__lead{color:rgba(255,255,255,.72);font-size:1.07rem;max-width:47ch;margin:20px 0 0}
+.hero .eyebrow{color:#8ED0DC}
+.hero .btn--out{border-color:rgba(255,255,255,.3);color:#fff}
+.hero .btn--out:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.55)}
 .hero__cta{display:flex;flex-wrap:wrap;gap:11px;margin-top:30px}
-.hero__note{font-family:var(--mono);font-size:.68rem;letter-spacing:.05em;color:var(--muted);
+.hero__note{font-family:var(--mono);font-size:.68rem;letter-spacing:.05em;color:rgba(255,255,255,.45);
   margin:18px 0 0;text-transform:uppercase}
 
+/* ---- franja de respaldo ---- */
+.proof{border-top:1px solid rgba(255,255,255,.12)}
+.proof__in{max-width:var(--wrap);margin:0 auto;padding:0 24px;
+  display:grid;grid-template-columns:repeat(4,1fr)}
+.proof div{padding:22px 20px 24px 0}
+.proof div+div{border-left:1px solid rgba(255,255,255,.12);padding-left:22px}
+.proof b{display:block;font-family:var(--disp);font-weight:800;font-size:1.6rem;
+  letter-spacing:-.04em;color:#fff;font-variant-numeric:tabular-nums;line-height:1}
+.proof span{display:block;margin-top:5px;font-size:.78rem;color:rgba(255,255,255,.5);line-height:1.45}
+@media (max-width:760px){
+  .proof__in{grid-template-columns:1fr 1fr}
+  .proof div:nth-child(3){border-left:none;padding-left:0}
+  .proof div:nth-child(n+3){border-top:1px solid rgba(255,255,255,.12)}
+}
+
 /* ---------- tablero: elemento firma ---------- */
-.board{background:var(--card);border:1px solid var(--line);border-radius:10px;
-  padding:23px 24px 19px;box-shadow:var(--sh)}
+.board{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);border-radius:10px;
+  padding:23px 24px 19px;backdrop-filter:blur(6px)}
 .board__head{display:flex;justify-content:space-between;align-items:baseline;
-  padding-bottom:12px;border-bottom:1.5px solid var(--navy);margin-bottom:4px}
+  padding-bottom:12px;border-bottom:1.5px solid rgba(255,255,255,.3);margin-bottom:4px}
 .board__head h2{font-family:var(--disp);font-size:.8rem;font-weight:700;letter-spacing:.04em;
-  color:var(--navy);margin:0;text-transform:uppercase}
+  color:#fff;margin:0;text-transform:uppercase}
 .board__head span{font-family:var(--mono);font-size:.62rem;letter-spacing:.09em;
-  color:var(--muted);text-transform:uppercase}
+  color:rgba(255,255,255,.5);text-transform:uppercase}
 .row{display:grid;grid-template-columns:1fr 42px;gap:11px;align-items:center;
-  padding:8px 0 9px;border-bottom:1px solid var(--line)}
+  padding:8px 0 9px;border-bottom:1px solid rgba(255,255,255,.1)}
 .row:last-of-type{border-bottom:none}
-.row__name{font-size:.79rem;line-height:1.3}
+.row__name{font-size:.79rem;line-height:1.3;color:rgba(255,255,255,.85)}
 .row__w{font-family:var(--mono);font-size:.67rem;font-weight:600;color:var(--cyan);
-  text-align:right;letter-spacing:-.02em}
-.row__track{grid-column:1/-1;height:6px;background:#E4EBEF;border-radius:3px;
+  text-align:right;letter-spacing:-.02em;color:#8ED0DC}
+.row__track{grid-column:1/-1;height:6px;background:rgba(255,255,255,.12);border-radius:3px;
   position:relative;margin-top:-3px;overflow:hidden}
-.row__track i{position:absolute;top:0;bottom:0;width:1px;background:rgba(255,255,255,.85);z-index:2}
+.row__track i{position:absolute;top:0;bottom:0;width:1px;background:rgba(7,31,54,.6);z-index:2}
 .row__fill{display:block;height:100%;width:0;border-radius:3px;
   transition:width 1.1s cubic-bezier(.22,.9,.28,1)}
 .board__foot{margin:13px 0 0;font-family:var(--mono);font-size:.61rem;letter-spacing:.08em;
-  text-transform:uppercase;color:var(--muted);line-height:1.75}
+  text-transform:uppercase;color:rgba(255,255,255,.42);line-height:1.75}
 
 /* ---------- secciones ---------- */
 .sec{padding:76px 0;border-top:1px solid var(--line)}
@@ -321,7 +342,7 @@ button{cursor:pointer}
   <section class="hero">
     <div class="wrap hero__grid">
       <div>
-        <img class="hero__logo" src="/logo.png" alt="Criterya · Consultora de gestión empresarial">
+        <img class="hero__logo" src="/logo-blanco.png" alt="Criterya · Consultora de gestión empresarial">
         <p class="eyebrow">Autodiagnóstico online · Sin costo</p>
         <h1>¿Querés saber dónde está parada <em>tu empresa</em>?</h1>
         <p class="hero__lead">Respondé el cuestionario desde tu computadora y obtené el puntaje de
@@ -345,6 +366,15 @@ button{cursor:pointer}
         <div id="rows"></div>
         <p class="board__foot">Perfil ilustrativo · El peso de cada área cambia según el rubro ·
         Tu empresa se mide en el diagnóstico</p>
+      </div>
+    </div>
+
+    <div class="proof">
+      <div class="proof__in">
+        <div><b>67</b><span>preguntas en el diagnóstico integral</span></div>
+        <div><b>171</b><span>acciones precargadas en la biblioteca</span></div>
+        <div><b>9</b><span>áreas ponderadas según el rubro</span></div>
+        <div><b>0</b><span>datos enviados sin tu confirmación</span></div>
       </div>
     </div>
   </section>
@@ -395,11 +425,11 @@ button{cursor:pointer}
 
         <article class="dg">
           <div class="dg__step"><b>3</b>Con consultor</div>
-          <h3>Relevamiento asistido</h3>
-          <p>Vamos a la empresa: entrevistas, recorrida y datos de los sistemas. Lo que el
-          autodiagnóstico no puede hacer es mirar el depósito y hablar con tu gente.</p>
+          <h3>Diagnóstico asistido</h3>
+          <p>Entrevistas, recorrida y datos de tus sistemas. Lo que el autodiagnóstico no puede
+          hacer es mirar la operación y hablar con tu gente.</p>
           <div class="dg__meta">
-            <span class="tag">Presencial</span>
+            <span class="tag">Presencial o videoconferencia</span>
             <span class="tag">A convenir</span>
           </div>
           <div class="dg__go">
@@ -638,7 +668,7 @@ button{cursor:pointer}
           <div>
             <h3>Cr. Adrián Pagés</h3>
             <p class="bio__role">Contador público · Socio</p>
-            <p class="bio__txt">[Negociación, Desarrollo de Grupos Empresariales, KPI, Marketing, Investigación de Mercados]</p>
+            <p class="bio__txt">Trabaja en negociación, desarrollo de grupos empresariales e indicadores de gestión, con foco en marketing e investigación de mercados.</p>
             <a class="bio__li" href="https://www.linkedin.com/in/adrianpages/" target="_blank" rel="noopener">
               Perfil en LinkedIn
               <svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3 9L9 3M9 3H4.5M9 3v4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -650,7 +680,7 @@ button{cursor:pointer}
           <div>
             <h3>Lic. Eduardo Rinaldi</h3>
             <p class="bio__role">Licenciado en administración · Socio</p>
-            <p class="bio__txt">[Investigador y Consultor en Marketing, Docente Investigador UNICEN, Master en Administración de Negocios, Doctorado en Administración]</p>
+            <p class="bio__txt">Investigador y consultor en marketing, docente investigador en la UNICEN. Máster en Administración de Negocios y doctorando en Administración.</p>
             <a class="bio__li" href="https://www.linkedin.com/in/eduardo-rinaldi-33a96857/" target="_blank" rel="noopener">
               Perfil en LinkedIn
               <svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3 9L9 3M9 3H4.5M9 3v4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -701,12 +731,10 @@ button{cursor:pointer}
 
         <aside>
           <div class="box">
-            <h3>Por Telegram</h3>
-            <p>Si preferís escribir directo, es la vía más rápida. Se responde en horario laboral.</p>
-            <a class="btn btn--out" href="https://t.me/adrianpages" target="_blank" rel="noopener">
-              Escribir a @adrianpages
-              <svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3 9L9 3M9 3H4.5M9 3v4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </a>
+            <h3>Por teléfono</h3>
+            <p>Si preferís hablar directo, es la vía más rápida. Atendemos en horario laboral.</p>
+            <a class="btn btn--out" href="tel:+542494526102">249 452-6102</a>
+            <a class="btn btn--out" href="tel:+542494492344" style="margin-top:9px">249 449-2344</a>
           </div>
           <div class="box">
             <h3>Datos de contacto</h3>
