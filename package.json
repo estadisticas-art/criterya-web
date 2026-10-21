@@ -1,0 +1,9 @@
+{
+  "name": "criterya-web",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Sitio institucional de Criterya y funcion de envio de correo por SMTP propio",
+  "dependencies": {
+    "nodemailer": "^6.9.14"
+  }
+}

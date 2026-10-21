@@ -776,6 +776,9 @@ button{cursor:pointer}
 
 <script>
 const ENDPOINT = "https://script.google.com/macros/s/AKfycbzDIp4cx8UxllSvsoCt25Yj0zo7B0mICQkMFUWfMw9X5psxv7IBi8dt3JVSqiWKp8TrBA/exec";
+/* El correo sale por SMTP propio desde esta misma web; el Apps Script
+   queda solo registrando en la planilla. */
+const ENVIO = "/api/enviar";
 const MAIL_FALLBACK = "contacto@criterya.com.ar";
 
 /* Umbrales del instrumento: las mismas bandas del diagnóstico. */
@@ -889,14 +892,22 @@ document.getElementById("anio").textContent = new Date().getFullYear();
       origen: location.href
     };
 
+    /* La planilla no debe poder voltear el envío del correo: se dispara
+       aparte y su resultado no se espera ni se chequea. */
+    fetch(ENDPOINT, {
+      method:"POST",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body: JSON.stringify(datos)
+    }).catch(() => {});
+
     try{
-      const r = await fetch(ENDPOINT, {
+      const r = await fetch(ENVIO, {
         method:"POST",
-        headers:{"Content-Type":"text/plain;charset=utf-8"},
-        body: JSON.stringify(datos)
+        headers:{"Content-Type":"application/json;charset=utf-8"},
+        body: JSON.stringify(Object.assign({ tipo:"contacto" }, datos))
       });
-      const j = await r.json();
-      if(!j.ok) throw new Error(j.error || "sin confirmación");
+      const j = await r.json().catch(() => ({ ok:false, error:"respuesta ilegible" }));
+      if(!r.ok || !j.ok) throw new Error(j.error || "sin confirmación");
       f.reset();
       out.className = "msg ok";
       out.textContent = "Consulta enviada. Te respondemos dentro de las 48 horas hábiles.";
@@ -904,7 +915,8 @@ document.getElementById("anio").textContent = new Date().getFullYear();
     }catch(err){
       out.className = "msg err";
       out.innerHTML = 'No se pudo enviar la consulta. Escribinos a ' +
-        '<a href="mailto:' + MAIL_FALLBACK + '">' + MAIL_FALLBACK + '</a> o por Telegram.';
+        '<a href="mailto:' + MAIL_FALLBACK + '">' + MAIL_FALLBACK + '</a> ' +
+        'o llamanos al 249 452-6102.';
       btn.textContent = "Reintentar envío"; btn.disabled = false;
     }
   });
