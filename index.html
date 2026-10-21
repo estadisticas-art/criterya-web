@@ -907,7 +907,11 @@ document.getElementById("anio").textContent = new Date().getFullYear();
         body: JSON.stringify(Object.assign({ tipo:"contacto" }, datos))
       });
       const j = await r.json().catch(() => ({ ok:false, error:"respuesta ilegible" }));
-      if(!r.ok || !j.ok) throw new Error(j.error || "sin confirmación");
+      if(!r.ok || !j.ok){
+        const e = new Error(j.error || "sin confirmación");
+        e.codigo = j.codigo || ("HTTP " + r.status);
+        throw e;
+      }
       f.reset();
       out.className = "msg ok";
       out.textContent = "Consulta enviada. Te respondemos dentro de las 48 horas hábiles.";
@@ -916,7 +920,8 @@ document.getElementById("anio").textContent = new Date().getFullYear();
       out.className = "msg err";
       out.innerHTML = 'No se pudo enviar la consulta. Escribinos a ' +
         '<a href="mailto:' + MAIL_FALLBACK + '">' + MAIL_FALLBACK + '</a> ' +
-        'o llamanos al 249 452-6102.';
+        'o llamanos al 249 452-6102.' +
+        (err && err.codigo ? ' <span style="opacity:.6;font-size:.82em">(' + err.codigo + ')</span>' : '');
       btn.textContent = "Reintentar envío"; btn.disabled = false;
     }
   });

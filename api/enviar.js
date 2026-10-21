@@ -100,7 +100,8 @@ module.exports = async function handler(req, res) {
   const faltan = ["SMTP_HOST", "SMTP_USER", "SMTP_PASS"].filter(function (k) { return !process.env[k]; });
   if (faltan.length) {
     console.error("Faltan variables de entorno:", faltan.join(", "));
-    return res.status(500).json({ ok: false, error: "El envío no está configurado" });
+    return res.status(500).json({ ok: false, error: "El envío no está configurado",
+                                  codigo: "SIN_" + faltan.join("_") });
   }
 
   let d = req.body;
@@ -160,8 +161,11 @@ module.exports = async function handler(req, res) {
     });
     return res.status(200).json({ ok: true });
   } catch (err) {
-    /* El detalle va al log de Vercel, nunca al navegador del visitante. */
-    console.error("Fallo el envío SMTP:", err && err.message);
-    return res.status(502).json({ ok: false, error: "No se pudo enviar el correo" });
+    /* El mensaje completo queda en el log de Vercel. Al navegador solo va el
+       código corto (EAUTH, ETIMEDOUT, ENOTFOUND...), que no expone nada y
+       permite diagnosticar sin acceso a los logs. */
+    console.error("Fallo el envío SMTP:", err && err.code, err && err.message);
+    return res.status(502).json({ ok: false, error: "No se pudo enviar el correo",
+                                  codigo: String((err && (err.code || err.responseCode)) || "DESCONOCIDO") });
   }
 };
