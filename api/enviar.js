@@ -92,6 +92,22 @@ function cuerpoDiagnostico(d, tipo) {
 }
 
 module.exports = async function handler(req, res) {
+  /* Diagnóstico: GET con ?check=1 informa QUÉ NOMBRES de variable llegan a la
+     función, nunca sus valores. Los nombres ya están en el repositorio, así
+     que no revela nada. Sirve para distinguir "mal configurado en Zoho" de
+     "Vercel no inyecta las variables". */
+  if (req.method === "GET" && req.query && req.query.check) {
+    const esperadas = ["SMTP_HOST", "SMTP_PORT", "SMTP_USER", "SMTP_PASS", "MAIL_INTERNO"];
+    const presentes = esperadas.filter(function (k) { return !!process.env[k]; });
+    return res.status(200).json({
+      ok: true,
+      presentes: presentes,
+      ausentes: esperadas.filter(function (k) { return presentes.indexOf(k) < 0; }),
+      totalVariablesDelEntorno: Object.keys(process.env).length,
+      entornoVercel: process.env.VERCEL_ENV || "(sin VERCEL_ENV)"
+    });
+  }
+
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
     return res.status(405).json({ ok: false, error: "Método no permitido" });
