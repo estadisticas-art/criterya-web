@@ -520,10 +520,9 @@ details.log[open] summary::after{content:"–"}
         <input id="f-per" type="text" placeholder="Nombre y cargo (opcional)" autocomplete="name">
       </div>
       <div class="rubros" role="group" aria-label="Rubro de la empresa">
-        <button class="rubro" type="button" data-rubro="distribuidora" aria-pressed="true">Distribuidora</button>
         <button class="rubro" type="button" data-rubro="comercio" aria-pressed="false">Comercio</button>
         <button class="rubro" type="button" data-rubro="industria" aria-pressed="false">Industria</button>
-        <button class="rubro" type="button" disabled>Servicios <small>en preparación</small></button>
+        <button class="rubro" type="button" data-rubro="distribuidora" aria-pressed="true">Distribuidora</button>
       </div>
     </div>
     <button id="start" class="cta" type="button">
@@ -3546,6 +3545,6 @@ document.querySelectorAll(".rubro:not([disabled])").forEach(b => b.onclick = () 
 });
 </script>
 <style>@keyframes draw{to{stroke-dashoffset:0}}</style>
-<!-- criterya-express build 2026-10-22-e-industria -->
+<!-- criterya-express build 2026-10-22-f -->
 </body>
 </html>
