@@ -522,7 +522,7 @@ details.log[open] summary::after{content:"–"}
       <div class="rubros" role="group" aria-label="Rubro de la empresa">
         <button class="rubro" type="button" data-rubro="distribuidora" aria-pressed="true">Distribuidora</button>
         <button class="rubro" type="button" data-rubro="comercio" aria-pressed="false">Comercio</button>
-        <button class="rubro" type="button" disabled>Industria <small>en preparación</small></button>
+        <button class="rubro" type="button" data-rubro="industria" aria-pressed="false">Industria</button>
         <button class="rubro" type="button" disabled>Servicios <small>en preparación</small></button>
       </div>
     </div>
@@ -2415,6 +2415,762 @@ const MODULOS = {
     "impacto": "alto"
    }
   }
+ },
+ "industria": {
+  "nombre": "Industria",
+  "areas": [
+   {
+    "id": "produccion",
+    "nombre": "Producción y costos",
+    "corto": "Producción",
+    "peso": 20,
+    "preg": [
+     "I1",
+     "I2",
+     "I3"
+    ]
+   },
+   {
+    "id": "insumos",
+    "nombre": "Abastecimiento e insumos",
+    "corto": "Insumos",
+    "peso": 14,
+    "preg": [
+     "I4",
+     "I5"
+    ]
+   },
+   {
+    "id": "comercial",
+    "nombre": "Comercial y cotización",
+    "corto": "Comercial",
+    "peso": 14,
+    "preg": [
+     "B1",
+     "B2",
+     "I6"
+    ]
+   },
+   {
+    "id": "finanzas",
+    "nombre": "Administración y finanzas",
+    "corto": "Finanzas",
+    "peso": 14,
+    "preg": [
+     "C1",
+     "C2"
+    ]
+   },
+   {
+    "id": "direccion",
+    "nombre": "Dirección y estrategia",
+    "corto": "Dirección",
+    "peso": 13,
+    "preg": [
+     "A1",
+     "A2"
+    ]
+   },
+   {
+    "id": "calidad",
+    "nombre": "Calidad y cumplimiento",
+    "corto": "Calidad",
+    "peso": 11,
+    "preg": [
+     "F1",
+     "I7",
+     "I8"
+    ]
+   },
+   {
+    "id": "personas",
+    "nombre": "Personas",
+    "corto": "Personas",
+    "peso": 8,
+    "preg": [
+     "D1",
+     "D2"
+    ]
+   },
+   {
+    "id": "sistemas",
+    "nombre": "Información y sistemas",
+    "corto": "Sistemas",
+    "peso": 6,
+    "preg": [
+     "E1"
+    ]
+   }
+  ],
+  "orden": [
+   "A1",
+   "A2",
+   "B1",
+   "B2",
+   "I6",
+   "C1",
+   "C2",
+   "D1",
+   "D2",
+   "E1",
+   "F1",
+   "I1",
+   "I2",
+   "I3",
+   "I4",
+   "I5",
+   "I7",
+   "I8"
+  ],
+  "coherencia": [
+   {
+    "if": [
+     [
+      "I6",
+      ">=",
+      2
+     ],
+     [
+      "I1",
+      "<=",
+      1
+     ]
+    ],
+    "areas": [
+     "comercial",
+     "produccion"
+    ],
+    "texto": "Se cotiza a partir del costo calculado del trabajo, pero no hay costeo por producto. La cotización se apoya en un costo que no está construido: conviene verificar sobre qué base se arman las horas y los materiales antes de sostener el precio frente al cliente."
+   },
+   {
+    "if": [
+     [
+      "I6",
+      ">=",
+      2
+     ],
+     [
+      "I5",
+      "==",
+      0
+     ]
+    ],
+    "areas": [
+     "comercial",
+     "insumos"
+    ],
+    "texto": "La cotización parte del costo del trabajo pero no se conoce la merma del material. Si se cotiza el material neto y en planta se consume un porcentaje mayor, esa diferencia se pierde en cada pedido y no se puede atribuir a ningún trabajo en particular."
+   },
+   {
+    "if": [
+     [
+      "I2",
+      ">=",
+      2
+     ],
+     [
+      "I3",
+      "<=",
+      1
+     ]
+    ],
+    "areas": [
+     "produccion"
+    ],
+    "texto": "Hay programación con fechas comprometidas pero no se conoce la capacidad del puesto que limita. Programar sin ese dato produce fechas que la planta no puede sostener, y el atraso aparece cuando ya no hay margen para avisar."
+   },
+   {
+    "if": [
+     [
+      "I8",
+      ">=",
+      2
+     ],
+     [
+      "I2",
+      "==",
+      0
+     ]
+    ],
+    "areas": [
+     "calidad",
+     "produccion"
+    ],
+    "texto": "Se mide el cumplimiento del plazo pero la producción se ordena por urgencias. El indicador va a mostrar el incumplimiento sin poder explicarlo: la causa está en cómo se decide qué se fabrica primero."
+   },
+   {
+    "if": [
+     [
+      "I4",
+      ">=",
+      2
+     ],
+     [
+      "I2",
+      "==",
+      0
+     ]
+    ],
+    "areas": [
+     "insumos",
+     "produccion"
+    ],
+    "texto": "Hay puntos de pedido definidos sobre una producción que se ordena por urgencias. El punto de pedido calcula sobre un consumo previsible; si la secuencia de trabajos cambia todo el tiempo, el consumo real se aparta de lo previsto y el faltante reaparece."
+   },
+   {
+    "if": [
+     [
+      "C1",
+      "==",
+      3
+     ],
+     [
+      "I1",
+      "==",
+      0
+     ]
+    ],
+    "areas": [
+     "finanzas",
+     "produccion"
+    ],
+    "texto": "Se declara un cierre mensual rápido y confiable, pero no se conoce el costo de lo que se fabrica. El resultado mensual dice cuánto se ganó; sin costo por producto no dice en qué trabajos se ganó y en cuáles se perdió, que es lo que hace falta para decidir qué conviene cotizar."
+   }
+  ],
+  "preguntas": {
+   "B1": {
+    "cod": "B1",
+    "titulo": "Conocimiento de los clientes",
+    "nota": null,
+    "opciones": [
+     {
+      "nivel": 0,
+      "texto": "No sé qué porcentaje de mi facturación hacen mis 10 mejores clientes."
+     },
+     {
+      "nivel": 1,
+      "texto": "Lo sé de forma aproximada, pero no lo mido."
+     },
+     {
+      "nivel": 2,
+      "texto": "Lo mido y conozco mi nivel de concentración de ventas."
+     },
+     {
+      "nivel": 3,
+      "texto": "Lo mido y tengo acciones concretas para clientes clave y para reducir la concentración."
+     }
+    ]
+   },
+   "B2": {
+    "cod": "B2",
+    "titulo": "Gestión de la venta",
+    "nota": null,
+    "opciones": [
+     {
+      "nivel": 0,
+      "texto": "Vendemos a quien viene o llama; no salimos a buscar clientes."
+     },
+     {
+      "nivel": 1,
+      "texto": "Tenemos vendedores, pero sin objetivos ni recorrido definido."
+     },
+     {
+      "nivel": 2,
+      "texto": "Vendedores con clientes asignados y objetivos de venta."
+     },
+     {
+      "nivel": 3,
+      "texto": "Clientes asignados con objetivos, seguimiento de los inactivos y registro de visitas o contactos."
+     }
+    ]
+   },
+   "I1": {
+    "cod": "I1",
+    "titulo": "Costo de lo que se fabrica",
+    "nota": "pregunta factual",
+    "opciones": [
+     {
+      "nivel": 0,
+      "texto": "No sé cuánto me cuesta fabricar cada producto; miro el resultado global a fin de mes."
+     },
+     {
+      "nivel": 1,
+      "texto": "Tengo una estimación por producto, basada sobre todo en el material."
+     },
+     {
+      "nivel": 2,
+      "texto": "Calculo material, mano de obra y una asignación de los gastos de planta."
+     },
+     {
+      "nivel": 3,
+      "texto": "Comparo el costo calculado contra el costo real del trabajo terminado y corrijo el cálculo con esa diferencia."
+     }
+    ]
+   },
+   "I2": {
+    "cod": "I2",
+    "titulo": "Planificación de la producción",
+    "nota": null,
+    "opciones": [
+     {
+      "nivel": 0,
+      "texto": "Se fabrica según lo que apura el cliente o lo que reclama el que grita más fuerte."
+     },
+     {
+      "nivel": 1,
+      "texto": "Hay un orden de trabajos, pero se reacomoda todo el tiempo según urgencias."
+     },
+     {
+      "nivel": 2,
+      "texto": "Hay una programación semanal de los trabajos, con fecha comprometida para cada uno."
+     },
+     {
+      "nivel": 3,
+      "texto": "La programación contempla la carga real de cada puesto y se revisa el cumplimiento de lo programado."
+     }
+    ]
+   },
+   "I3": {
+    "cod": "I3",
+    "titulo": "Capacidad y cuellos de botella",
+    "nota": null,
+    "opciones": [
+     {
+      "nivel": 0,
+      "texto": "No sé cuánto puedo producir por mes ni dónde se traba la producción."
+     },
+     {
+      "nivel": 1,
+      "texto": "Sé por experiencia dónde se traba, pero no lo tengo medido."
+     },
+     {
+      "nivel": 2,
+      "texto": "Tengo identificado el puesto que limita la producción y conozco su capacidad."
+     },
+     {
+      "nivel": 3,
+      "texto": "Mido la ocupación del puesto que limita y decido sobre él: turnos, tercerización o inversión."
+     }
+    ]
+   },
+   "I4": {
+    "cod": "I4",
+    "titulo": "Stock de materia prima y reposición",
+    "nota": null,
+    "opciones": [
+     {
+      "nivel": 0,
+      "texto": "Compramos cuando falta; a veces la producción se frena esperando material."
+     },
+     {
+      "nivel": 1,
+      "texto": "Compramos con anticipación según la experiencia, sin un punto de pedido definido."
+     },
+     {
+      "nivel": 2,
+      "texto": "Hay punto de pedido para los insumos principales, considerando el plazo de entrega del proveedor."
+     },
+     {
+      "nivel": 3,
+      "texto": "La reposición se ajusta a la producción programada y medimos las paradas por falta de material."
+     }
+    ]
+   },
+   "I5": {
+    "cod": "I5",
+    "titulo": "Rendimiento y merma del material",
+    "nota": "pregunta factual",
+    "opciones": [
+     {
+      "nivel": 0,
+      "texto": "No sé qué porcentaje del material se pierde entre recorte, descarte y error."
+     },
+     {
+      "nivel": 1,
+      "texto": "Sé que hay pérdida y me parece alta, pero no está medida."
+     },
+     {
+      "nivel": 2,
+      "texto": "Mido la merma de los materiales principales y conozco su porcentaje."
+     },
+     {
+      "nivel": 3,
+      "texto": "La merma está incorporada al costo, se sigue su evolución y se actúa sobre las causas que la generan."
+     }
+    ]
+   },
+   "I6": {
+    "cod": "I6",
+    "titulo": "Cotización de pedidos",
+    "nota": null,
+    "opciones": [
+     {
+      "nivel": 0,
+      "texto": "Cotizo con un precio de referencia y la experiencia del momento."
+     },
+     {
+      "nivel": 1,
+      "texto": "Cotizo sobre el material más un porcentaje que cubre lo demás."
+     },
+     {
+      "nivel": 2,
+      "texto": "La cotización parte del costo calculado del trabajo, con horas de máquina y de mano de obra."
+     },
+     {
+      "nivel": 3,
+      "texto": "Comparo lo cotizado contra lo que realmente costó el trabajo terminado, y ajusto los criterios de cotización."
+     }
+    ]
+   },
+   "I7": {
+    "cod": "I7",
+    "titulo": "Retrabajos y rechazos",
+    "nota": "pregunta factual",
+    "opciones": [
+     {
+      "nivel": 0,
+      "texto": "No registramos cuánto se rehace; se corrige sobre la marcha y no queda constancia."
+     },
+     {
+      "nivel": 1,
+      "texto": "Sabemos que hay retrabajos frecuentes, pero no están cuantificados."
+     },
+     {
+      "nivel": 2,
+      "texto": "Registramos los retrabajos y rechazos, y conocemos su frecuencia."
+     },
+     {
+      "nivel": 3,
+      "texto": "Registramos la causa de cada retrabajo y actuamos sobre la que más se repite."
+     }
+    ]
+   },
+   "I8": {
+    "cod": "I8",
+    "titulo": "Cumplimiento del plazo de entrega",
+    "nota": null,
+    "opciones": [
+     {
+      "nivel": 0,
+      "texto": "Prometemos una fecha estimada y habitualmente se entrega más tarde."
+     },
+     {
+      "nivel": 1,
+      "texto": "Comprometemos fecha, pero no medimos cuántas veces se cumple."
+     },
+     {
+      "nivel": 2,
+      "texto": "Medimos el porcentaje de pedidos entregados en la fecha comprometida."
+     },
+     {
+      "nivel": 3,
+      "texto": "Medimos el cumplimiento, conocemos las causas de los atrasos y avisamos al cliente antes de que venza el plazo."
+     }
+    ]
+   }
+  },
+  "fichas": {
+   "B1-0": {
+    "cod": "B1",
+    "nivel": 0,
+    "eco": "no sé qué porcentaje hacen mis 10 mejores clientes",
+    "accion": "Extraer el ranking de clientes por facturación de los últimos 12 meses y calcular qué porcentaje representan los primeros 10 y los primeros 20. Es un cálculo de una hora que suele modificar la percepción del riesgo del negocio.",
+    "responsable": "administración",
+    "plazo": "15 días",
+    "esfuerzo": "bajo",
+    "impacto": "alto"
+   },
+   "B1-1": {
+    "cod": "B1",
+    "nivel": 1,
+    "eco": "lo sé de forma aproximada",
+    "accion": "Convertir el dato en seguimiento: ranking mensual con variación contra el mismo período del año anterior. Permite detectar la caída de un cliente importante cuando todavía se puede actuar, en lugar de descubrirla al cierre del ejercicio.",
+    "responsable": "administración",
+    "plazo": "30 días",
+    "esfuerzo": "bajo",
+    "impacto": "alto"
+   },
+   "B1-2": {
+    "cod": "B1",
+    "nivel": 2,
+    "eco": "lo mido y conozco mi concentración",
+    "accion": "Definir acciones diferenciadas: plan de contacto y condiciones específicas para los clientes clave, y una meta de captación para reducir la dependencia. Cuando un cliente concentra una porción alta de la facturación, su pérdida deja de ser un problema comercial y pasa a ser estructural.",
+    "responsable": "dueño + comercial",
+    "plazo": "90 días",
+    "esfuerzo": "medio",
+    "impacto": "alto"
+   },
+   "B2-0": {
+    "cod": "B2",
+    "nivel": 0,
+    "eco": "vendemos a quien viene o llama",
+    "accion": "Armar el padrón de clientes inactivos: los que compraron en los últimos 24 meses y no compraron en los últimos 6. Es la lista de contactos con mayor tasa de respuesta que tiene el negocio y no requiere ninguna inversión en captación.",
+    "responsable": "administración + mostrador",
+    "plazo": "30 días",
+    "esfuerzo": "bajo",
+    "impacto": "alto"
+   },
+   "B2-1": {
+    "cod": "B2",
+    "nivel": 1,
+    "eco": "hay vendedores, sin objetivos ni recorrido definido",
+    "accion": "Asignar clientes por vendedor y fijar objetivo mensual de facturación y de cantidad de clientes activos. Sin clientes asignados a alguien, nadie responde por que un cliente deje de comprar.",
+    "responsable": "dueño",
+    "plazo": "45 días",
+    "esfuerzo": "bajo",
+    "impacto": "alto"
+   },
+   "B2-2": {
+    "cod": "B2",
+    "nivel": 2,
+    "eco": "clientes asignados con objetivos",
+    "accion": "Incorporar seguimiento de actividad y no sólo de resultado: registro de visitas o contactos y alerta de clientes asignados sin compra en los últimos 60 días. El objetivo de facturación se puede cumplir con dos clientes grandes mientras el resto de los clientes deja de comprar por detrás.",
+    "responsable": "comercial",
+    "plazo": "60 días",
+    "esfuerzo": "medio",
+    "impacto": "alto"
+   },
+   "I1-0": {
+    "cod": "I1",
+    "nivel": 0,
+    "eco": "no sé cuánto cuesta fabricar cada producto",
+    "accion": "Costear un solo producto, el de mayor facturación: material consumido, horas de trabajo a valor hora cargado, y una parte de los gastos de planta proporcional a esas horas. Comparar el resultado contra el precio al que se vende. Un solo producto costeado suele cambiar la conversación sobre precios más que un sistema de costeo completo que nunca se termina.",
+    "responsable": "dueño + administración",
+    "plazo": "30 días",
+    "esfuerzo": "medio",
+    "impacto": "alto"
+   },
+   "I1-1": {
+    "cod": "I1",
+    "nivel": 1,
+    "eco": "estimación por producto basada en el material",
+    "accion": "Incorporar la mano de obra al cálculo con un valor hora que incluya cargas sociales, no solo el sueldo de bolsillo. En producción a pedido la mano de obra suele pesar tanto como el material, y dejarla afuera hace que los trabajos de mucha elaboración parezcan más rentables de lo que son.",
+    "responsable": "administración",
+    "plazo": "45 días",
+    "esfuerzo": "medio",
+    "impacto": "alto"
+   },
+   "I1-2": {
+    "cod": "I1",
+    "nivel": 2,
+    "eco": "costeo con material, mano de obra y gastos de planta",
+    "accion": "Cerrar el circuito comparando el costo calculado contra el costo real de los trabajos terminados, al menos en los cinco pedidos más grandes del mes. La diferencia entre lo que se presupuestó y lo que efectivamente costó es la corrección que necesita el cálculo, y sin ese cierre el costeo envejece sin que nadie lo note.",
+    "responsable": "administración + producción",
+    "plazo": "60 días",
+    "esfuerzo": "medio",
+    "impacto": "alto"
+   },
+   "I2-0": {
+    "cod": "I2",
+    "nivel": 0,
+    "eco": "se fabrica según lo que apura el cliente",
+    "accion": "Armar un tablero visible con los trabajos en curso y su fecha comprometida, aunque sea una pizarra en el taller. El objetivo no es optimizar sino hacer visible la carga: mientras el orden de producción viva en la cabeza del encargado, cada pedido urgente desordena todo lo demás sin que se vea el costo de hacerlo.",
+    "responsable": "encargado de producción",
+    "plazo": "30 días",
+    "esfuerzo": "bajo",
+    "impacto": "alto"
+   },
+   "I2-1": {
+    "cod": "I2",
+    "nivel": 1,
+    "eco": "hay un orden pero se reacomoda por urgencias",
+    "accion": "Pasar a una programación semanal con fecha comprometida por trabajo, y registrar cada vez que se altera y por qué. Ese registro, en un mes, muestra si las urgencias vienen de unos pocos clientes, de una mala estimación de los plazos al cotizar, o de faltantes de material.",
+    "responsable": "encargado de producción",
+    "plazo": "45 días",
+    "esfuerzo": "medio",
+    "impacto": "alto"
+   },
+   "I2-2": {
+    "cod": "I2",
+    "nivel": 2,
+    "eco": "programación semanal con fecha por trabajo",
+    "accion": "Incorporar la carga real de cada puesto a la programación: cuántas horas de trabajo tiene comprometidas y cuántas hay disponibles. Programar sin mirar la capacidad del puesto que limita genera fechas que no se pueden cumplir, y el atraso aparece recién cuando ya es tarde para avisar.",
+    "responsable": "encargado de producción",
+    "plazo": "60 días",
+    "esfuerzo": "medio",
+    "impacto": "alto"
+   },
+   "I3-0": {
+    "cod": "I3",
+    "nivel": 0,
+    "eco": "no sé cuánto puedo producir ni dónde se traba",
+    "accion": "Identificar el cuello de botella con una observación simple: recorrer el taller tres veces al día durante una semana y anotar delante de qué puesto se acumula trabajo esperando. El puesto donde se junta la cola es el que define la capacidad de toda la planta, y suele no ser el que uno supone.",
+    "responsable": "encargado de producción",
+    "plazo": "30 días",
+    "esfuerzo": "bajo",
+    "impacto": "alto"
+   },
+   "I3-1": {
+    "cod": "I3",
+    "nivel": 1,
+    "eco": "sé dónde se traba por experiencia, sin medirlo",
+    "accion": "Medir la capacidad del puesto que limita: cuántas horas está efectivamente produciendo por semana y cuántas está parado esperando material, preparación o decisión. Casi siempre aparece capacidad disponible antes de que haga falta invertir en una máquina nueva.",
+    "responsable": "encargado de producción",
+    "plazo": "45 días",
+    "esfuerzo": "medio",
+    "impacto": "alto"
+   },
+   "I3-2": {
+    "cod": "I3",
+    "nivel": 2,
+    "eco": "puesto que limita identificado y con capacidad conocida",
+    "accion": "Usar la medición para decidir: si la ocupación del cuello de botella está cerca del máximo de forma sostenida, evaluar turno adicional, tercerización de esa operación o inversión, en ese orden de costo. La decisión sobre el puesto que limita es la única que aumenta la capacidad de toda la planta.",
+    "responsable": "dueño",
+    "plazo": "90 días",
+    "esfuerzo": "medio",
+    "impacto": "alto"
+   },
+   "I4-0": {
+    "cod": "I4",
+    "nivel": 0,
+    "eco": "compramos cuando falta y la producción se frena",
+    "accion": "Listar los insumos que frenan la producción cuando faltan —no todos, los cinco o seis críticos— y anotar para cada uno el plazo de entrega real del proveedor. Con ese dato se define un stock mínimo que cubra ese plazo. Una parada de planta cuesta mucho más que el capital inmovilizado en el material que la evita.",
+    "responsable": "compras + producción",
+    "plazo": "30 días",
+    "esfuerzo": "bajo",
+    "impacto": "alto"
+   },
+   "I4-1": {
+    "cod": "I4",
+    "nivel": 1,
+    "eco": "compramos por experiencia, sin punto de pedido",
+    "accion": "Definir punto de pedido para esos insumos críticos: consumo promedio por el plazo de entrega, más un margen de seguridad. La experiencia funciona mientras la demanda es estable; el punto de pedido escrito funciona también cuando el que sabe está de licencia.",
+    "responsable": "compras",
+    "plazo": "45 días",
+    "esfuerzo": "bajo",
+    "impacto": "alto"
+   },
+   "I4-2": {
+    "cod": "I4",
+    "nivel": 2,
+    "eco": "punto de pedido para los insumos principales",
+    "accion": "Vincular la compra con la producción programada en lugar del consumo histórico, y registrar las horas de planta paradas por falta de material. Ese registro es lo que justifica, con un número, revisar un proveedor que entrega tarde o sostener más stock de un insumo puntual.",
+    "responsable": "compras + producción",
+    "plazo": "60 días",
+    "esfuerzo": "medio",
+    "impacto": "medio"
+   },
+   "I5-0": {
+    "cod": "I5",
+    "nivel": 0,
+    "eco": "no sé qué porcentaje de material se pierde",
+    "accion": "Medir la merma de un solo material, el de mayor peso en el costo: cuánto se compró y cuánto terminó en producto vendible durante un mes. La diferencia, expresada en porcentaje y en pesos, suele ser el número que más sorprende de todo el diagnóstico.",
+    "responsable": "producción + administración",
+    "plazo": "30 días",
+    "esfuerzo": "medio",
+    "impacto": "alto"
+   },
+   "I5-1": {
+    "cod": "I5",
+    "nivel": 1,
+    "eco": "sé que hay pérdida alta, no está medida",
+    "accion": "Separar la merma en sus tres causas y medir cada una: la inevitable por recorte o despunte, la que viene de errores de ejecución y la que viene de material en mal estado. Son tres problemas distintos con tres soluciones distintas, y sin separarlos se termina discutiendo sobre el total sin poder actuar.",
+    "responsable": "encargado de producción",
+    "plazo": "45 días",
+    "esfuerzo": "medio",
+    "impacto": "alto"
+   },
+   "I5-2": {
+    "cod": "I5",
+    "nivel": 2,
+    "eco": "merma medida en los materiales principales",
+    "accion": "Incorporar el porcentaje de merma al costeo y a la cotización. Cotizar con el material neto cuando en la práctica se consume un porcentaje mayor significa regalar esa diferencia en cada pedido, y se nota recién en el resultado del mes, donde ya no se puede atribuir a ningún trabajo en particular.",
+    "responsable": "administración",
+    "plazo": "60 días",
+    "esfuerzo": "bajo",
+    "impacto": "alto"
+   },
+   "I6-0": {
+    "cod": "I6",
+    "nivel": 0,
+    "eco": "cotizo con precio de referencia y experiencia",
+    "accion": "Armar una planilla de cotización con tres renglones fijos: material con su merma, horas de trabajo a valor hora cargado, y margen. Cotizar de memoria funciona mientras los pedidos se parecen entre sí; con pedidos distintos, el error no se compensa y se trabaja a pérdida sin saber en cuáles.",
+    "responsable": "dueño",
+    "plazo": "30 días",
+    "esfuerzo": "bajo",
+    "impacto": "alto"
+   },
+   "I6-1": {
+    "cod": "I6",
+    "nivel": 1,
+    "eco": "cotizo material más un porcentaje",
+    "accion": "Reemplazar el porcentaje único por las horas que efectivamente lleva el trabajo. Un recargo fijo sobre el material subsidia los trabajos de mucha elaboración con los de poca: los primeros se venden baratos y los segundos se pierden por caros, y el efecto neto es una cartera de pedidos cada vez menos rentable.",
+    "responsable": "dueño + producción",
+    "plazo": "45 días",
+    "esfuerzo": "medio",
+    "impacto": "alto"
+   },
+   "I6-2": {
+    "cod": "I6",
+    "nivel": 2,
+    "eco": "cotización desde el costo calculado del trabajo",
+    "accion": "Comparar lo cotizado contra lo que costó el trabajo terminado en los pedidos más grandes, y llevar el desvío como indicador. Si los trabajos terminan costando sistemáticamente más de lo cotizado, el problema no está en el precio sino en la estimación, y se corrige en los criterios de cotización.",
+    "responsable": "dueño + administración",
+    "plazo": "60 días",
+    "esfuerzo": "medio",
+    "impacto": "alto"
+   },
+   "I7-0": {
+    "cod": "I7",
+    "nivel": 0,
+    "eco": "no registramos cuánto se rehace",
+    "accion": "Empezar por el registro más simple: una planilla donde se anote cada trabajo que hubo que rehacer, con el motivo en una línea. Dos semanas alcanzan para ver un patrón. El retrabajo consume material, horas del puesto que limita y plazo de entrega, pero como no se factura aparte, no aparece en ningún lado.",
+    "responsable": "encargado de producción",
+    "plazo": "30 días",
+    "esfuerzo": "bajo",
+    "impacto": "alto"
+   },
+   "I7-1": {
+    "cod": "I7",
+    "nivel": 1,
+    "eco": "hay retrabajos frecuentes sin cuantificar",
+    "accion": "Cuantificar el retrabajo en horas y en material, y expresarlo como porcentaje de la capacidad mensual. Convertir 'se rehace bastante' en 'el retrabajo consume el equivalente a cuatro días de planta por mes' es lo que convierte una molestia conocida en una prioridad de gestión.",
+    "responsable": "encargado de producción",
+    "plazo": "45 días",
+    "esfuerzo": "medio",
+    "impacto": "alto"
+   },
+   "I7-2": {
+    "cod": "I7",
+    "nivel": 2,
+    "eco": "retrabajos y rechazos registrados, con su frecuencia",
+    "accion": "Clasificar las causas con categorías fijas —plano o especificación poco clara, error de ejecución, material fuera de tolerancia, herramienta o máquina— y revisar mensualmente cuál concentra más casos. La corrección va a la causa dominante, no a todas a la vez.",
+    "responsable": "encargado de producción",
+    "plazo": "60 días",
+    "esfuerzo": "medio",
+    "impacto": "medio"
+   },
+   "I8-0": {
+    "cod": "I8",
+    "nivel": 0,
+    "eco": "se promete una fecha y se entrega más tarde",
+    "accion": "Comprometer fechas que la planta pueda sostener en una semana cargada, no en la mejor semana. Un plazo más largo y cumplido vale más que uno corto e incumplido: el cliente organiza su propio trabajo con la fecha que se le da, y el atraso le cuesta a él aunque el costo lo pague la relación.",
+    "responsable": "dueño + producción",
+    "plazo": "30 días",
+    "esfuerzo": "bajo",
+    "impacto": "alto"
+   },
+   "I8-1": {
+    "cod": "I8",
+    "nivel": 1,
+    "eco": "comprometemos fecha pero no medimos el cumplimiento",
+    "accion": "Registrar para cada pedido la fecha comprometida y la de entrega real, y sacar el porcentaje de cumplimiento mensual. Es un indicador de dos columnas en una planilla, y es el que mejor explica pérdidas de clientes que se atribuyen a precio.",
+    "responsable": "administración",
+    "plazo": "45 días",
+    "esfuerzo": "bajo",
+    "impacto": "alto"
+   },
+   "I8-2": {
+    "cod": "I8",
+    "nivel": 2,
+    "eco": "medimos el cumplimiento del plazo comprometido",
+    "accion": "Agregar dos cosas al indicador: la causa de cada atraso, para saber si el problema es de programación, de material o de capacidad, y el aviso anticipado al cliente cuando la fecha no se va a cumplir. Un atraso avisado a tiempo es un inconveniente; uno que el cliente descubre el día de la entrega es una pérdida de confianza.",
+    "responsable": "producción + comercial",
+    "plazo": "60 días",
+    "esfuerzo": "bajo",
+    "impacto": "alto"
+   }
+  }
  }
 };
 
@@ -2790,6 +3546,6 @@ document.querySelectorAll(".rubro:not([disabled])").forEach(b => b.onclick = () 
 });
 </script>
 <style>@keyframes draw{to{stroke-dashoffset:0}}</style>
-<!-- criterya-express build 2026-10-21-d-rubros -->
+<!-- criterya-express build 2026-10-22-e-industria -->
 </body>
 </html>
