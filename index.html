@@ -318,7 +318,140 @@ button{cursor:pointer}
   html{scroll-behavior:auto}
   .rv{opacity:1;transform:none}
 }
+
+/* ---- variante B: dos puertas en el hero ---- */
+.puertas{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:30px}
+.puerta{display:flex;flex-direction:column;gap:7px;text-decoration:none;
+  background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.16);
+  border-radius:10px;padding:19px 20px 17px;transition:background .2s,border-color .2s,transform .2s}
+.puerta:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.4);transform:translateY(-2px)}
+.puerta__k{font-family:var(--mono);font-size:.64rem;letter-spacing:.14em;
+  text-transform:uppercase;color:#8ED0DC}
+.puerta b{font-family:var(--disp);font-weight:700;font-size:1.12rem;color:#fff;letter-spacing:-.015em}
+.puerta__d{font-size:.86rem;line-height:1.5;color:rgba(255,255,255,.66)}
+.puerta__go{margin-top:6px;font-family:var(--disp);font-weight:600;font-size:.86rem;color:#fff;
+  display:inline-flex;align-items:center;gap:7px}
+.puerta__go i{font-style:normal;background:var(--act);color:#fff;border-radius:3px;
+  padding:1px 7px;font-size:.72rem;letter-spacing:.04em}
+.puerta__go::after{content:"";width:16px;height:1.5px;background:var(--act-lt);transition:width .2s}
+.puerta:hover .puerta__go::after{width:26px}
+@media (max-width:760px){.puertas{grid-template-columns:1fr}}
+
+
+/* ---- carrusel del hero ---- */
+.show{position:relative}
+.show__stage{position:relative;background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.16);border-radius:12px;padding:24px 26px 20px;
+  min-height:430px;overflow:hidden}
+.slide{margin:0;position:absolute;inset:24px 26px 20px;opacity:0;visibility:hidden;
+  transform:translateY(10px);transition:opacity .55s ease,transform .55s ease,visibility .55s;
+  display:flex;flex-direction:column}
+.slide[data-on]{opacity:1;visibility:visible;transform:none}
+.slide__cap{margin-bottom:20px}
+.slide__cap b{display:block;font-family:var(--disp);font-weight:700;font-size:1.1rem;
+  color:#fff;letter-spacing:-.015em}
+.slide__cap span{display:block;margin-top:4px;font-size:.84rem;color:rgba(255,255,255,.58)}
+.slide__pie{margin:auto 0 0;padding-top:16px;border-top:1px solid rgba(255,255,255,.12);
+  font-size:.82rem;line-height:1.55;color:rgba(255,255,255,.62)}
+.slide img{width:100%;height:230px;object-fit:cover;border-radius:8px;display:block}
+
+/* comparacion de precios */
+.cmp{display:grid;gap:13px}
+.cmp__r{display:grid;grid-template-columns:1fr 92px 46px;gap:12px;align-items:center}
+.cmp__a{font-size:.85rem;color:rgba(255,255,255,.88)}
+.cmp__b{height:7px;background:rgba(255,255,255,.13);border-radius:4px;overflow:hidden}
+.cmp__b i{display:block;height:100%;background:var(--b2);border-radius:4px}
+.cmp__r[data-alto] .cmp__b i{background:var(--act)}
+.cmp__v{font-family:var(--mono);font-size:.78rem;text-align:right;color:rgba(255,255,255,.6)}
+.cmp__r[data-alto] .cmp__v{color:var(--act-lt);font-weight:600}
+
+/* participacion por zona */
+.zon{display:grid;gap:14px}
+.zon__r{display:grid;grid-template-columns:96px 1fr 42px;gap:12px;align-items:center}
+.zon__r>span:first-child{font-size:.85rem;color:rgba(255,255,255,.88)}
+.zon__b{height:9px;background:rgba(255,255,255,.13);border-radius:5px;overflow:hidden}
+.zon__b i{display:block;height:100%;background:linear-gradient(90deg,var(--b2),#8ED0DC);border-radius:5px}
+.zon__r b{font-family:var(--disp);font-weight:700;font-size:.92rem;color:#fff;text-align:right;
+  font-variant-numeric:tabular-nums}
+
+/* tablero */
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.kpi3{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
+  border-radius:8px;padding:14px 15px}
+.kpi3 span{display:block;font-size:.76rem;color:rgba(255,255,255,.55);margin-bottom:7px}
+.kpi3 b{display:block;font-family:var(--disp);font-weight:800;font-size:1.5rem;color:#fff;
+  letter-spacing:-.035em;font-variant-numeric:tabular-nums;line-height:1}
+.kpi3 b i{font-style:normal;font-size:.9rem;opacity:.6;margin-left:1px}
+.kpi3 em{display:block;margin-top:6px;font-family:var(--mono);font-size:.72rem;font-style:normal}
+.kpi3 em[data-up]{color:#7FD4B0} .kpi3 em[data-dn]{color:var(--act-lt)}
+
+/* controles */
+.show__nav{display:flex;align-items:center;gap:9px;margin-top:14px}
+.dot{width:26px;height:4px;border-radius:2px;border:none;padding:0;cursor:pointer;
+  background:rgba(255,255,255,.22);transition:background .25s,width .25s}
+.dot:hover{background:rgba(255,255,255,.45)}
+.dot[data-on]{background:var(--act-lt);width:40px}
+.dot:focus-visible{outline:2px solid #8ED0DC;outline-offset:3px}
+.show__note{margin-left:auto;font-family:var(--mono);font-size:.66rem;letter-spacing:.08em;
+  text-transform:uppercase;color:rgba(255,255,255,.35)}
+@media (max-width:760px){.show__stage{min-height:468px}}
+@media (prefers-reduced-motion:reduce){.slide{transition:none}}
+
+
+/* ====== DIRECCIÓN VISUAL: NOCTURNO ====== */
+
+:root{
+  --paper:#0B0E12; --card:#141A23; --surface:#10161E; --line:#242D39;
+  --ink:#E6EDF4; --navy:#F2F7FB; --muted:#8B9DAD; --cyan:#4FC3D0; --deep:#07090D;
+}
+body{background:var(--paper);color:var(--ink)}
+.nav{background:rgba(11,14,18,.9);border-bottom-color:#1D242E}
+.nav.is-stuck,.nav[data-stuck]{border-bottom-color:#2A3442}
+.panel,.foot{background:#05080C}
+.foot{color:#7F93A3}
+.btn--nav{background:var(--act)} .btn--nav:hover{background:var(--act-h)}
+.btn--out{color:#E6EDF4;border-color:#2E3844}
+.btn--out:hover{background:rgba(255,255,255,.07);border-color:#4A5765}
+.diag{background:linear-gradient(175deg,#0E1621 0%,#17242F 100%)}
+.todo{background:#1B1710;border-color:#6E5526;color:#E3D3AE}
+.fld input,.fld textarea,.fld select{background:#10161E;color:#E6EDF4;border-color:#2A3340}
+.fld input:focus,.fld textarea:focus,.fld select:focus{background:#161E28}
+.who,.flow{border-top-color:var(--act)}
+.dg__step b{background:#2B3542} .dg--live .dg__step b{background:var(--act)}
+.bio__ph{background:#141A23;border-color:#2A3340}
+.todo p{color:#E3D3AE}
+.svc li::before{background:var(--cyan)}
+.dot{background:rgba(255,255,255,.22)}
+
+
+/* ---- láminas del carrusel ---- */
+.hist{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;align-items:end;
+  height:214px;padding-top:4px}
+.hist__c{display:flex;flex-direction:column;align-items:center;height:100%;justify-content:flex-end}
+.hist__c b{font-family:var(--disp);font-weight:800;font-size:1.05rem;color:rgba(255,255,255,.92);
+  font-variant-numeric:tabular-nums;margin-bottom:7px;letter-spacing:-.02em}
+.hist__c i{display:block;width:100%;border-radius:4px 4px 0 0;
+  background:linear-gradient(180deg,#4FC3D0,#2F8FA0);min-height:5px;
+  transition:height .7s cubic-bezier(.3,0,.2,1)}
+.hist__c[data-eje] i{background:linear-gradient(180deg,#7FD4B0,#3F9A77)}
+.hist__c[data-alto] i{background:linear-gradient(180deg,#E8835A,#B84A22)}
+.hist__c span{margin-top:9px;font-size:.68rem;line-height:1.3;text-align:center;
+  color:rgba(255,255,255,.5)}
+.hist__c[data-alto] span{color:rgba(232,131,90,.85)}
+
+.zon__leg{display:flex;gap:18px;margin-top:15px}
+.zon__leg span{display:flex;align-items:center;gap:7px;font-size:.72rem;color:rgba(255,255,255,.5)}
+.zon__leg i{width:14px;height:7px;border-radius:3px;background:rgba(255,255,255,.13)}
+.zon__leg i[data-f]{background:linear-gradient(90deg,#2F8FA0,#8ED0DC)}
+
+.spark{display:block;width:100%;height:26px;margin-top:9px;overflow:visible}
+.spark polyline{fill:none;stroke:#7FD4B0;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;
+  vector-effect:non-scaling-stroke}
+.spark[data-dn] polyline{stroke:#E8835A}
+.kpi3 b i{font-style:normal;font-size:.82rem;opacity:.55;margin-left:1px}
+
 </style>
+<meta name="robots" content="index,follow">
 </head>
 <body>
 
@@ -327,6 +460,7 @@ button{cursor:pointer}
     <a class="nav__brand" href="#top"><img src="/logomark.png" alt=""><b>CRITERYA</b></a>
     <nav class="nav__links">
       <a href="#diagnosticos">Diagnósticos</a>
+      <a href="#mercado">Mercado</a>
       <a href="#servicios">Servicios</a>
       <a href="#indicadores">Indicadores</a>
       <a href="#metodo">Método</a>
@@ -343,29 +477,86 @@ button{cursor:pointer}
     <div class="wrap hero__grid">
       <div>
         <img class="hero__logo" src="/logo-blanco.png" alt="Criterya · Consultora de gestión empresarial">
-        <p class="eyebrow">Autodiagnóstico online · Sin costo</p>
-        <h1>¿Querés saber dónde está parada <em>tu empresa</em>?</h1>
-        <p class="hero__lead">Respondé el cuestionario desde tu computadora y obtené el puntaje de
-        cada área de gestión, el FODA y las cinco acciones de mayor impacto. Sin costo, sin registro
-        previo y sin que nadie te llame si no lo pedís.</p>
-        <div class="hero__cta">
-          <a class="btn btn--act" href="#diagnosticos">
-            Empezar el autodiagnóstico
-            <span class="btn__free">Gratis</span>
+        <p class="eyebrow">Consultoría de gestión · Tandil</p>
+        <h1>Para decidir hace falta el dato. <em>Adentro y afuera</em>.</h1>
+        <p class="hero__lead">Medimos cómo está la gestión de tu empresa por dentro y qué está
+        pasando en tu mercado por fuera. Las dos cosas, con método y con el fundamento a la vista.</p>
+        <div class="puertas">
+          <a class="puerta" href="#diagnosticos">
+            <span class="puerta__k">Hacia adentro</span>
+            <b>Diagnóstico de gestión</b>
+            <span class="puerta__d">Puntaje por área, FODA y las cinco acciones de mayor impacto.</span>
+            <span class="puerta__go">Empezar <i>gratis</i></span>
           </a>
-          <a class="btn btn--out" href="#servicios">Ver los servicios</a>
+          <a class="puerta" href="#mercado">
+            <span class="puerta__k">Hacia afuera</span>
+            <b>Investigación de mercado</b>
+            <span class="puerta__d">Competencia, precios, clientes perdidos y tamaño de tu mercado.</span>
+            <span class="puerta__go">Ver cómo trabajamos</span>
+          </a>
         </div>
         <p class="hero__note">Se procesa en tu navegador · Nada se envía sin tu confirmación</p>
       </div>
 
-      <div class="board" id="board">
-        <div class="board__head">
-          <h2>Áreas de gestión</h2>
-          <span>Peso sobre 100</span>
+      <div class="show" id="show">
+        <div class="show__stage">
+
+          <figure class="slide" data-on>
+            <figcaption class="slide__cap"><b>Relevamiento de precios</b>
+              <span>Cincuenta referencias comparadas contra la competencia</span></figcaption>
+            <div class="hist">
+              <div class="hist__c"><b>3</b><i style="height:13%"></i><span>Muy por<br>debajo</span></div>
+              <div class="hist__c"><b>8</b><i style="height:33%"></i><span>Por<br>debajo</span></div>
+              <div class="hist__c" data-eje><b>24</b><i style="height:100%"></i><span>En línea<br>con el mercado</span></div>
+              <div class="hist__c" data-alto><b>11</b><i style="height:46%"></i><span>Por<br>encima</span></div>
+              <div class="hist__c" data-alto><b>4</b><i style="height:17%"></i><span>Muy por<br>encima</span></div>
+            </div>
+            <p class="slide__pie">Tres de cada diez referencias están por encima del mercado sin que
+            nadie lo haya decidido. Ahí se van los clientes que después se atribuyen al servicio.</p>
+          </figure>
+
+          <figure class="slide">
+            <figcaption class="slide__cap"><b>Cuánto mercado hay en tu zona</b>
+              <span>Participación estimada y potencial sin tomar</span></figcaption>
+            <div class="zon">
+              <div class="zon__r"><span>Tandil</span><span class="zon__b"><i style="width:38%"></i></span><b>38%</b></div>
+              <div class="zon__r"><span>Rauch</span><span class="zon__b"><i style="width:47%"></i></span><b>47%</b></div>
+              <div class="zon__r"><span>Azul</span><span class="zon__b"><i style="width:22%"></i></span><b>22%</b></div>
+              <div class="zon__r"><span>Olavarría</span><span class="zon__b"><i style="width:11%"></i></span><b>11%</b></div>
+              <div class="zon__r"><span>Benito Juárez</span><span class="zon__b"><i style="width:6%"></i></span><b>6%</b></div>
+            </div>
+            <div class="zon__leg"><span><i data-f></i>Tu participación</span><span><i></i>Mercado sin tomar</span></div>
+            <p class="slide__pie">Dónde ya sos fuerte y dónde hay mercado disponible, con nombre y
+            con número. No la misma estrategia para todas las plazas.</p>
+          </figure>
+
+          <figure class="slide">
+            <figcaption class="slide__cap"><b>Tablero de indicadores</b>
+              <span>Lo que deberías poder mirar cualquier lunes</span></figcaption>
+            <div class="kpis">
+              <div class="kpi3"><span>Margen bruto</span><b>31,4<i>%</i></b>
+                <svg class="spark" viewBox="0 0 90 26" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,20 15,18 30,19 45,14 60,12 75,9 90,6"/></svg>
+                <em data-up>+1,2 pts</em></div>
+              <div class="kpi3"><span>Mora a 60 días</span><b>7,8<i>%</i></b>
+                <svg class="spark" data-dn viewBox="0 0 90 26" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,6 15,9 30,8 45,13 60,15 75,18 90,20"/></svg>
+                <em data-up>−2,1 pts</em></div>
+              <div class="kpi3"><span>Rotación de stock</span><b>4,6<i>×</i></b>
+                <svg class="spark" viewBox="0 0 90 26" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,18 15,16 30,17 45,13 60,11 75,10 90,7"/></svg>
+                <em data-up>+0,4</em></div>
+              <div class="kpi3"><span>Entregas en fecha</span><b>86<i>%</i></b>
+                <svg class="spark" data-dn viewBox="0 0 90 26" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,7 15,6 30,10 45,9 60,14 75,13 90,17"/></svg>
+                <em data-dn>−3 pts</em></div>
+            </div>
+            <p class="slide__pie">Actualizado sobre tu propio sistema de gestión. Uno se mueve hacia
+            el lado equivocado: eso es lo que hay que mirar el lunes.</p>
+          </figure>
         </div>
-        <div id="rows"></div>
-        <p class="board__foot">Perfil ilustrativo · El peso de cada área cambia según el rubro ·
-        Tu empresa se mide en el diagnóstico</p>
+        <div class="show__nav">
+          <button class="dot" type="button" data-i="0" aria-label="Relevamiento de precios"></button>
+          <button class="dot" type="button" data-i="1" aria-label="Participación por zona"></button>
+          <button class="dot" type="button" data-i="2" aria-label="Tablero de indicadores"></button>
+          <span class="show__note">Ejemplos ilustrativos</span>
+        </div>
       </div>
     </div>
 
@@ -435,6 +626,44 @@ button{cursor:pointer}
           <div class="dg__go">
             <a class="btn btn--out btn--sm" href="#contacto">Pedir una propuesta</a>
           </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ INVESTIGACIÓN DE MERCADO ============ -->
+  <section class="sec rv" id="mercado">
+    <div class="wrap">
+      <div class="sec__head">
+        <p class="eyebrow">Investigación de mercado</p>
+        <h2>Lo que pasa afuera no lo contesta ningún cuestionario interno</h2>
+        <p>El diagnóstico mira la empresa por dentro. Para decidir dónde abrir, qué línea sumar o
+        cómo mover los precios hace falta salir a buscar el dato afuera.</p>
+      </div>
+      <div class="svcs">
+        <article class="svc">
+          <span class="svc__tag">Competencia</span>
+          <h3>Quién más juega y a qué precio</h3>
+          <p>Relevamiento sistemático de competidores directos: surtido, precios, condiciones de
+          venta y posicionamiento. Comparado contra tu propia estructura.</p>
+        </article>
+        <article class="svc">
+          <span class="svc__tag">Clientes</span>
+          <h3>Por qué compran y por qué dejaron de comprar</h3>
+          <p>Encuestas y entrevistas a clientes activos y perdidos. Los que se fueron suelen
+          explicar mejor el problema que los que se quedaron.</p>
+        </article>
+        <article class="svc">
+          <span class="svc__tag">Demanda</span>
+          <h3>Cuánto mercado hay en tu zona</h3>
+          <p>Dimensionamiento por zona y segmento con datos públicos y relevamiento propio, para
+          saber qué participación tenés y cuánto queda por tomar.</p>
+        </article>
+        <article class="svc">
+          <span class="svc__tag">Decisión</span>
+          <h3>Un informe que se pueda usar</h3>
+          <p>Conclusiones accionables con su fundamento a la vista, no un documento de cien
+          páginas que termina en un cajón.</p>
         </article>
       </div>
     </div>
@@ -591,44 +820,6 @@ button{cursor:pointer}
     </div>
   </section>
 
-  <!-- ============ INVESTIGACIÓN DE MERCADO ============ -->
-  <section class="sec rv" id="mercado">
-    <div class="wrap">
-      <div class="sec__head">
-        <p class="eyebrow">Investigación de mercado</p>
-        <h2>Lo que pasa afuera no lo contesta ningún cuestionario interno</h2>
-        <p>El diagnóstico mira la empresa por dentro. Para decidir dónde abrir, qué línea sumar o
-        cómo mover los precios hace falta salir a buscar el dato afuera.</p>
-      </div>
-      <div class="svcs">
-        <article class="svc">
-          <span class="svc__tag">Competencia</span>
-          <h3>Quién más juega y a qué precio</h3>
-          <p>Relevamiento sistemático de competidores directos: surtido, precios, condiciones de
-          venta y posicionamiento. Comparado contra tu propia estructura.</p>
-        </article>
-        <article class="svc">
-          <span class="svc__tag">Clientes</span>
-          <h3>Por qué compran y por qué dejaron de comprar</h3>
-          <p>Encuestas y entrevistas a clientes activos y perdidos. Los que se fueron suelen
-          explicar mejor el problema que los que se quedaron.</p>
-        </article>
-        <article class="svc">
-          <span class="svc__tag">Demanda</span>
-          <h3>Cuánto mercado hay en tu zona</h3>
-          <p>Dimensionamiento por zona y segmento con datos públicos y relevamiento propio, para
-          saber qué participación tenés y cuánto queda por tomar.</p>
-        </article>
-        <article class="svc">
-          <span class="svc__tag">Decisión</span>
-          <h3>Un informe que se pueda usar</h3>
-          <p>Conclusiones accionables con su fundamento a la vista, no un documento de cien
-          páginas que termina en un cajón.</p>
-        </article>
-      </div>
-    </div>
-  </section>
-
   <!-- ============ MÉTODO ============ -->
   <section class="sec rv" id="metodo">
     <div class="wrap">
@@ -755,6 +946,7 @@ button{cursor:pointer}
     </div>
   </section>
 
+
 </main>
 
 <footer class="foot">
@@ -825,6 +1017,7 @@ function animar(cont, sel){
 
 (function tablero(){
   const c = document.getElementById("rows");
+  if(!c) return;                 /* el hero ahora lleva el carrusel */
   c.innerHTML = AREAS.map(a => `
     <div class="row">
       <span class="row__name">${a.n}</span>
@@ -926,6 +1119,42 @@ document.getElementById("anio").textContent = new Date().getFullYear();
     }
   });
 })();
+
+/* ---- carrusel del hero: rota solo, se detiene al pasar el mouse ---- */
+(function carrusel(){
+  const cont = document.getElementById("show");
+  if(!cont) return;
+  const slides = [...cont.querySelectorAll(".slide")];
+  const dots   = [...cont.querySelectorAll(".dot")];
+  if(slides.length < 2) return;
+  let i = 0, t = null;
+  const quieto = window.matchMedia("(prefers-reduced-motion:reduce)").matches;
+
+  function ver(n){
+    i = (n + slides.length) % slides.length;
+    /* las barras crecen cada vez que su lámina vuelve a entrar */
+    const act = slides[i];
+    act.querySelectorAll(".hist__c i").forEach(b => {
+      const alto = b.style.height; b.style.height = "0";
+      requestAnimationFrame(() => requestAnimationFrame(() => { b.style.height = alto; }));
+    });
+    slides.forEach((s,k)=> k===i ? s.setAttribute("data-on","") : s.removeAttribute("data-on"));
+    dots.forEach((d,k)=> k===i ? d.setAttribute("data-on","") : d.removeAttribute("data-on"));
+  }
+  function arrancar(){ if(quieto) return; parar(); t = setInterval(()=>ver(i+1), 5200); }
+  function parar(){ if(t){ clearInterval(t); t = null; } }
+
+  dots.forEach(d => d.addEventListener("click", ()=>{ ver(+d.dataset.i); arrancar(); }));
+  cont.addEventListener("mouseenter", parar);
+  cont.addEventListener("mouseleave", arrancar);
+  cont.addEventListener("focusin", parar);
+  cont.addEventListener("focusout", arrancar);
+  document.addEventListener("visibilitychange", ()=> document.hidden ? parar() : arrancar());
+
+  ver(0); arrancar();
+})();
+
 </script>
+<!-- sitio-criterya build 2026-11-10-nocturno -->
 </body>
 </html>
