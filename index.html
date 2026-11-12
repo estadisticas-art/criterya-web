@@ -450,6 +450,17 @@ body{background:var(--paper);color:var(--ink)}
 .spark[data-dn] polyline{stroke:#E8835A}
 .kpi3 b i{font-style:normal;font-size:.82rem;opacity:.55;margin-left:1px}
 
+
+/* ---- WhatsApp ---- */
+.wa{position:fixed;right:20px;bottom:20px;z-index:70;display:flex;align-items:center;gap:9px;
+  background:#1FA855;color:#fff;text-decoration:none;border-radius:999px;padding:13px 18px 13px 15px;
+  font-family:var(--disp);font-weight:700;font-size:.9rem;
+  box-shadow:0 10px 28px -8px rgba(0,0,0,.6);transition:transform .18s,background .18s}
+.wa:hover{background:#178A45;transform:translateY(-2px)}
+.wa:focus-visible{outline:2.5px solid #fff;outline-offset:3px}
+.btn--wa{background:#1FA855;color:#fff;gap:8px} .btn--wa:hover{background:#178A45;transform:translateY(-1px)}
+@media (max-width:620px){.wa{right:14px;bottom:14px;padding:14px} .wa span{display:none}}
+@media print{.wa{display:none}}
 </style>
 <meta name="robots" content="index,follow">
 </head>
@@ -921,8 +932,10 @@ body{background:var(--paper);color:var(--ink)}
 
         <aside>
           <div class="box">
-            <h3>Por teléfono</h3>
+            <h3>Por teléfono o WhatsApp</h3>
             <p>Si preferís hablar directo, es la vía más rápida. Atendemos en horario laboral.</p>
+            <a class="btn btn--wa" href="https://wa.me/5492494492344?text=Hola%20Criterya%2C%20quiero%20hacer%20una%20consulta." target="_blank" rel="noopener" style="margin-bottom:9px">
+              <svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor" aria-hidden="true"><path d="M12 3a9 9 0 0 0-7.8 13.5L3 21l4.6-1.2A9 9 0 1 0 12 3Z"/></svg> Escribir por WhatsApp</a>
             <a class="btn btn--out" href="tel:+542494526102">249 452-6102</a>
             <a class="btn btn--out" href="tel:+542494492344" style="margin-top:9px">249 449-2344</a>
           </div>
@@ -935,6 +948,8 @@ body{background:var(--paper);color:var(--ink)}
                 <a href="tel:+542494492344">249 449-2344</a></dd></div>
               <div><dt>Ubicación</dt><dd>Tandil, Buenos Aires<br>
                 <span style="color:var(--muted);font-size:.86rem">Trabajo presencial y remoto</span></dd></div>
+              <div><dt>Instagram</dt><dd>
+                <a href="https://www.instagram.com/criteryatandil/" target="_blank" rel="noopener">@criteryatandil</a></dd></div>
               <div><dt>LinkedIn</dt><dd>
                 <a href="https://www.linkedin.com/in/adrianpages/" target="_blank" rel="noopener">Adrián Pagés</a><br>
                 <a href="https://www.linkedin.com/in/eduardo-rinaldi-33a96857/" target="_blank" rel="noopener">Eduardo Rinaldi</a></dd></div>
@@ -948,6 +963,11 @@ body{background:var(--paper);color:var(--ink)}
 
 </main>
 
+<a class="wa" href="https://wa.me/5492494492344?text=Hola%20Criterya%2C%20quiero%20hacer%20una%20consulta." target="_blank" rel="noopener" aria-label="Escribinos por WhatsApp">
+  <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" aria-hidden="true"><path d="M12 3a9 9 0 0 0-7.8 13.5L3 21l4.6-1.2A9 9 0 1 0 12 3Z"/></svg>
+  <span>WhatsApp</span>
+</a>
+
 <footer class="foot">
   <div class="wrap foot__in">
     <img src="/logo-blanco.png" alt="Criterya">
@@ -959,6 +979,7 @@ body{background:var(--paper);color:var(--ink)}
       <a href="#mercado">Mercado</a>
       <a href="#socios">Socios</a>
       <a href="#contacto">Contacto</a>
+      <a href="https://www.instagram.com/criteryatandil/" target="_blank" rel="noopener">Instagram</a>
     </nav>
     <p class="foot__legal">© <span id="anio">2026</span> Criterya · Consultora de gestión empresarial.
     Los autodiagnósticos en línea ordenan prioridades y no reemplazan el relevamiento en la empresa.</p>
@@ -1154,6 +1175,6 @@ document.getElementById("anio").textContent = new Date().getFullYear();
 })();
 
 </script>
-<!-- sitio-criterya build 2026-11-12-b -->
+<!-- sitio-criterya build 2026-11-12-c -->
 </body>
 </html>
