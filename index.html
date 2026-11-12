@@ -80,10 +80,10 @@ button{cursor:pointer}
   background:rgba(255,255,255,.2);padding:2px 7px;border-radius:3px}
 
 /* ---------- hero ---------- */
-.hero{padding:60px 0 0;background:var(--deep);
+.hero{padding:38px 0 0;background:var(--deep);
   background-image:radial-gradient(ellipse 70% 90% at 80% -18%,rgba(47,143,160,.34),transparent 62%)}
-.hero__grid{padding-bottom:68px}
-.hero__grid{display:grid;grid-template-columns:1.06fr .94fr;gap:56px;align-items:center}
+.hero__grid{padding-bottom:52px}
+.hero__grid{display:grid;grid-template-columns:1.06fr .94fr;gap:56px;align-items:start}
 .hero__logo{width:206px;margin-bottom:28px}
 .hero h1{font-family:var(--disp);font-weight:800;font-size:clamp(2rem,4.7vw,3.15rem);
   line-height:1.06;letter-spacing:-.03em;color:#fff;margin:.32em 0 0;max-width:15ch}
@@ -320,7 +320,7 @@ button{cursor:pointer}
 }
 
 /* ---- variante B: dos puertas en el hero ---- */
-.puertas{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:30px}
+.puertas{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:24px}
 .puerta{display:flex;flex-direction:column;gap:7px;text-decoration:none;
   background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.16);
   border-radius:10px;padding:19px 20px 17px;transition:background .2s,border-color .2s,transform .2s}
@@ -395,7 +395,7 @@ button{cursor:pointer}
 .show__note{margin-left:auto;font-family:var(--mono);font-size:.66rem;letter-spacing:.08em;
   text-transform:uppercase;color:rgba(255,255,255,.35)}
 @media (max-width:760px){.show__stage{min-height:468px}}
-@media (prefers-reduced-motion:reduce){.slide{transition:none}}
+@media (prefers-reduced-motion:reduce){.slide{transition:none;transform:none}.hist__c i{transition:none}}
 
 
 /* ====== DIRECCIÓN VISUAL: NOCTURNO ====== */
@@ -476,7 +476,6 @@ body{background:var(--paper);color:var(--ink)}
   <section class="hero">
     <div class="wrap hero__grid">
       <div>
-        <img class="hero__logo" src="/logo-blanco.png" alt="Criterya · Consultora de gestión empresarial">
         <p class="eyebrow">Consultoría de gestión · Tandil</p>
         <h1>Para decidir hace falta el dato. <em>Adentro y afuera</em>.</h1>
         <p class="hero__lead">Medimos cómo está la gestión de tu empresa por dentro y qué está
@@ -511,8 +510,8 @@ body{background:var(--paper);color:var(--ink)}
               <div class="hist__c" data-alto><b>11</b><i style="height:46%"></i><span>Por<br>encima</span></div>
               <div class="hist__c" data-alto><b>4</b><i style="height:17%"></i><span>Muy por<br>encima</span></div>
             </div>
-            <p class="slide__pie">Tres de cada diez referencias están por encima del mercado sin que
-            nadie lo haya decidido. Ahí se van los clientes que después se atribuyen al servicio.</p>
+            <p class="slide__pie">Quince de cincuenta: tres de cada diez referencias están por encima
+            del mercado. El relevamiento dice cuáles, para decidir una por una.</p>
           </figure>
 
           <figure class="slide">
@@ -1134,14 +1133,14 @@ document.getElementById("anio").textContent = new Date().getFullYear();
     i = (n + slides.length) % slides.length;
     /* las barras crecen cada vez que su lámina vuelve a entrar */
     const act = slides[i];
-    act.querySelectorAll(".hist__c i").forEach(b => {
+    if(!quieto) act.querySelectorAll(".hist__c i").forEach(b => {
       const alto = b.style.height; b.style.height = "0";
       requestAnimationFrame(() => requestAnimationFrame(() => { b.style.height = alto; }));
     });
     slides.forEach((s,k)=> k===i ? s.setAttribute("data-on","") : s.removeAttribute("data-on"));
     dots.forEach((d,k)=> k===i ? d.setAttribute("data-on","") : d.removeAttribute("data-on"));
   }
-  function arrancar(){ if(quieto) return; parar(); t = setInterval(()=>ver(i+1), 5200); }
+  function arrancar(){ parar(); t = setInterval(()=>ver(i+1), quieto ? 7500 : 5200); }
   function parar(){ if(t){ clearInterval(t); t = null; } }
 
   dots.forEach(d => d.addEventListener("click", ()=>{ ver(+d.dataset.i); arrancar(); }));
@@ -1155,6 +1154,6 @@ document.getElementById("anio").textContent = new Date().getFullYear();
 })();
 
 </script>
-<!-- sitio-criterya build 2026-11-10-nocturno -->
+<!-- sitio-criterya build 2026-11-12-b -->
 </body>
 </html>
