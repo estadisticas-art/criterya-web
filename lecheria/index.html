@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Criterya Lechería — Gestión de empresas tamberas</title>
+<meta name="description" content="Consultoría en gestión de tambos: costo por litro, margen, rodeo, alimentación y finanzas. Diagnóstico express gratuito para empresas lecheras.">
+<link rel="icon" href="data:image/png;base64,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">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#043760; --teal:#0D475A; --cyan:#2F8FA0; --cyan-l:#6CC3D1;
+  --bg:#05182A; --bg-2:#081F33; --surface:#0B2639; --surface-2:#0F2E44;
+  --line:rgba(255,255,255,.09); --line-2:rgba(255,255,255,.16);
+  --text:#EAF1F4; --muted:#A6BAC6; --dim:#7F96A4;
+  --cream:#F5EFE3; --cream-2:#EBE2D0; --ink:#0B2236; --ink-muted:#4A5D6B;
+  --pasto:#9CC57A;
+  --r:14px; --r-lg:22px;
+  --f-head:'Archivo',system-ui,sans-serif; --f-body:'IBM Plex Sans',system-ui,sans-serif; --f-mono:'IBM Plex Mono',ui-monospace,monospace;
+  --ease:cubic-bezier(.2,.7,.2,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{font-family:var(--f-body);font-size:17px;line-height:1.6;color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased}
+img,svg{display:block;max-width:100%}
+a{color:inherit}
+h1,h2,h3,h4{font-family:var(--f-head);line-height:1.12;letter-spacing:-.015em;font-weight:700}
+.wrap{width:min(1180px,100% - 40px);margin-inline:auto}
+.skip{position:absolute;left:-999px;top:8px;background:#fff;color:#000;padding:8px 14px;border-radius:8px;z-index:100}
+.skip:focus{left:12px}
+:focus-visible{outline:3px solid var(--cyan-l);outline-offset:3px;border-radius:6px}
+.eyebrow{font-family:var(--f-mono);font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--cyan-l);display:inline-flex;align-items:center;gap:10px}
+.eyebrow::before{content:"";width:22px;height:1px;background:currentColor}
+.sec{padding:clamp(72px,10vw,120px) 0}
+.sec-head{max-width:720px;margin-bottom:52px}
+.sec-head h2{font-size:clamp(30px,4.2vw,46px);margin-top:14px}
+.sec-head p{color:var(--muted);margin-top:16px;font-size:18px}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;gap:10px;min-height:50px;padding:0 24px;border-radius:999px;font-family:var(--f-head);font-weight:600;font-size:16px;text-decoration:none;cursor:pointer;border:1px solid transparent;transition:transform .2s var(--ease),background .2s,border-color .2s,color .2s}
+.btn svg{width:18px;height:18px}
+.btn-primary{background:var(--cream);color:var(--ink)}
+.btn-primary:hover{background:#fff;transform:translateY(-1px)}
+.btn-ghost{border-color:var(--line-2);color:var(--text)}
+.btn-ghost:hover{border-color:var(--cyan-l);color:#fff}
+
+/* nav */
+.nav{position:sticky;top:0;z-index:50;background:rgba(5,24,42,.82);backdrop-filter:saturate(1.4) blur(12px);-webkit-backdrop-filter:saturate(1.4) blur(12px);border-bottom:1px solid var(--line)}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;height:70px;gap:20px}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none}
+.brand img{width:34px;height:34px;background:#fff;border-radius:50%;padding:3px}
+.brand b{font-family:var(--f-head);font-weight:800;letter-spacing:.18em;font-size:16px}
+.brand span{font-family:var(--f-mono);font-size:12px;color:var(--cyan-l);letter-spacing:.12em;text-transform:uppercase;border-left:1px solid var(--line-2);padding-left:12px}
+.nav ul{display:flex;gap:28px;list-style:none}
+.nav ul a{text-decoration:none;font-size:15px;color:var(--muted);transition:color .2s}
+.nav ul a:hover{color:#fff}
+.nav-cta{display:flex;align-items:center;gap:16px}
+.back{font-size:14px;color:var(--dim);text-decoration:none}
+.back:hover{color:var(--text)}
+.nav .btn{min-height:42px;padding:0 18px;font-size:15px;white-space:nowrap}
+@media (max-width:420px){.nav .btn{padding:0 14px;font-size:14px}.kpi strong{font-size:20px}}
+@media (max-width:980px){.nav ul,.back{display:none}}
+@media (max-width:520px){.brand span{display:none}}
+
+/* hero */
+.hero{position:relative;overflow:hidden;padding:clamp(56px,8vw,96px) 0 clamp(64px,9vw,110px)}
+.hero::before{content:"";position:absolute;inset:-20% -10% auto auto;width:780px;height:780px;background:radial-gradient(circle,rgba(47,143,160,.22),transparent 62%);pointer-events:none}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center;position:relative}
+.hero h1{font-size:clamp(38px,5.6vw,66px);font-weight:800;margin:20px 0 22px}
+.hero h1 em{font-style:normal;color:var(--cream);position:relative;white-space:nowrap}
+.hero h1 em::after{content:"";position:absolute;left:0;right:0;bottom:.06em;height:.12em;background:var(--cyan);opacity:.7;border-radius:4px;z-index:-1}
+.lead{font-size:clamp(18px,1.6vw,20px);color:var(--muted);max-width:560px}
+.hero-ctas{display:flex;flex-wrap:wrap;gap:14px;margin-top:34px}
+.hero-meta{display:flex;flex-wrap:wrap;gap:22px;margin-top:34px;font-size:14px;color:var(--dim)}
+.hero-meta span{display:inline-flex;align-items:center;gap:8px}
+.hero-meta svg{width:16px;height:16px;color:var(--pasto)}
+
+/* dashboard card */
+.board{background:linear-gradient(180deg,var(--surface-2),var(--surface));border:1px solid var(--line-2);border-radius:var(--r-lg);padding:26px;box-shadow:0 40px 80px -30px rgba(0,0,0,.6)}
+.board-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:18px}
+.board-top h3{font-size:16px;font-weight:600}
+.tag{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);border:1px solid var(--line-2);border-radius:999px;padding:3px 10px}
+.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.kpi{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.kpi small{display:block;font-size:12.5px;color:var(--dim)}
+.kpi strong{font-family:var(--f-mono);font-weight:500;font-size:24px;color:#fff;letter-spacing:-.02em}
+.kpi strong i{font-style:normal;font-size:13px;color:var(--muted);margin-left:4px}
+.kpi .d{font-family:var(--f-mono);font-size:12px;margin-top:2px}
+.up{color:var(--pasto)} .down{color:#E7A98B}
+.chart{margin-top:14px;background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:12px;padding:14px 16px 8px}
+.chart-h{display:flex;justify-content:space-between;font-size:12.5px;color:var(--dim);margin-bottom:6px}
+.chart svg{width:100%;height:auto}
+.legend{display:flex;gap:16px;font-size:12px;color:var(--dim);margin-top:4px}
+.legend i{display:inline-block;width:10px;height:3px;border-radius:2px;margin-right:6px;vertical-align:middle}
+
+/* problem strip */
+.strip{border-block:1px solid var(--line);background:var(--bg-2)}
+.strip .wrap{display:grid;grid-template-columns:1.1fr 2fr;gap:48px;padding:56px 0;align-items:start}
+.strip h2{font-size:clamp(26px,3vw,34px)}
+.strip h2 span{color:var(--cyan-l)}
+.pains{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
+.pain svg{width:28px;height:28px;color:var(--cyan-l);margin-bottom:12px}
+.pain h3{font-size:17px;margin-bottom:6px}
+.pain p{font-size:15px;color:var(--muted)}
+
+/* areas */
+.areas{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.area{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:28px;transition:border-color .25s,transform .25s var(--ease)}
+.area:hover{border-color:rgba(108,195,209,.45);transform:translateY(-3px)}
+.area .ic{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;background:rgba(47,143,160,.14);color:var(--cyan-l);margin-bottom:18px}
+.area .ic svg{width:24px;height:24px}
+.area h3{font-size:20px;margin-bottom:8px}
+.area p{font-size:15.5px;color:var(--muted)}
+.area ul{list-style:none;margin-top:16px;display:flex;flex-wrap:wrap;gap:6px}
+.area li{font-family:var(--f-mono);font-size:12px;color:var(--text);background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:6px;padding:3px 8px}
+
+/* indicators (cream) */
+.light{background:var(--cream);color:var(--ink)}
+.light .eyebrow{color:var(--teal)}
+.light .sec-head p{color:var(--ink-muted)}
+.ind-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid rgba(11,34,54,.15)}
+.ind{display:grid;grid-template-columns:56px 1fr;gap:18px;padding:26px 8px 26px 0;border-bottom:1px solid rgba(11,34,54,.15)}
+.ind:nth-child(odd){padding-right:40px;border-right:1px solid rgba(11,34,54,.15)}
+.ind:nth-child(even){padding-left:40px}
+.ind .n{font-family:var(--f-mono);font-size:14px;color:var(--teal);padding-top:4px}
+.ind h3{font-size:19px;margin-bottom:4px}
+.ind p{font-size:15.5px;color:var(--ink-muted)}
+.ind code{font-family:var(--f-mono);font-size:13px;background:var(--cream-2);border-radius:6px;padding:2px 8px;display:inline-block;margin-top:8px;color:var(--ink)}
+.note{font-size:14px;color:var(--ink-muted);margin-top:28px;max-width:760px}
+
+/* services */
+.svc{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.card{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:28px 24px;display:flex;flex-direction:column}
+.card.feat{background:linear-gradient(160deg,#0F3A52,var(--surface));border-color:rgba(108,195,209,.45)}
+.card .lvl{font-family:var(--f-mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--cyan-l)}
+.card h3{font-size:21px;margin:10px 0 10px}
+.card p{font-size:15.5px;color:var(--muted);flex:1}
+.card .foot{margin-top:20px;padding-top:16px;border-top:1px solid var(--line);font-size:14px;color:var(--dim);display:flex;justify-content:space-between}
+.card .foot b{color:var(--text);font-weight:600}
+.badge{position:absolute;top:-12px;right:20px;background:var(--cream);color:var(--ink);font-family:var(--f-head);font-weight:700;font-size:12px;padding:4px 12px;border-radius:999px}
+
+/* steps */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:0;counter-reset:s;position:relative}
+.step{padding:0 24px 0 0;position:relative}
+.step::before{counter-increment:s;content:"0" counter(s);font-family:var(--f-mono);font-size:14px;color:var(--bg);background:var(--cyan-l);width:40px;height:40px;border-radius:50%;display:grid;place-items:center;margin-bottom:20px;position:relative;z-index:1}
+.step::after{content:"";position:absolute;top:20px;left:40px;right:0;height:1px;background:var(--line-2)}
+.step:last-child::after{display:none}
+.step h3{font-size:19px;margin-bottom:8px}
+.step p{font-size:15.5px;color:var(--muted)}
+
+/* express CTA */
+.express{background:linear-gradient(135deg,var(--navy),var(--teal));border-radius:28px;padding:clamp(36px,5vw,64px);display:grid;grid-template-columns:1.2fr 1fr;gap:48px;align-items:center;position:relative;overflow:hidden}
+.express::after{content:"";position:absolute;right:-120px;bottom:-160px;width:420px;height:420px;border-radius:50%;border:60px solid rgba(255,255,255,.05)}
+.express h2{font-size:clamp(28px,3.6vw,42px);margin:14px 0 16px}
+.express p{color:#CFE0E8;font-size:17.5px}
+.express .eyebrow{color:var(--cream)}
+.dims{list-style:none;display:grid;gap:10px;position:relative;z-index:1}
+.dims li{display:flex;align-items:center;gap:14px;background:rgba(5,24,42,.35);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px 16px;font-size:15.5px}
+.dims li b{font-family:var(--f-mono);font-weight:500;color:var(--cream);font-size:13px;min-width:24px}
+.express .hero-ctas{margin-top:28px}
+.soon{font-family:var(--f-mono);font-size:12px;color:var(--cream);opacity:.8;margin-top:14px}
+
+/* team */
+.team{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.person{display:flex;gap:20px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:26px}
+.avatar{flex:none;width:64px;height:64px;border-radius:50%;background:#fff;display:grid;place-items:center}
+.avatar img{width:40px}
+.person h3{font-size:19px}
+.person .role{font-size:14px;color:var(--cyan-l);font-family:var(--f-mono);margin:2px 0 8px}
+.person p{font-size:15.5px;color:var(--muted)}
+
+/* contact */
+.contact{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+.contact h2{font-size:clamp(30px,4vw,44px);margin-top:14px}
+.contact p{color:var(--muted);margin-top:14px}
+.ch{display:grid;gap:12px}
+.ch a{display:flex;align-items:center;gap:16px;text-decoration:none;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;transition:border-color .2s}
+.ch a:hover{border-color:var(--cyan-l)}
+.ch svg{width:22px;height:22px;color:var(--cyan-l);flex:none}
+.ch small{display:block;font-size:13px;color:var(--dim)}
+.ch span{font-weight:500}
+
+footer{border-top:1px solid var(--line);padding:32px 0;font-size:14px;color:var(--dim)}
+footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+footer a{color:var(--muted)}
+
+.wa{position:fixed;right:22px;bottom:22px;width:58px;height:58px;border-radius:50%;background:#25D366;display:grid;place-items:center;box-shadow:0 12px 28px rgba(0,0,0,.35);z-index:60;transition:transform .2s}
+.wa:hover{transform:scale(1.06)}
+.wa svg{width:30px;height:30px;color:#fff}
+
+/* reveal */
+.rv{opacity:0;transform:translateY(18px);transition:opacity .6s var(--ease),transform .6s var(--ease)}
+.rv.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.rv{opacity:1;transform:none;transition:none}*{transition:none!important}}
+
+/* responsive */
+@media (max-width:1060px){.svc{grid-template-columns:repeat(2,1fr)}.steps{grid-template-columns:repeat(2,1fr);row-gap:40px}.step:nth-child(2)::after{display:none}}
+@media (max-width:900px){
+  .hero-grid,.express,.contact,.strip .wrap{grid-template-columns:1fr}
+  .areas{grid-template-columns:1fr 1fr}
+  .pains{grid-template-columns:1fr}
+  .team{grid-template-columns:1fr}
+  .ind-grid{grid-template-columns:1fr}
+  .ind:nth-child(odd){padding-right:0;border-right:0}
+  .ind:nth-child(even){padding-left:0}
+}
+@media (max-width:620px){.areas,.svc,.steps{grid-template-columns:1fr}.step::after{display:none}.hero h1 em{white-space:normal}}
+@media print{.nav,.wa{display:none}body{background:#fff;color:#000}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Saltar al contenido</a>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="Criterya Lechería, inicio">
+      <img src="data:image/png;base64,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" alt="">
+      <b>CRITERYA</b><span>Lechería</span>
+    </a>
+    <nav aria-label="Secciones">
+      <ul>
+        <li><a href="#enfoque">Enfoque</a></li>
+        <li><a href="#indicadores">Indicadores</a></li>
+        <li><a href="#servicios">Servicios</a></li>
+        <li><a href="#metodo">Cómo trabajamos</a></li>
+        <li><a href="#contacto">Contacto</a></li>
+      </ul>
+    </nav>
+    <div class="nav-cta">
+      <a class="back" href="/">← criterya.com.ar</a>
+      <a class="btn btn-primary" href="/lecheria/express/">Diagnóstico gratis</a>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+<!-- HERO -->
+<section class="hero" id="top">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="eyebrow">Consultoría para empresas lecheras</span>
+      <h1>Un tambo que produce litros. Una empresa que <em>gana margen.</em></h1>
+      <p class="lead">Ordenamos los números del tambo —producción, rodeo, alimentación y finanzas— para que cada decisión se tome sabiendo cuánto cuesta el litro y cuánto deja.</p>
+      <div class="hero-ctas">
+        <a class="btn btn-primary" href="/lecheria/express/">Hacer el diagnóstico express
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <a class="btn btn-ghost" href="#contacto">Hablar con un consultor</a>
+      </div>
+      <div class="hero-meta">
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Gratuito y online</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Resultados en pesos y en dólares</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Ejercicio julio–junio</span>
+      </div>
+    </div>
+
+    <figure class="board rv" aria-label="Ejemplo ilustrativo de tablero de gestión de un tambo">
+      <div class="board-top"><h3>Tablero del tambo · ejercicio</h3><span class="tag">Ejemplo ilustrativo</span></div>
+      <div class="kpis">
+        <div class="kpi"><small>Producción individual</small><strong>21,4<i>L/VO/día</i></strong><div class="d up">▲ 6% vs. ejercicio ant.</div></div>
+        <div class="kpi"><small>Sólidos útiles</small><strong>1,62<i>kg SU/VO</i></strong><div class="d up">▲ 4%</div></div>
+        <div class="kpi"><small>Costo directo</small><strong>0,27<i>US$/L</i></strong><div class="d down">▲ 3% a vigilar</div></div>
+        <div class="kpi"><small>Vacas en ordeñe / totales</small><strong>84<i>%</i></strong><div class="d up">Objetivo ≥ 82%</div></div>
+      </div>
+      <div class="chart">
+        <div class="chart-h"><span>Litros remitidos por mes</span><span>JUL → JUN</span></div>
+        <svg viewBox="0 0 320 110" role="img" aria-label="Curva estacional de litros remitidos, con caída en verano y recuperación en otoño">
+          <defs><linearGradient id="g" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#6CC3D1" stop-opacity=".35"/><stop offset="1" stop-color="#6CC3D1" stop-opacity="0"/></linearGradient></defs>
+          <g stroke="rgba(255,255,255,.07)"><line x1="0" y1="20" x2="320" y2="20"/><line x1="0" y1="55" x2="320" y2="55"/><line x1="0" y1="90" x2="320" y2="90"/></g>
+          <path d="M5 22 L33 26 L61 34 L89 50 L117 64 L145 80 L173 92 L201 78 L229 52 L257 36 L285 18 L313 26 L313 105 L5 105 Z" fill="url(#g)"/>
+          <path d="M5 22 L33 26 L61 34 L89 50 L117 64 L145 80 L173 92 L201 78 L229 52 L257 36 L285 18 L313 26" fill="none" stroke="#6CC3D1" stroke-width="2.4" stroke-linejoin="round"/>
+          <path d="M5 30 L33 33 L61 40 L89 55 L117 70 L145 86 L173 98 L201 88 L229 63 L257 46 L285 30 L313 36" fill="none" stroke="#F5EFE3" stroke-opacity=".5" stroke-width="1.6" stroke-dasharray="4 4"/>
+        </svg>
+        <div class="legend"><span><i style="background:#6CC3D1"></i>Ejercicio actual</span><span><i style="background:#F5EFE3;opacity:.6"></i>Ejercicio anterior</span></div>
+      </div>
+    </figure>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section class="strip" aria-labelledby="pain-t">
+  <div class="wrap">
+    <h2 id="pain-t" class="rv">El tambo se mide en litros.<br><span>La empresa, en margen.</span></h2>
+    <div class="pains">
+      <div class="pain rv">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg>
+        <h3>Precio y costos que se mueven</h3>
+        <p>El precio por litro, el balanceado y la tierra cambian en pesos y en dólares. Sin una base común, comparar meses o ejercicios engaña.</p>
+      </div>
+      <div class="pain rv">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="7" height="7" rx="1.5"/><rect x="14" y="4" width="7" height="7" rx="1.5"/><rect x="3" y="15" width="7" height="5" rx="1.5"/><path d="M14 17.5h7"/></svg>
+        <h3>Datos en lugares distintos</h3>
+        <p>Liquidación de la usina, control lechero, planilla de alimentación y números del contador. Nadie los junta en un solo tablero.</p>
+      </div>
+      <div class="pain rv">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        <h3>Decisiones a destiempo</h3>
+        <p>Suplementar, vender vacas, recriar o invertir en la fosa: cuando el resultado aparece en el balance, la oportunidad ya pasó.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AREAS -->
+<section class="sec" id="enfoque" aria-labelledby="enf-t">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="eyebrow">Enfoque</span>
+      <h2 id="enf-t">Seis áreas que explican el resultado del tambo</h2>
+      <p>Trabajamos con la misma estructura con la que se lleva el ejercicio productivo: datos físicos mes a mes y resultado económico, para el tambo y para la recría.</p>
+    </div>
+    <div class="areas">
+      <article class="area rv">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2h8l-1 5 3 4v9a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2v-9l3-4z"/><path d="M6 14h12"/></svg></div>
+        <h3>Producción y calidad</h3>
+        <p>Litros remitidos, sólidos y calidad de leche: lo que la usina paga y lo que descuenta.</p>
+        <ul><li>L/VO/día</li><li>% GB · % PB</li><li>kg SU</li><li>CCS · UFC</li></ul>
+      </article>
+      <article class="area rv">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M15 15c2.8 0 5 2.2 5 5"/></svg></div>
+        <h3>Rodeo y reproducción</h3>
+        <p>Estructura del rodeo, partos, preñez y salidas. El motor que define los litros del próximo ejercicio.</p>
+        <ul><li>VO/VT</li><li>Tasa de preñez</li><li>Intervalo parto-concepción</li><li>Mortandad</li></ul>
+      </article>
+      <article class="area rv">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22V10"/><path d="M12 10c0-4 3-7 8-7 0 5-3 8-8 7z"/><path d="M12 14c0-3-2.5-5.5-7-5.5 0 4 2.5 6.5 7 5.5z"/></svg></div>
+        <h3>Alimentación y forraje</h3>
+        <p>Pasto, verdeos, reservas y concentrados: el mayor costo del tambo y la mayor palanca de eficiencia.</p>
+        <ul><li>g concentrado/L</li><li>Silo y heno</li><li>Superficie VT</li><li>Carga</li></ul>
+      </article>
+      <article class="area rv">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></div>
+        <h3>Resultado económico</h3>
+        <p>Ingreso neto, gastos directos, margen bruto y EBITDA, mensual y por ejercicio, en pesos y en dólares.</p>
+        <ul><li>Costo US$/L</li><li>Margen bruto</li><li>EBITDA</li><li>Dif. inventario</li></ul>
+      </article>
+      <article class="area rv">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/><path d="M12 8v4l3 2"/></svg></div>
+        <h3>Crianza y recría</h3>
+        <p>Cuánto cuesta realmente la vaquillona que entra al tambo, y si conviene criarla, comprarla o capitalizar.</p>
+        <ul><li>Costo vaquillona</li><li>Edad al parto</li><li>Mortandad recría</li></ul>
+      </article>
+      <article class="area rv">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h3"/></svg></div>
+        <h3>Finanzas y estructura</h3>
+        <p>Personal, administración, cobranzas y caja. Que el resultado económico se transforme en liquidez.</p>
+        <ul><li>VO/persona</li><li>Período medio de cobro</li><li>Gastos de estructura</li></ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- INDICATORS -->
+<section class="sec light" id="indicadores" aria-labelledby="ind-t">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="eyebrow">Indicadores</span>
+      <h2 id="ind-t">Pocos números, bien calculados, todos los meses</h2>
+      <p>El tablero se arma sobre indicadores comparables entre meses, ejercicios y tambos. Así es como se calculan.</p>
+    </div>
+    <div class="ind-grid">
+      <div class="ind rv"><span class="n">01</span><div><h3>Producción individual</h3><p>Litros totales del mes sobre vacas en ordeñe y días del mes.</p><code>L totales ÷ (VO prom × días)</code></div></div>
+      <div class="ind rv"><span class="n">02</span><div><h3>Sólidos útiles por vaca</h3><p>Grasa más proteína: lo que define el precio en la mayoría de las usinas.</p><code>(kg GB + kg PB) ÷ (VO × días)</code></div></div>
+      <div class="ind rv"><span class="n">03</span><div><h3>Relación VO/VT</h3><p>Qué parte del rodeo está produciendo. Refleja reproducción y manejo de secas.</p><code>VO prom ÷ (VO + VS) prom</code></div></div>
+      <div class="ind rv"><span class="n">04</span><div><h3>Concentrado por litro</h3><p>Eficiencia de la suplementación: cuánto alimento comprado lleva cada litro.</p><code>kg concentrado × 1000 ÷ L totales</code></div></div>
+      <div class="ind rv"><span class="n">05</span><div><h3>Costo directo por litro</h3><p>Gastos directos del tambo, incluida la tierra, convertidos al dólar del mes.</p><code>Gastos directos US$ ÷ L totales</code></div></div>
+      <div class="ind rv"><span class="n">06</span><div><h3>Margen bruto y EBITDA</h3><p>Lo que queda después de gastos directos y de estructura, por litro y por hectárea VT.</p><code>Ingreso neto − directos − estructura</code></div></div>
+      <div class="ind rv"><span class="n">07</span><div><h3>Calidad higiénico-sanitaria</h3><p>Recuento de células somáticas y bacterias: bonificaciones, descuentos y salud de ubre.</p><code>CCS (miles/ml) · UFC (miles/ml)</code></div></div>
+      <div class="ind rv"><span class="n">08</span><div><h3>Período medio de cobro</h3><p>Días que tarda en entrar el dinero de la leche entregada.</p><code>Saldo medio clientes ÷ venta c/IVA × días</code></div></div>
+    </div>
+    <p class="note rv">Los valores de referencia se definen para cada sistema (pastoril, semiestabulado o estabulado) y región; no hay un número “bueno” universal.</p>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section class="sec" id="servicios" aria-labelledby="svc-t">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="eyebrow">Servicios</span>
+      <h2 id="svc-t">De una primera mirada al acompañamiento permanente</h2>
+      <p>Empezás por donde tenga sentido. Cada nivel se apoya en el anterior.</p>
+    </div>
+    <div class="svc">
+      <article class="card feat rv"><span class="badge">Gratis</span><span class="lvl">Nivel 1</span><h3>Diagnóstico express</h3><p>Cuestionario online sobre las seis áreas. Te muestra en minutos dónde está parado el tambo y qué mirar primero.</p><div class="foot"><span>Online</span><b>~10 min</b></div></article>
+      <article class="card rv"><span class="lvl">Nivel 2</span><h3>Diagnóstico integral</h3><p>Relevamiento del ejercicio completo: datos físicos mensuales, inventarios de hacienda y reservas, y resultado económico.</p><div class="foot"><span>Informe</span><b>Ejercicio</b></div></article>
+      <article class="card rv"><span class="lvl">Nivel 3</span><h3>Tablero de gestión</h3><p>Carga mensual y tablero con los indicadores clave, comparado contra el ejercicio anterior y contra objetivos.</p><div class="foot"><span>Seguimiento</span><b>Mensual</b></div></article>
+      <article class="card rv"><span class="lvl">Nivel 4</span><h3>Acompañamiento a la dirección</h3><p>Presupuesto forrajero y económico, flujo de fondos y evaluación de inversiones junto al productor y sus asesores.</p><div class="foot"><span>Presencial / remoto</span><b>A medida</b></div></article>
+    </div>
+  </div>
+</section>
+
+<!-- METHOD -->
+<section class="sec" id="metodo" aria-labelledby="met-t" style="padding-top:0">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="eyebrow">Cómo trabajamos</span>
+      <h2 id="met-t">Complementamos al agrónomo y al veterinario</h2>
+      <p>Ellos conocen el campo y las vacas. Nosotros sumamos la mirada de gestión: números ordenados, comparables y a tiempo.</p>
+    </div>
+    <div class="steps">
+      <div class="step rv"><h3>Diagnóstico</h3><p>Express gratuito o integral, para tener una foto inicial del tambo.</p></div>
+      <div class="step rv"><h3>Relevamiento</h3><p>Ordenamos la información del ejercicio con una planilla única, mes a mes.</p></div>
+      <div class="step rv"><h3>Tablero</h3><p>Indicadores físicos y económicos, en pesos y en dólares, con alertas.</p></div>
+      <div class="step rv"><h3>Seguimiento</h3><p>Reunión periódica para revisar desvíos y decidir con datos.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- EXPRESS -->
+<section class="sec" id="express" aria-labelledby="exp-t" style="padding-top:0">
+  <div class="wrap">
+    <div class="express rv">
+      <div style="position:relative;z-index:1">
+        <span class="eyebrow">Diagnóstico express · Tambos</span>
+        <h2 id="exp-t">¿Dónde está parado tu tambo?</h2>
+        <p>Un autodiagnóstico gratuito, pensado para empresas lecheras. Respondés desde el celular, ves el resultado al instante y podés descargarlo en PDF.</p>
+        <div class="hero-ctas">
+          <a class="btn btn-primary" href="/lecheria/express/">Hacer el diagnóstico
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        </div>
+        <p class="soon">Gratuito · 18 preguntas · 6–8 minutos</p>
+      </div>
+      <ul class="dims" aria-label="Áreas que evalúa el diagnóstico">
+        <li><b>01</b>Producción y calidad de leche</li>
+        <li><b>02</b>Rodeo y reproducción</li>
+        <li><b>03</b>Alimentación y forraje</li>
+        <li><b>04</b>Resultado económico</li>
+        <li><b>05</b>Crianza y recría</li>
+        <li><b>06</b>Finanzas, personal y estructura</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- TEAM -->
+<section class="sec" aria-labelledby="team-t" style="padding-top:0">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="eyebrow">Equipo</span>
+      <h2 id="team-t">Criterya, consultora de gestión empresarial</h2>
+      <p>Desde Tandil, para empresas tamberas de la provincia de Buenos Aires y la región.</p>
+    </div>
+    <div class="team">
+      <div class="person rv"><div class="avatar"><img src="data:image/png;base64,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" alt=""></div><div><h3>Cr. Adrián Pagés</h3><div class="role">Contador público</div><p>Análisis de datos, costos, finanzas y tableros de gestión.</p></div></div>
+      <div class="person rv"><div class="avatar"><img src="data:image/png;base64,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" alt=""></div><div><h3>Lic. Eduardo Rinaldi</h3><div class="role">Licenciado en administración</div><p>Organización, procesos y acompañamiento a la dirección.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="sec" id="contacto" aria-labelledby="ct-t" style="border-top:1px solid var(--line)">
+  <div class="wrap contact">
+    <div class="rv">
+      <span class="eyebrow">Contacto</span>
+      <h2 id="ct-t">Conversemos sobre tu tambo</h2>
+      <p>Una primera charla sin costo para entender el sistema, los datos que ya tenés y qué conviene medir primero.</p>
+    </div>
+    <div class="ch rv">
+      <a href="https://wa.me/5492494492344?text=Hola%20Criterya%2C%20quiero%20consultar%20por%20gesti%C3%B3n%20de%20tambos" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 1-13.3 7.9L3 21l1.2-4.5A9 9 0 1 1 21 12z"/></svg>
+        <div><small>WhatsApp</small><span>249 449-2344</span></div></a>
+      <a href="tel:+542494614411">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg>
+        <div><small>Teléfono · Mario Romano</small><span>2494 61-4411</span></div></a>
+      <a href="https://www.linkedin.com/in/mario-romano-20656624/" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 10v7M8 7v.01M12 17v-4a2 2 0 0 1 4 0v4M12 10v7"/></svg>
+        <div><small>LinkedIn</small><span>Mario Romano</span></div></a>
+      <a href="mailto:contacto@criterya.com.ar?subject=Consulta%20Lecher%C3%ADa">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+        <div><small>Email</small><span>contacto@criterya.com.ar</span></div></a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Criterya · Consultora de gestión empresarial · Tandil</span>
+    <span><a href="/">criterya.com.ar</a> · <a href="https://instagram.com/criteryatandil" target="_blank" rel="noopener">@criteryatandil</a></span>
+  </div>
+</footer>
+
+<a class="wa" href="https://wa.me/5492494492344?text=Hola%20Criterya%2C%20quiero%20consultar%20por%20gesti%C3%B3n%20de%20tambos" target="_blank" rel="noopener" aria-label="Escribir por WhatsApp">
+  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.5 14.4c-.3-.1-1.8-.9-2-1-.3-.1-.5-.1-.7.1-.2.3-.8 1-.9 1.2-.2.2-.3.2-.6.1-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.4-.5c.2-.2.2-.3.3-.5.1-.2 0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.8-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.2-.3-.3-.6-.4zM12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2z"/></svg>
+</a>
+
+<script>
+(function(){
+  var els=document.querySelectorAll('.rv');
+  if(!('IntersectionObserver' in window)||matchMedia('(prefers-reduced-motion: reduce)').matches){els.forEach(function(e){e.classList.add('in')});return;}
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}})},{threshold:.12,rootMargin:'0px 0px -40px 0px'});
+  els.forEach(function(e){io.observe(e)});
+})();
+</script>
+</body>
+</html>

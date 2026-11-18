@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Diagnóstico express · Tambos · Criterya</title>
+<meta name="description" content="Autodiagnóstico gratuito de gestión para empresas lecheras: 18 preguntas sobre producción, rodeo, alimentación, resultado económico, crianza y dirección.">
+<link rel="icon" href="data:image/png;base64,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">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#043760; --teal:#0D475A; --cyan:#2F8FA0; --ink:#0A1B2A;
+  --paper:#F5F1E8; --card:#FFFFFF; --line:#E1DBCD; --muted:#5F6E79;
+  --n0:#9A3B2C; --n1:#B5822C; --n2:#2F8FA0; --n3:#043760;
+  --disp:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --body:"IBM Plex Sans",-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+  --sh:0 1px 2px rgba(4,55,96,.05),0 8px 24px -12px rgba(4,55,96,.18);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+button{font-family:inherit;cursor:pointer}
+:focus-visible{outline:2.5px solid var(--cyan);outline-offset:3px;border-radius:3px}
+.eyebrow{font-family:var(--disp);font-weight:600;font-size:.68rem;letter-spacing:.19em;text-transform:uppercase;color:var(--cyan)}
+.wrap{max-width:760px;margin:0 auto;padding:0 22px}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.hidden{display:none !important}
+
+/* inicio */
+.intro{min-height:100vh;display:flex;flex-direction:column}
+.intro__body{flex:1;display:flex;align-items:center;padding:40px 0}
+.backlink{display:inline-flex;align-items:center;gap:7px;font-size:.86rem;color:var(--muted);text-decoration:none;margin-bottom:28px}
+.backlink:hover{color:var(--navy)}
+.intro__brand{display:flex;align-items:center;gap:14px;margin-bottom:34px}
+.intro__brand img{width:170px;height:auto}
+.intro__brand span{font-family:var(--mono);font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);border-left:1px solid var(--line);padding-left:14px}
+.intro h1{font-family:var(--disp);font-weight:700;font-size:clamp(1.85rem,5.2vw,2.9rem);line-height:1.1;letter-spacing:-.022em;color:var(--navy);margin:.35em 0 0;max-width:20ch}
+.intro__lead{color:var(--muted);font-size:1.02rem;max-width:58ch;margin:20px 0 0}
+.facts{list-style:none;padding:0;margin:34px 0 0;border-top:1px solid var(--line)}
+.facts li{display:flex;gap:16px;align-items:baseline;padding:13px 0;border-bottom:1px solid var(--line);font-size:.94rem}
+.facts b{font-family:var(--mono);font-weight:600;color:var(--teal);font-size:.82rem;min-width:5.4em;letter-spacing:-.02em}
+.form{margin-top:34px;display:grid;gap:16px;grid-template-columns:1fr 1fr}
+.field{display:flex;flex-direction:column;gap:7px}
+.field label,.glabel{font-family:var(--disp);font-weight:600;font-size:.66rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted)}
+.field input{font:inherit;font-size:.96rem;padding:11px 13px;border:1px solid var(--line);border-radius:5px;background:var(--card);color:var(--ink);width:100%}
+.field input:focus{border-color:var(--cyan);outline:none;box-shadow:0 0 0 3px rgba(47,143,160,.15)}
+.sist{grid-column:1/-1;display:flex;flex-direction:column;gap:9px}
+.rubros{display:flex;gap:9px;flex-wrap:wrap}
+.rubro{border:1px solid var(--line);background:var(--card);border-radius:5px;padding:9px 15px;font-size:.88rem;color:var(--ink);font-weight:500;min-height:42px}
+.rubro[aria-pressed=true]{border-color:var(--navy);background:var(--navy);color:#fff;box-shadow:0 0 0 3px rgba(4,55,96,.12)}
+.cta{margin-top:30px;display:inline-flex;align-items:center;gap:13px;background:var(--navy);color:#fff;border:none;border-radius:6px;font-family:var(--disp);font-weight:600;font-size:1rem;letter-spacing:.01em;padding:15px 26px;box-shadow:var(--sh);transition:background .18s,transform .18s}
+.cta:hover{background:#052c4c;transform:translateY(-1px)}
+.cta svg{transition:transform .18s}
+.cta:hover svg{transform:translateX(3px)}
+.note{margin-top:18px;font-size:.8rem;color:var(--muted);max-width:56ch}
+
+/* barra */
+.bar{position:sticky;top:0;z-index:20;background:rgba(245,241,232,.93);backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);border-bottom:1px solid var(--line)}
+.bar__in{max-width:760px;margin:0 auto;padding:12px 22px;display:flex;align-items:center;gap:18px}
+.bar__mark{width:31px;height:auto;display:block;flex:none}
+.bar__meta{flex:1;min-width:0}
+.bar__count{font-family:var(--mono);font-size:.76rem;font-weight:600;color:var(--navy);letter-spacing:.02em}
+.bar__count span{color:var(--muted);font-weight:400}
+.bar__area{font-family:var(--disp);font-weight:600;font-size:.63rem;letter-spacing:.17em;text-transform:uppercase;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dial{width:44px;height:44px;flex:none}
+.exit{flex:none;width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--muted);display:grid;place-items:center}
+.exit:hover{color:var(--navy);border-color:var(--muted)}
+.track{height:2px;background:var(--line)}
+.track__fill{height:100%;background:var(--navy);width:0;transition:width .32s cubic-bezier(.4,0,.2,1)}
+
+/* pregunta */
+.q{padding:46px 0 90px;animation:qin .3s cubic-bezier(.2,0,.2,1)}
+@keyframes qin{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+.q__code{font-family:var(--mono);font-weight:600;font-size:.78rem;color:#fff;background:var(--teal);padding:2px 8px;border-radius:3px;letter-spacing:.03em}
+.q__flag{font-family:var(--disp);font-size:.63rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--n1);border:1px solid currentColor;padding:2px 7px;border-radius:3px;margin-left:9px}
+.q h2{font-family:var(--disp);font-weight:700;font-size:clamp(1.4rem,4.4vw,2rem);line-height:1.18;letter-spacing:-.02em;color:var(--navy);margin:16px 0 6px}
+.q__hint{color:var(--muted);font-size:.87rem;margin:0 0 26px}
+.opts{display:grid;gap:9px}
+.opt{display:grid;grid-template-columns:38px 1fr;align-items:start;gap:14px;text-align:left;width:100%;background:var(--card);border:1px solid var(--line);border-radius:7px;padding:15px 17px;font-size:.97rem;line-height:1.48;color:var(--ink);transition:border-color .15s,box-shadow .15s,transform .15s}
+.opt:hover{border-color:var(--cyan);transform:translateX(3px)}
+.opt__n{font-family:var(--mono);font-weight:600;font-size:.82rem;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--paper);color:var(--muted);border:1px solid var(--line);transition:all .15s}
+.opt:hover .opt__n{border-color:var(--cyan);color:var(--teal)}
+.opt[aria-pressed=true]{border-color:var(--navy);box-shadow:0 0 0 3px rgba(4,55,96,.11)}
+.opt[aria-pressed=true] .opt__n{background:var(--navy);border-color:var(--navy);color:#fff}
+.nav{display:flex;justify-content:space-between;align-items:center;margin-top:28px}
+.back{background:none;border:none;color:var(--muted);font-size:.88rem;padding:8px 0;display:inline-flex;align-items:center;gap:7px;min-height:44px}
+.back:hover{color:var(--navy)}
+.keys{font-family:var(--mono);font-size:.72rem;color:var(--muted)}
+.keys kbd{background:var(--card);border:1px solid var(--line);border-bottom-width:2px;border-radius:3px;padding:1px 5px;font-family:inherit;font-size:.68rem}
+
+/* resultados */
+.res{padding:0 0 60px}
+.res__hero{background:var(--navy);color:#fff;padding:44px 0 40px;margin-bottom:44px;background-image:radial-gradient(circle at 82% -10%,rgba(47,143,160,.34),transparent 58%)}
+.res__hero .eyebrow{color:rgba(255,255,255,.55)}
+.res__hero h1{font-family:var(--disp);font-weight:700;font-size:clamp(1.5rem,4.4vw,2.1rem);letter-spacing:-.02em;margin:.3em 0 0;line-height:1.15}
+.res__sub{color:rgba(255,255,255,.66);font-size:.87rem;margin:8px 0 0}
+.gauge{display:flex;align-items:center;gap:clamp(20px,5vw,44px);margin-top:34px;flex-wrap:wrap}
+.gauge__ring{width:clamp(170px,42vw,208px);height:clamp(170px,42vw,208px);flex:none;position:relative}
+.gauge__ring svg{width:100%;height:100%;display:block}
+.gauge__ctr{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+.gauge__score{font-family:var(--disp);font-weight:700;font-size:clamp(2.5rem,9vw,3.5rem);line-height:.92;letter-spacing:-.045em;font-variant-numeric:tabular-nums}
+.gauge__of{font-family:var(--mono);font-size:.68rem;color:rgba(255,255,255,.55);letter-spacing:.1em}
+.gauge__lvl{flex:1;min-width:190px}
+.gauge__lvlname{font-family:var(--disp);font-weight:700;font-size:clamp(1.35rem,4.4vw,1.85rem);letter-spacing:-.02em;line-height:1.1}
+.gauge__lvldesc{color:rgba(255,255,255,.72);font-size:.93rem;margin-top:9px;max-width:34ch}
+.scale{list-style:none;padding:0;margin:22px 0 0;display:grid;gap:1px}
+.scale li{display:flex;align-items:center;gap:11px;font-size:.78rem;color:rgba(255,255,255,.5);font-family:var(--mono);padding:3px 0}
+.scale li[data-on]{color:#fff}
+.scale i{width:22px;height:4px;border-radius:2px;background:currentColor;flex:none;opacity:.55}
+.scale li[data-on] i{opacity:1}
+h3.sect{font-family:var(--disp);font-weight:700;font-size:1.15rem;color:var(--navy);letter-spacing:-.012em;margin:0 0 4px;padding-top:8px}
+.sect__note{color:var(--muted);font-size:.86rem;margin:0 0 22px;max-width:62ch}
+.block{margin-bottom:48px}
+.ascale{display:grid;grid-template-columns:1fr 104px;gap:14px;align-items:end;margin-bottom:22px}
+.ascale__strip{position:relative;display:flex;padding-bottom:17px}
+.ascale__strip span{font-family:var(--disp);font-weight:600;font-size:.58rem;letter-spacing:.11em;text-transform:uppercase;color:#fff;padding:4px 7px;white-space:nowrap;overflow:hidden;min-width:0;box-shadow:inset -1px 0 0 rgba(255,255,255,.55)}
+.ascale__strip span:first-child{border-radius:3px 0 0 3px}
+.ascale__strip span:last-of-type{border-radius:0 3px 3px 0;box-shadow:none}
+.ascale__strip em{position:absolute;bottom:0;transform:translateX(-50%);font-family:var(--mono);font-size:.66rem;font-style:normal;color:var(--muted)}
+.ascale__strip em.l{transform:none}.ascale__strip em.r{transform:translateX(-100%)}
+.ascale__lbl{font-family:var(--disp);font-weight:600;font-size:.58rem;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);text-align:right;padding-bottom:17px}
+.ascale__legend{display:none}
+.areas{display:grid;gap:2px}
+.arow{display:grid;grid-template-columns:1fr 104px;gap:14px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.arow__top{display:flex;align-items:baseline;gap:9px;margin-bottom:8px;flex-wrap:wrap}
+.arow__name{font-weight:600;font-size:.95rem}
+.arow__w{font-family:var(--mono);font-size:.68rem;color:var(--muted);border:1px solid var(--line);border-radius:3px;padding:0 5px;white-space:nowrap}
+.arow__q{font-family:var(--mono);font-size:.68rem;color:#8E9AA3;letter-spacing:.03em}
+.arow__bar{position:relative;height:9px;background:var(--paper);border-radius:4px;box-shadow:inset 0 0 0 1px var(--line)}
+.arow__bar .tick{position:absolute;top:-2px;bottom:-2px;width:1px;background:var(--line);z-index:1}
+.arow__fill{position:relative;z-index:2;height:100%;border-radius:4px;width:0;transition:width .8s cubic-bezier(.3,0,.2,1)}
+.arow__num{text-align:right;line-height:1.1}
+.arow__num b{display:block;font-family:var(--disp);font-weight:700;font-size:1.42rem;font-variant-numeric:tabular-nums;letter-spacing:-.035em}
+.arow__num span{font-family:var(--disp);font-weight:600;font-size:.56rem;letter-spacing:.11em;text-transform:uppercase;opacity:.85}
+.warn{background:#FDF8EF;border:1px solid #EBD9B4;border-left:3px solid var(--n1);border-radius:6px;padding:15px 18px;margin-bottom:10px}
+.warn__h{font-family:var(--disp);font-weight:600;font-size:.68rem;letter-spacing:.15em;text-transform:uppercase;color:#8A6420;margin-bottom:6px}
+.warn p{margin:0;font-size:.92rem;color:#4A3D22}
+.plan__group{margin-bottom:30px}
+.plan__gh{display:flex;align-items:center;gap:12px;margin-bottom:14px;padding-bottom:9px;border-bottom:2px solid var(--navy);flex-wrap:wrap}
+.plan__gh h4{font-family:var(--disp);font-weight:700;font-size:1rem;color:var(--navy);margin:0}
+.plan__gh span{font-family:var(--mono);font-size:.74rem;color:var(--muted)}
+.act{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:19px 21px;margin-bottom:11px;box-shadow:var(--sh);display:grid;grid-template-columns:30px 1fr;gap:16px}
+.act__rank{font-family:var(--disp);font-weight:700;font-size:1.32rem;color:var(--cyan);line-height:1}
+.act__top{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:9px}
+.act__code{font-family:var(--mono);font-weight:600;font-size:.7rem;color:#fff;background:var(--teal);padding:2px 7px;border-radius:3px}
+.act__q{font-weight:600;font-size:.95rem;color:var(--navy)}
+.act__ans{font-size:.8rem;color:var(--muted);margin:0 0 11px;padding-left:11px;border-left:2px solid var(--line);font-style:italic}
+.act__do{margin:0 0 14px;font-size:.95rem;line-height:1.55}
+.act__meta{display:flex;flex-wrap:wrap;gap:0 22px;padding-top:12px;border-top:1px solid var(--line);margin:0}
+.act__meta div{font-size:.78rem}
+.act__meta dt{font-family:var(--disp);font-weight:600;font-size:.6rem;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin-bottom:1px}
+.act__meta dd{margin:0;font-weight:500}
+.act__meta dd::first-letter{text-transform:uppercase}
+.empty{border:1px dashed var(--line);border-radius:8px;padding:26px 24px;background:var(--card)}
+.empty h4{font-family:var(--disp);font-weight:700;font-size:1rem;color:var(--navy);margin:0 0 8px}
+.empty p{margin:0;font-size:.92rem;color:var(--muted);max-width:58ch}
+details.log{border-top:1px solid var(--line)}
+details.log summary{padding:15px 0;font-family:var(--disp);font-weight:600;font-size:.92rem;color:var(--navy);cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center}
+details.log summary::-webkit-details-marker{display:none}
+details.log summary::after{content:"+";font-family:var(--mono);color:var(--cyan);font-size:1.2rem}
+details.log[open] summary::after{content:"–"}
+.log__t{width:100%;border-collapse:collapse;font-size:.86rem;margin-bottom:18px}
+.log__t td{padding:8px 10px 8px 0;border-bottom:1px solid var(--line);vertical-align:top}
+.log__t td:first-child{font-family:var(--mono);font-size:.74rem;color:var(--muted);width:38px}
+.log__t td:last-child{width:30px;text-align:right;font-family:var(--mono);font-weight:600}
+.actions{display:flex;gap:11px;flex-wrap:wrap;margin-top:8px}
+.btn{border:1px solid var(--navy);background:var(--card);color:var(--navy);border-radius:6px;padding:12px 20px;font-family:var(--disp);font-weight:600;font-size:.88rem;transition:all .16s;min-height:44px;text-decoration:none;display:inline-flex;align-items:center}
+.btn:hover{background:var(--navy);color:#fff}
+.btn--ghost{border-color:var(--line);color:var(--muted)}
+.btn--ghost:hover{background:var(--paper);color:var(--navy);border-color:var(--muted)}
+.contact{margin-top:40px;background:var(--navy);color:#fff;border-radius:10px;padding:28px 28px 24px;background-image:radial-gradient(circle at 100% 0,rgba(47,143,160,.35),transparent 55%)}
+.contact h4{font-family:var(--disp);font-weight:700;font-size:1.2rem;margin:6px 0 8px}
+.contact p{margin:0 0 18px;color:rgba(255,255,255,.75);font-size:.93rem;max-width:58ch}
+.contact .eyebrow{color:rgba(255,255,255,.6)}
+.contact__links{display:flex;gap:10px;flex-wrap:wrap}
+.contact__links a{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border-radius:6px;border:1px solid rgba(255,255,255,.3);color:#fff;text-decoration:none;font-family:var(--disp);font-weight:600;font-size:.88rem}
+.contact__links a:first-child{background:#F5EFE3;color:var(--navy);border-color:#F5EFE3}
+.contact__links a:hover{border-color:#fff}
+.foot{border-top:1px solid var(--line);margin-top:36px;padding:32px 0 0;display:flex;gap:26px;align-items:flex-start;flex-wrap:wrap}
+.foot img{width:150px;height:auto;flex:none;opacity:.9}
+.foot p{margin:0;font-size:.78rem;color:var(--muted);max-width:52ch;line-height:1.6}
+
+@media (max-width:620px){
+  .form{grid-template-columns:1fr}
+  .opt{grid-template-columns:32px 1fr;gap:11px;padding:13px 14px;font-size:.93rem}
+  .dial{width:38px;height:38px}
+  .act{grid-template-columns:1fr;gap:8px}
+  .keys{display:none}
+  .intro__brand img{width:140px}
+  .ascale{grid-template-columns:1fr;gap:0;margin-bottom:14px}
+  .ascale__strip span{font-size:0;padding:0;height:6px}
+  .ascale__lbl{display:none}
+  .ascale__legend{display:flex;flex-wrap:wrap;gap:4px 15px;margin-bottom:18px}
+  .ascale__legend span{display:inline-flex;align-items:center;gap:6px;font-family:var(--disp);font-weight:600;font-size:.6rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+  .ascale__legend i{width:11px;height:11px;border-radius:2px;flex:none}
+  .arow{grid-template-columns:1fr 74px;gap:11px}
+  .arow__q{display:none}
+  .arow__num b{font-size:1.2rem}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}.gauge__ring path{stroke-dashoffset:0 !important}}
+@media print{
+  @page{margin:14mm}
+  body{background:#fff;font-size:10.5pt}
+  *{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important}
+  .bar,.actions,.keys,.nav{display:none !important}
+  .res__hero{background:#fff !important;color:var(--ink);padding:0 0 22px;border-bottom:3px solid var(--navy);margin-bottom:28px}
+  .res__hero .eyebrow{color:var(--cyan)}
+  .res__sub,.gauge__of,.gauge__lvldesc{color:var(--muted)}
+  .scale li{color:#999}.scale li[data-on]{color:var(--navy)}
+  .contact{background:#fff !important;color:var(--ink);border:1px solid var(--line)}
+  .contact p,.contact .eyebrow{color:var(--muted)}
+  .contact__links a,.contact__links a:first-child{background:#fff;color:var(--navy);border-color:var(--line)}
+  .act,.warn,.block,.contact{break-inside:avoid;box-shadow:none}
+  details.log{display:none}
+  .wrap{max-width:none;padding:0}
+}
+@keyframes draw{to{stroke-dashoffset:0}}
+</style>
+</head>
+<body>
+
+<section id="intro" class="intro">
+  <div class="intro__body"><div class="wrap">
+    <a class="backlink" href="/lecheria/">
+      <svg width="15" height="10" viewBox="0 0 15 10" fill="none" aria-hidden="true"><path d="M14 5H1M5 1L.5 5 5 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Volver a Criterya Lechería</a>
+    <div class="intro__brand">
+      <img src="data:image/png;base64,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" alt="Criterya · Consultora de gestión empresarial">
+      <span>Lechería</span>
+    </div>
+    <div class="eyebrow">Diagnóstico express · Tambos</div>
+    <h1>¿Dónde está parado tu tambo? 18 preguntas</h1>
+    <p class="intro__lead">Cada pregunta tiene cuatro respuestas posibles. Elegí la que describe cómo se trabaja hoy en el tambo, no la que debería ser: el resultado sirve en la medida en que refleje la práctica real.</p>
+    <ul class="facts">
+      <li><b>6–8 min</b><span>Dieciocho preguntas, una por pantalla.</span></li>
+      <li><b>6 áreas</b><span>Producción, rodeo, alimentación, resultado económico, crianza y dirección. Cada una pesa distinto en el resultado.</span></li>
+      <li><b>5 acciones</b><span>El resultado incluye las medidas de mayor impacto sobre las brechas detectadas.</span></li>
+    </ul>
+    <div class="form">
+      <div class="field">
+        <label for="f-emp">Establecimiento</label>
+        <input id="f-emp" type="text" placeholder="Opcional" autocomplete="organization">
+      </div>
+      <div class="field">
+        <label for="f-per">Quién responde</label>
+        <input id="f-per" type="text" placeholder="Nombre y rol (opcional)" autocomplete="name">
+      </div>
+      <div class="sist">
+        <span class="glabel" id="sist-l">Sistema de producción</span>
+        <div class="rubros" role="group" aria-labelledby="sist-l">
+          <button class="rubro" type="button" aria-pressed="false" data-v="Pastoril">Pastoril</button>
+          <button class="rubro" type="button" aria-pressed="false" data-v="Pastoril con suplementación">Pastoril con suplementación</button>
+          <button class="rubro" type="button" aria-pressed="false" data-v="Confinado / estabulado">Confinado / estabulado</button>
+        </div>
+      </div>
+    </div>
+    <button id="start" class="cta" type="button">Comenzar el diagnóstico
+      <svg width="17" height="11" viewBox="0 0 17 11" fill="none" aria-hidden="true"><path d="M1 5.5h14M11 1l4.5 4.5L11 10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <p class="note">Las respuestas se procesan en este dispositivo y no se envían a ningún servidor. Al terminar podés imprimir el resultado o guardarlo en PDF.</p>
+  </div></div>
+</section>
+
+<div id="quiz" class="hidden">
+  <div class="bar">
+    <div class="bar__in">
+      <img class="bar__mark" src="data:image/png;base64,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" alt="Criterya">
+      <div class="bar__meta">
+        <div class="bar__count mono" id="q-count"></div>
+        <div class="bar__area" id="q-area"></div>
+      </div>
+      <svg class="dial" id="q-dial" viewBox="0 0 100 100" aria-hidden="true"></svg>
+      <button class="exit" type="button" id="exit" aria-label="Salir del diagnóstico">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="track"><div class="track__fill" id="q-track"></div></div>
+  </div>
+  <div class="wrap"><div class="q" id="q-body"></div></div>
+</div>
+
+<div id="res" class="res hidden"></div>
+
+<script>
+const DATA = {"preguntas": {"P1": {"cod": "P1", "titulo": "Registro de la producción", "nota": null, "opciones": [{"nivel": 0, "texto": "Sólo conozco los litros totales que figuran en la liquidación de la usina."}, {"nivel": 1, "texto": "Anoto los litros diarios del tanque, pero no sé cuánto produce cada vaca."}, {"nivel": 2, "texto": "Hago control lechero individual periódico y calculo los litros por vaca en ordeñe."}, {"nivel": 3, "texto": "Control lechero mensual con litros y sólidos por vaca, y lo uso para decidir secado, descarte y lotes de alimentación."}]}, "P2": {"cod": "P2", "titulo": "Calidad de leche: células somáticas y bacterias", "nota": null, "opciones": [{"nivel": 0, "texto": "No sigo los recuentos de células somáticas (CCS) ni de bacterias (UFC); me entero por la liquidación."}, {"nivel": 1, "texto": "Miro los recuentos de la usina cuando aparece un descuento."}, {"nivel": 2, "texto": "Sigo CCS y UFC todos los meses y hay una rutina de ordeñe definida."}, {"nivel": 3, "texto": "Además identifico las vacas con mastitis subclínica y mido el resultado de los tratamientos y del secado."}]}, "P3": {"cod": "P3", "titulo": "Liquidación y precio de la leche", "nota": null, "opciones": [{"nivel": 0, "texto": "Cobro lo que liquida la usina sin verificar el cálculo."}, {"nivel": 1, "texto": "Controlo los litros, pero no el precio por sólidos ni las bonificaciones."}, {"nivel": 2, "texto": "Verifico cada liquidación: litros, grasa, proteína, calidad y bonificaciones."}, {"nivel": 3, "texto": "Verifico la liquidación y comparo el precio por kilo de sólidos con el de otras usinas o compradores."}]}, "R1": {"cod": "R1", "titulo": "Registros del rodeo", "nota": null, "opciones": [{"nivel": 0, "texto": "No hay identificación individual confiable ni registro de eventos."}, {"nivel": 1, "texto": "Las vacas tienen caravana, pero partos, servicios y tactos se anotan en cuadernos sueltos."}, {"nivel": 2, "texto": "Hay registro individual de partos, servicios, tactos y secados, en planilla o software."}, {"nivel": 3, "texto": "Registro individual en software, al día, que usamos para generar las listas de trabajo (vacas a servir, a tactar, a secar)."}]}, "R2": {"cod": "R2", "titulo": "Eficiencia reproductiva", "nota": null, "opciones": [{"nivel": 0, "texto": "No mido indicadores reproductivos; sé que las vacas se preñan \"más o menos\"."}, {"nivel": 1, "texto": "Hago tactos y conozco el porcentaje de preñez, pero no cuánto tardan en preñarse."}, {"nivel": 2, "texto": "Mido tasa de preñez o intervalo parto-concepción y lo reviso con el veterinario."}, {"nivel": 3, "texto": "Además tengo metas reproductivas y analizamos las causas de las vacas vacías a más de 150 días posparto."}]}, "R3": {"cod": "R3", "titulo": "Estructura del rodeo y reposición", "nota": "pregunta factual", "opciones": [{"nivel": 0, "texto": "No sé qué proporción del rodeo está en ordeñe a lo largo del año."}, {"nivel": 1, "texto": "Lo sé de forma aproximada; hay épocas con muchas vacas secas."}, {"nivel": 2, "texto": "Calculo mes a mes la relación vacas en ordeñe / vacas totales y conozco mi tasa de reposición y descarte."}, {"nivel": 3, "texto": "Planifico la reposición (vaquillonas que entran, descartes previstos) para sostener la proporción en ordeñe y la producción del ejercicio."}]}, "R4": {"cod": "R4", "titulo": "Plan sanitario", "nota": null, "opciones": [{"nivel": 0, "texto": "Se vacuna y se trata cuando aparece un problema; no hay un plan sanitario."}, {"nivel": 1, "texto": "Se cumplen las vacunaciones y controles obligatorios, pero no hay un plan propio del tambo."}, {"nivel": 2, "texto": "Hay un plan sanitario anual escrito con el veterinario y se registran los tratamientos."}, {"nivel": 3, "texto": "Plan sanitario con registro de enfermedades por vaca (mastitis, metritis, rengueras) y seguimiento de su incidencia."}]}, "F1": {"cod": "F1", "titulo": "Planificación forrajera", "nota": null, "opciones": [{"nivel": 0, "texto": "Siembro y hago reservas según como venga el año; no hay un plan escrito."}, {"nivel": 1, "texto": "Tengo una rotación habitual de pasturas y verdeos, pero no un balance entre oferta y demanda."}, {"nivel": 2, "texto": "Hago un presupuesto forrajero anual: oferta de pasto y reservas contra los requerimientos del rodeo."}, {"nivel": 3, "texto": "Presupuesto forrajero con seguimiento mensual (crecimiento, carga, reservas) y ajustes durante el ejercicio."}]}, "F2": {"cod": "F2", "titulo": "Suplementación y dieta", "nota": null, "opciones": [{"nivel": 0, "texto": "La ración se da \"a ojo\" y es igual para todas las vacas."}, {"nivel": 1, "texto": "Hay una ración armada, pero no sé cuánto concentrado se usa por litro producido."}, {"nivel": 2, "texto": "La dieta está formulada por un nutricionista y conozco los gramos de concentrado por litro."}, {"nivel": 3, "texto": "Dieta por lotes según producción, con seguimiento del costo de alimentación por litro y del margen sobre alimentación."}]}, "F3": {"cod": "F3", "titulo": "Reservas: silo y heno", "nota": null, "opciones": [{"nivel": 0, "texto": "No sé cuántas toneladas de silo y heno tengo disponibles."}, {"nivel": 1, "texto": "Estimo las reservas por cantidad de silos y rollos, sin medirlas."}, {"nivel": 2, "texto": "Mido el stock de reservas (toneladas y materia seca) al confeccionarlas."}, {"nivel": 3, "texto": "Llevo el stock de reservas al día, mido pérdidas y sé cuántos días de suplementación cubren."}]}, "E1": {"cod": "E1", "titulo": "Costo por litro", "nota": null, "opciones": [{"nivel": 0, "texto": "No sé cuánto me cuesta producir un litro de leche."}, {"nivel": 1, "texto": "Tengo una idea aproximada, sin un cálculo detrás."}, {"nivel": 2, "texto": "Calculo el costo directo por litro al cierre del ejercicio."}, {"nivel": 3, "texto": "Calculo el costo por litro todos los meses, en pesos y en dólares, abierto por rubro (alimentación, personal, sanidad, tierra)."}]}, "E2": {"cod": "E2", "titulo": "Resultado económico del tambo", "nota": null, "opciones": [{"nivel": 0, "texto": "Me guío por la plata que queda en la cuenta."}, {"nivel": 1, "texto": "El contador me presenta el balance impositivo una vez por año."}, {"nivel": 2, "texto": "Armo el resultado del ejercicio productivo (julio–junio): ingreso neto, gastos directos y margen bruto."}, {"nivel": 3, "texto": "Resultado mensual con margen bruto y EBITDA, comparado con el ejercicio anterior y con el presupuesto."}]}, "E3": {"cod": "E3", "titulo": "Inventario de hacienda y reservas", "nota": null, "opciones": [{"nivel": 0, "texto": "No hago inventario de hacienda al inicio y al cierre del ejercicio."}, {"nivel": 1, "texto": "Cuento la hacienda, pero no la valorizo."}, {"nivel": 2, "texto": "Hago inventario valorizado al inicio y al cierre, y calculo la diferencia de inventario."}, {"nivel": 3, "texto": "Inventario valorizado de hacienda y reservas, y la diferencia se imputa al resultado del tambo y de la recría por separado."}]}, "C1": {"cod": "C1", "titulo": "Crianza de terneras", "nota": null, "opciones": [{"nivel": 0, "texto": "No registro cuántas terneras nacen, mueren o pasan a recría."}, {"nivel": 1, "texto": "Sé cuántas terneras hay, pero no la mortandad."}, {"nivel": 2, "texto": "Registro nacimientos, muertes y salidas a recría, y calculo la mortandad."}, {"nivel": 3, "texto": "Además controlo el calostrado y el peso al desleche, con metas de mortandad y crecimiento."}]}, "C2": {"cod": "C2", "titulo": "Recría y costo de la vaquillona", "nota": null, "opciones": [{"nivel": 0, "texto": "No sé a qué edad paren las vaquillonas ni cuánto cuesta criarlas."}, {"nivel": 1, "texto": "Conozco la edad aproximada al primer parto, pero no el costo de la recría."}, {"nivel": 2, "texto": "Mido la edad y el peso al primer parto."}, {"nivel": 3, "texto": "Mido edad y peso al parto y calculo el costo de la vaquillona puesta en el tambo, comparado con comprarla."}]}, "D1": {"cod": "D1", "titulo": "Personal y rutina de trabajo", "nota": null, "opciones": [{"nivel": 0, "texto": "No hay tareas ni horarios definidos; cada tambero trabaja a su manera."}, {"nivel": 1, "texto": "Las tareas están claras por costumbre, pero la rutina de ordeñe cambia según quién ordeñe."}, {"nivel": 2, "texto": "Hay una rutina de ordeñe escrita y tareas asignadas por persona."}, {"nivel": 3, "texto": "Rutina escrita, capacitación periódica y una retribución vinculada a resultados (litros, calidad, reproducción)."}]}, "D2": {"cod": "D2", "titulo": "Flujo de fondos y financiamiento", "nota": null, "opciones": [{"nivel": 0, "texto": "No proyecto el flujo de fondos; resuelvo los pagos a medida que llegan."}, {"nivel": 1, "texto": "Sé cuándo cobro la leche y cuáles son los vencimientos grandes, pero no lo proyecto."}, {"nivel": 2, "texto": "Tengo un flujo de fondos proyectado a 3–6 meses."}, {"nivel": 3, "texto": "Flujo de fondos a 12 meses con escenarios de precio de leche y alimento, y control del período medio de cobro."}]}, "D3": {"cod": "D3", "titulo": "Toma de decisiones y asesoramiento", "nota": null, "opciones": [{"nivel": 0, "texto": "Decido solo y sobre la marcha; no hay reuniones con asesores."}, {"nivel": 1, "texto": "Consulto al veterinario o al agrónomo cuando aparece un problema."}, {"nivel": 2, "texto": "Me reúno periódicamente con los asesores para revisar la situación del tambo."}, {"nivel": 3, "texto": "Reuniones periódicas con agenda e indicadores, objetivos por ejercicio y comparación con otros tambos."}]}}, "fichas": {"P1-0": {"cod": "P1", "nivel": 0, "eco": "sólo conozco los litros que liquida la usina", "accion": "Empezar a registrar los litros diarios del tanque y el número de vacas en ordeñe de cada día. Con esos dos datos se calcula la producción individual (litros por vaca en ordeñe por día), que es el indicador base del tambo y el punto de partida para comparar meses y ejercicios.", "responsable": "encargado de tambo", "plazo": "15 días", "esfuerzo": "bajo", "impacto": "alto"}, "P1-1": {"cod": "P1", "nivel": 1, "eco": "anoto los litros del tanque, no la producción por vaca", "accion": "Incorporar control lechero individual al menos cada 45 días, propio o contratado. El promedio del tanque esconde a las vacas que no pagan su ración: con el dato individual se decide a quién secar, a quién descartar y cómo armar los lotes de alimentación.", "responsable": "productor + veterinario", "plazo": "45 días", "esfuerzo": "medio", "impacto": "alto"}, "P1-2": {"cod": "P1", "nivel": 2, "eco": "control lechero periódico y litros por vaca", "accion": "Pasar a control mensual con análisis de grasa y proteína por vaca, y usarlo como lista de trabajo: vacas de baja producción para revisar, candidatas a secado y descarte, y armado de lotes. El dato vale cuando cambia una decisión del mes.", "responsable": "encargado de tambo + veterinario", "plazo": "60 días", "esfuerzo": "medio", "impacto": "medio"}, "P2-0": {"cod": "P2", "nivel": 0, "eco": "no sigo CCS ni UFC", "accion": "Pedir a la usina el histórico de recuentos de los últimos 12 meses y graficarlo mes a mes junto al precio cobrado. Es la forma más rápida de ver cuánto se pierde en bonificaciones no cobradas o descuentos por calidad.", "responsable": "productor", "plazo": "15 días", "esfuerzo": "bajo", "impacto": "alto"}, "P2-1": {"cod": "P2", "nivel": 1, "eco": "miro los recuentos cuando hay descuento", "accion": "Revisar los recuentos todos los meses, no sólo cuando castigan el precio. Si las CCS suben, revisar con el veterinario la rutina de ordeñe y el estado de la máquina; si suben las UFC, la higiene del equipo y el enfriado. Cuando aparece el descuento, el problema lleva semanas.", "responsable": "productor + veterinario", "plazo": "30 días", "esfuerzo": "bajo", "impacto": "alto"}, "P2-2": {"cod": "P2", "nivel": 2, "eco": "sigo CCS y UFC mensualmente con rutina definida", "accion": "Bajar del dato del tanque al de la vaca: identificar las de mayor recuento con control lechero o prueba de mastitis (CMT), definir criterios de tratamiento, secado y descarte, y medir si las vacas tratadas efectivamente bajan. El recuento del tanque lo sostienen pocas vacas.", "responsable": "veterinario + encargado de tambo", "plazo": "60 días", "esfuerzo": "medio", "impacto": "medio"}, "P3-0": {"cod": "P3", "nivel": 0, "eco": "cobro lo que liquida la usina sin verificar", "accion": "Armar una planilla de control de la liquidación: litros remitidos según el registro propio contra los liquidados, porcentaje de grasa y proteína, recuentos y bonificaciones aplicadas. Las diferencias de litros y las bonificaciones mal aplicadas se recuperan sólo si se reclaman a tiempo.", "responsable": "administración", "plazo": "30 días", "esfuerzo": "bajo", "impacto": "alto"}, "P3-1": {"cod": "P3", "nivel": 1, "eco": "controlo litros, no sólidos ni bonificaciones", "accion": "Expresar el precio cobrado en pesos por kilo de sólidos útiles (grasa más proteína) y no sólo por litro. El precio por litro sube o baja con la composición de la leche; el precio por kilo de sólidos muestra si la usina está pagando más o menos.", "responsable": "administración", "plazo": "30 días", "esfuerzo": "bajo", "impacto": "medio"}, "P3-2": {"cod": "P3", "nivel": 2, "eco": "verifico cada liquidación", "accion": "Comparar el precio por kilo de sólidos obtenido con el de otras usinas y con referencias públicas del sector, convertido a dólares. Es la base para negociar condiciones o evaluar un cambio de comprador con números.", "responsable": "productor", "plazo": "60 días", "esfuerzo": "bajo", "impacto": "medio"}, "R1-0": {"cod": "R1", "nivel": 0, "eco": "no hay identificación ni registro de eventos", "accion": "Revisar la identificación de todo el rodeo y abrir un registro único por vaca con fecha de parto, servicios y resultado de tacto. Sin identificación y fechas no se puede calcular ningún indicador reproductivo ni saber qué vaca está por secarse.", "responsable": "encargado de tambo + veterinario", "plazo": "45 días", "esfuerzo": "medio", "impacto": "alto"}, "R1-1": {"cod": "R1", "nivel": 1, "eco": "datos en cuadernos sueltos", "accion": "Pasar los cuadernos a un registro único, en planilla o en un software de gestión de rodeo, con carga semanal. El dato existe, pero disperso no permite calcular intervalos ni armar la lista de vacas a revisar.", "responsable": "encargado de tambo", "plazo": "45 días", "esfuerzo": "medio", "impacto": "alto"}, "R1-2": {"cod": "R1", "nivel": 2, "eco": "registro individual de eventos", "accion": "Usar el registro como herramienta de trabajo y no sólo de archivo: emitir cada semana las listas de vacas a servir, a tactar, a secar y próximas a parir. Es lo que convierte el registro en manejo.", "responsable": "encargado de tambo", "plazo": "30 días", "esfuerzo": "bajo", "impacto": "medio"}, "R2-0": {"cod": "R2", "nivel": 0, "eco": "no mido indicadores reproductivos", "accion": "Calcular con el veterinario dos indicadores con los datos de tacto disponibles: porcentaje de preñez y días promedio desde el parto hasta la preñez. La reproducción define cuántas vacas habrá en ordeñe dentro de un año; sin medirla, la caída de producción se descubre tarde.", "responsable": "veterinario", "plazo": "30 días", "esfuerzo": "bajo", "impacto": "alto"}, "R2-1": {"cod": "R2", "nivel": 1, "eco": "conozco el porcentaje de preñez, no la velocidad", "accion": "Sumar la velocidad: intervalo parto-concepción o tasa de preñez cada 21 días. Un rodeo puede preñar el 90% y aun así perder producción si las vacas tardan mucho en quedar preñadas, porque pasan más días en la parte baja de la lactancia.", "responsable": "veterinario", "plazo": "45 días", "esfuerzo": "bajo", "impacto": "alto"}, "R2-2": {"cod": "R2", "nivel": 2, "eco": "mido tasa de preñez o intervalo y lo reviso", "accion": "Fijar metas reproductivas por ejercicio y revisar caso por caso las vacas vacías a más de 150 días: condición corporal, enfermedades del posparto, detección de celo. Las vacas problema concentran gran parte de la pérdida y tienen causas identificables.", "responsable": "veterinario + productor", "plazo": "60 días", "esfuerzo": "medio", "impacto": "alto"}, "R3-0": {"cod": "R3", "nivel": 0, "eco": "no sé qué proporción está en ordeñe", "accion": "Registrar cada mes vacas en ordeñe y vacas secas y calcular la relación VO/VT (vacas en ordeñe sobre vacas totales). Es el indicador que más rápido muestra si el rodeo está trabajando: las vacas secas comen y no producen.", "responsable": "encargado de tambo", "plazo": "15 días", "esfuerzo": "bajo", "impacto": "alto"}, "R3-1": {"cod": "R3", "nivel": 1, "eco": "conozco la proporción de forma aproximada", "accion": "Calcular VO/VT mensual junto con ventas, muertes y entradas de vaquillonas. Con doce meses de datos aparecen los meses de baja y se puede trabajar con el veterinario en la concentración de partos o en la reposición.", "responsable": "encargado de tambo + administración", "plazo": "30 días", "esfuerzo": "bajo", "impacto": "medio"}, "R3-2": {"cod": "R3", "nivel": 2, "eco": "calculo VO/VT, reposición y descarte", "accion": "Armar un plan de rodeo para el ejercicio: vaquillonas que entran por mes, descartes previstos y partos esperados según los tactos. Permite anticipar la producción mensual y decidir si sobran o faltan vaquillonas antes de que suceda.", "responsable": "productor + veterinario", "plazo": "60 días", "esfuerzo": "medio", "impacto": "medio"}, "R4-0": {"cod": "R4", "nivel": 0, "eco": "se trata cuando aparece un problema", "accion": "Armar con el veterinario un calendario sanitario anual: vacunas, controles de brucelosis y tuberculosis, antiparasitarios y manejo del preparto. Lo sanitario no planificado se paga después en leche descartada, abortos y vacas perdidas.", "responsable": "veterinario + productor", "plazo": "30 días", "esfuerzo": "bajo", "impacto": "alto"}, "R4-1": {"cod": "R4", "nivel": 1, "eco": "se cumple lo obligatorio, sin plan propio", "accion": "Sumar a lo obligatorio un plan propio según los problemas del tambo y empezar a registrar cada tratamiento con fecha, vaca y producto. El registro también ordena los tiempos de retiro de leche y evita descartes por error.", "responsable": "veterinario + encargado de tambo", "plazo": "45 días", "esfuerzo": "bajo", "impacto": "medio"}, "R4-2": {"cod": "R4", "nivel": 2, "eco": "plan anual escrito y registro de tratamientos", "accion": "Registrar las enfermedades por vaca y calcular su incidencia mensual (mastitis clínica, metritis, rengueras). Con la incidencia se mide si el plan sanitario funciona y se estima cuánto cuesta cada enfermedad en leche y en descarte.", "responsable": "veterinario", "plazo": "60 días", "esfuerzo": "medio", "impacto": "medio"}, "F1-0": {"cod": "F1", "nivel": 0, "eco": "no hay plan forrajero escrito", "accion": "Armar con el agrónomo un plan anual simple: superficie de pasturas, verdeos de invierno y verano y cultivos para silo, con fecha de siembra y uso esperado. Es el primer paso para que la comida del tambo no dependa de decisiones de último momento.", "responsable": "productor + agrónomo", "plazo": "45 días", "esfuerzo": "medio", "impacto": "alto"}, "F1-1": {"cod": "F1", "nivel": 1, "eco": "rotación habitual sin balance oferta-demanda", "accion": "Construir el presupuesto forrajero: oferta mensual de pasto y reservas contra los requerimientos del rodeo según vacas y producción esperada. Los baches de comida que hoy se tapan con balanceado comprado aparecen en el papel meses antes.", "responsable": "agrónomo + productor", "plazo": "60 días", "esfuerzo": "medio", "impacto": "alto"}, "F1-2": {"cod": "F1", "nivel": 2, "eco": "presupuesto forrajero anual", "accion": "Convertir el presupuesto en seguimiento: comparar cada mes la oferta real (crecimiento de pasto, stock de reservas, carga) con la planeada y ajustar siembras, compras o carga a tiempo. Un presupuesto que no se revisa queda viejo en el primer mes de sequía.", "responsable": "agrónomo", "plazo": "60 días", "esfuerzo": "medio", "impacto": "medio"}, "F2-0": {"cod": "F2", "nivel": 0, "eco": "la ración se da a ojo", "accion": "Pesar lo que efectivamente se entrega de cada alimento durante una semana y formular la dieta con un nutricionista. La suplementación es el principal gasto directo del tambo; si no se sabe cuánto se da, no se puede saber si se gasta de más.", "responsable": "productor + nutricionista", "plazo": "30 días", "esfuerzo": "medio", "impacto": "alto"}, "F2-1": {"cod": "F2", "nivel": 1, "eco": "ración armada sin medir concentrado por litro", "accion": "Calcular mes a mes los gramos de concentrado por litro: kilos de concentrado consumidos sobre litros totales. Es el indicador más simple de eficiencia de la suplementación y permite ver si un aumento de producción se pagó con más ración.", "responsable": "administración + encargado de tambo", "plazo": "30 días", "esfuerzo": "bajo", "impacto": "alto"}, "F2-2": {"cod": "F2", "nivel": 2, "eco": "dieta formulada y g de concentrado por litro", "accion": "Agregar el costo de alimentación por litro y el margen sobre alimentación (precio de la leche menos costo de la dieta por litro). Con eso se decide cuánto suplementar en función del precio relativo leche/alimento, no de la costumbre.", "responsable": "productor + nutricionista", "plazo": "60 días", "esfuerzo": "medio", "impacto": "alto"}, "F3-0": {"cod": "F3", "nivel": 0, "eco": "no sé cuántas reservas tengo", "accion": "Cubicar los silos y contar los rollos existentes para estimar toneladas disponibles, y dividirlas por el consumo diario actual. El resultado son días de reserva: el dato que define si hay que salir a comprar antes de que falte.", "responsable": "encargado de tambo + agrónomo", "plazo": "15 días", "esfuerzo": "bajo", "impacto": "alto"}, "F3-1": {"cod": "F3", "nivel": 1, "eco": "estimo las reservas sin medir", "accion": "Medir las reservas al confeccionarlas (toneladas y materia seca) y descontar el consumo diario. Un silo mal dimensionado o con pérdidas altas obliga a comprar alimento caro en el peor momento.", "responsable": "encargado de tambo", "plazo": "45 días", "esfuerzo": "bajo", "impacto": "medio"}, "F3-2": {"cod": "F3", "nivel": 2, "eco": "mido el stock al confeccionarlas", "accion": "Llevar el stock de reservas actualizado mes a mes y estimar las pérdidas en el frente de ataque y por deterioro. Valorizar las reservas al inicio y al cierre del ejercicio para que su costo se impute al período en que se consumen.", "responsable": "encargado de tambo + administración", "plazo": "60 días", "esfuerzo": "medio", "impacto": "medio"}, "E1-0": {"cod": "E1", "nivel": 0, "eco": "no sé cuánto cuesta producir un litro", "accion": "Juntar los gastos directos del último ejercicio (alimentación, personal, sanidad, inseminación, energía, mantenimiento y arrendamiento o costo de la tierra) y dividirlos por los litros producidos. Aunque sea aproximado, es el número que permite saber si el precio de la leche alcanza.", "responsable": "productor + contador", "plazo": "30 días", "esfuerzo": "medio", "impacto": "alto"}, "E1-1": {"cod": "E1", "nivel": 1, "eco": "idea aproximada sin cálculo", "accion": "Formalizar el cálculo con una planilla por rubro y convertir cada mes al tipo de cambio del período. En un contexto de precios cambiantes, el costo en pesos de hace seis meses no sirve para comparar; en dólares, sí.", "responsable": "administración", "plazo": "45 días", "esfuerzo": "medio", "impacto": "alto"}, "E1-2": {"cod": "E1", "nivel": 2, "eco": "costo directo por litro al cierre", "accion": "Pasar a costo mensual abierto por rubro y en dólares, con comparación contra el mismo mes del ejercicio anterior. El cálculo anual muestra el resultado cuando ya no se puede corregir; el mensual muestra qué rubro se desvió mientras todavía se puede actuar.", "responsable": "administración", "plazo": "60 días", "esfuerzo": "medio", "impacto": "alto"}, "E2-0": {"cod": "E2", "nivel": 0, "eco": "me guío por la plata en la cuenta", "accion": "Separar el resultado de la caja: armar para el último ejercicio un estado simple de ingreso neto (leche, venta de hacienda, diferencia de inventario) menos gastos directos y de estructura. Un buen mes de caja puede esconder un tambo que pierde plata, y al revés.", "responsable": "productor + contador", "plazo": "45 días", "esfuerzo": "medio", "impacto": "alto"}, "E2-1": {"cod": "E2", "nivel": 1, "eco": "balance impositivo anual", "accion": "Armar un resultado de gestión por ejercicio productivo, independiente del balance impositivo: ingreso neto, gastos directos, margen bruto y gastos de estructura. El balance impositivo responde a otras reglas y cierra en otra fecha; no explica cómo le fue al tambo.", "responsable": "contador + administración", "plazo": "60 días", "esfuerzo": "medio", "impacto": "alto"}, "E2-2": {"cod": "E2", "nivel": 2, "eco": "resultado del ejercicio con margen bruto", "accion": "Llevar el resultado a frecuencia mensual, agregar el EBITDA y compararlo con el ejercicio anterior y con un presupuesto. Con el resultado mensual se puede ver el efecto de una decisión de alimentación o de descarte dentro del mismo ejercicio.", "responsable": "administración", "plazo": "90 días", "esfuerzo": "medio", "impacto": "alto"}, "E3-0": {"cod": "E3", "nivel": 0, "eco": "no hago inventario de hacienda", "accion": "Hacer el conteo de hacienda por categoría (vacas, vaquillonas, terneras, toros) al 30 de junio y repetirlo al cierre del próximo ejercicio. Sin inventario, una venta extraordinaria de vacas se confunde con ganancia del tambo.", "responsable": "encargado de tambo + administración", "plazo": "30 días", "esfuerzo": "bajo", "impacto": "alto"}, "E3-1": {"cod": "E3", "nivel": 1, "eco": "cuento la hacienda sin valorizarla", "accion": "Valorizar el inventario por categoría a precios de mercado al inicio y al cierre, y calcular la diferencia. Es la parte del resultado que no pasa por la caja: un rodeo que crece o se achica cambia el resultado real aunque la cuenta bancaria no lo muestre.", "responsable": "administración", "plazo": "30 días", "esfuerzo": "bajo", "impacto": "alto"}, "E3-2": {"cod": "E3", "nivel": 2, "eco": "inventario valorizado con diferencia de inventario", "accion": "Sumar las reservas al inventario y separar la diferencia entre tambo y crianza-recría. Así se ve qué actividad genera el resultado y cuánto le cuesta realmente al tambo la vaquillona que recibe.", "responsable": "administración", "plazo": "60 días", "esfuerzo": "medio", "impacto": "medio"}, "C1-0": {"cod": "C1", "nivel": 0, "eco": "no registro nacimientos ni muertes", "accion": "Abrir una planilla de crianza con cada ternera: fecha de nacimiento, madre, fecha de salida a recría o de muerte con su causa. Cada ternera que muere es una vaquillona menos dentro de dos años.", "responsable": "encargado de crianza", "plazo": "15 días", "esfuerzo": "bajo", "impacto": "alto"}, "C1-1": {"cod": "C1", "nivel": 1, "eco": "sé cuántas terneras hay, no la mortandad", "accion": "Calcular la mortandad de crianza por mes y por causa con el veterinario. Los picos suelen concentrarse en épocas y causas puntuales (calostrado, diarreas, neumonías) que se corrigen con manejo.", "responsable": "encargado de crianza + veterinario", "plazo": "30 días", "esfuerzo": "bajo", "impacto": "alto"}, "C1-2": {"cod": "C1", "nivel": 2, "eco": "registro y calculo la mortandad", "accion": "Incorporar controles de proceso: calidad del calostrado y peso al desleche, con metas por ejercicio. La mortandad muestra el problema; el calostrado y el peso muestran dónde se origina.", "responsable": "encargado de crianza + veterinario", "plazo": "60 días", "esfuerzo": "medio", "impacto": "medio"}, "C2-0": {"cod": "C2", "nivel": 0, "eco": "no sé la edad al parto ni el costo", "accion": "Calcular la edad al primer parto de las vaquillonas que entraron en el último año a partir de las fechas de nacimiento y parto. Cada mes de más en recría es comida y lugar sin producción de leche.", "responsable": "encargado de tambo + veterinario", "plazo": "30 días", "esfuerzo": "bajo", "impacto": "medio"}, "C2-1": {"cod": "C2", "nivel": 1, "eco": "conozco la edad aproximada, no el costo", "accion": "Separar los gastos de crianza y recría (alimento, leche consumida, sanidad, inseminación, personal) y dividirlos por las vaquillonas que entraron al tambo. Es el dato para decidir si conviene criar todas, vender excedentes o capitalizar.", "responsable": "administración", "plazo": "60 días", "esfuerzo": "medio", "impacto": "alto"}, "C2-2": {"cod": "C2", "nivel": 2, "eco": "mido edad y peso al primer parto", "accion": "Calcular el costo de la vaquillona puesta en el tambo y compararlo con el precio de compra de una vaquillona preñada. Junto con la edad al parto, define cuántas vaquillonas criar y cuántas vender.", "responsable": "administración + productor", "plazo": "60 días", "esfuerzo": "medio", "impacto": "medio"}, "D1-0": {"cod": "D1", "nivel": 0, "eco": "no hay tareas ni horarios definidos", "accion": "Escribir en una carilla las tareas de cada persona y los horarios de ordeñe, alimentación y crianza. Sin funciones claras, lo que no se hizo no tiene responsable.", "responsable": "productor", "plazo": "30 días", "esfuerzo": "bajo", "impacto": "medio"}, "D1-1": {"cod": "D1", "nivel": 1, "eco": "la rutina cambia según quién ordeñe", "accion": "Definir con el veterinario una rutina de ordeñe única, escribirla y colocarla en la sala. La rutina de ordeñe incide directamente en la calidad de la leche y en la salud de la ubre; si cambia por turno, los recuentos también.", "responsable": "productor + veterinario", "plazo": "30 días", "esfuerzo": "bajo", "impacto": "alto"}, "D1-2": {"cod": "D1", "nivel": 2, "eco": "rutina escrita y tareas asignadas", "accion": "Vincular parte de la retribución a indicadores que el personal puede influir (calidad de leche, mortandad de terneras, detección de celo) y sostener una capacitación periódica. El esquema tiene que ser simple y medible para que funcione.", "responsable": "productor", "plazo": "90 días", "esfuerzo": "medio", "impacto": "medio"}, "D2-0": {"cod": "D2", "nivel": 0, "eco": "resuelvo los pagos a medida que llegan", "accion": "Armar un flujo de fondos de los próximos 3 meses: cobros de leche esperados, sueldos, alimento, arrendamiento e impuestos. Permite anticipar los meses de caja ajustada y negociar plazos antes y no después.", "responsable": "administración", "plazo": "30 días", "esfuerzo": "bajo", "impacto": "alto"}, "D2-1": {"cod": "D2", "nivel": 1, "eco": "conozco cobros y vencimientos, no lo proyecto", "accion": "Proyectar el flujo a 6 meses considerando la estacionalidad de la producción. La caída de litros en verano y el pico de gastos de siembra suelen coincidir; anticiparlo evita financiarse caro.", "responsable": "administración", "plazo": "45 días", "esfuerzo": "medio", "impacto": "alto"}, "D2-2": {"cod": "D2", "nivel": 2, "eco": "flujo proyectado a 3–6 meses", "accion": "Extender el flujo a 12 meses con dos o tres escenarios de precio de la leche y del alimento, y controlar el período medio de cobro de la usina. Con escenarios, la decisión de invertir o endeudarse se toma sabiendo cuánto margen hay.", "responsable": "administración + productor", "plazo": "60 días", "esfuerzo": "medio", "impacto": "medio"}, "D3-0": {"cod": "D3", "nivel": 0, "eco": "decido solo y sobre la marcha", "accion": "Fijar una reunión mensual de una hora con los asesores que ya trabajan en el tambo, con tres temas fijos: producción, reproducción y comida. Ordenar la conversación ya cambia la calidad de las decisiones.", "responsable": "productor", "plazo": "30 días", "esfuerzo": "bajo", "impacto": "alto"}, "D3-1": {"cod": "D3", "nivel": 1, "eco": "consulto cuando aparece un problema", "accion": "Pasar de la consulta por urgencia a la revisión periódica. Llevar a cada reunión cuatro o cinco indicadores (litros por vaca, VO/VT, preñez, concentrado por litro, costo por litro) para que los asesores puedan anticiparse.", "responsable": "productor", "plazo": "45 días", "esfuerzo": "bajo", "impacto": "alto"}, "D3-2": {"cod": "D3", "nivel": 2, "eco": "reuniones periódicas con asesores", "accion": "Agregar objetivos por ejercicio y comparación con otros tambos de sistema similar, por ejemplo a través de un grupo de productores. La comparación muestra qué brechas son propias y cuáles son del año.", "responsable": "productor", "plazo": "90 días", "esfuerzo": "medio", "impacto": "medio"}}, "areas": [{"id": "econ", "nombre": "Resultado económico", "corto": "Económico", "peso": 20, "preg": ["E1", "E2", "E3"]}, {"id": "alim", "nombre": "Alimentación y forraje", "corto": "Alimentación", "peso": 20, "preg": ["F1", "F2", "F3"]}, {"id": "prod", "nombre": "Producción y calidad de leche", "corto": "Producción", "peso": 18, "preg": ["P1", "P2", "P3"]}, {"id": "rodeo", "nombre": "Rodeo, reproducción y sanidad", "corto": "Rodeo", "peso": 18, "preg": ["R1", "R2", "R3", "R4"]}, {"id": "dir", "nombre": "Dirección, personal y finanzas", "corto": "Dirección", "peso": 14, "preg": ["D1", "D2", "D3"]}, {"id": "cria", "nombre": "Crianza y recría", "corto": "Crianza", "peso": 10, "preg": ["C1", "C2"]}], "coherencia": [{"if": [["R2", ">=", 2], ["R1", "<=", 1]], "areas": ["rodeo"], "texto": "Se declara que se miden indicadores reproductivos, pero los eventos del rodeo no están en un registro individual ordenado. Conviene verificar con qué datos se calculan: sin fechas de parto y servicio confiables, la tasa de preñez o el intervalo pueden estar mal estimados."}, {"if": [["F1", ">=", 2], ["F3", "==", 0]], "areas": ["alim"], "texto": "Hay presupuesto forrajero, pero no se conoce el stock de reservas. Las reservas son una parte central de la oferta de comida: sin medirlas, el balance entre oferta y demanda queda incompleto."}, {"if": [["E1", ">=", 2], ["E3", "<=", 1]], "areas": ["econ"], "texto": "Se calcula el costo por litro, pero no hay inventario valorizado de hacienda. Sin diferencia de inventario, el resultado del tambo puede verse mejor o peor de lo que es según se haya vendido o retenido hacienda en el ejercicio."}, {"if": [["E2", "==", 3], ["E1", "<=", 1]], "areas": ["econ"], "texto": "Se declara un resultado mensual con margen bruto y EBITDA, pero no se conoce el costo por litro. Con los mismos datos del resultado mensual se puede calcular directamente; conviene revisar si el resultado está armado por rubro."}, {"if": [["D1", "==", 3], ["P2", "<=", 1]], "areas": ["dir", "prod"], "texto": "Hay retribución vinculada a resultados, pero no se siguen los recuentos de calidad mes a mes. Si la calidad de leche forma parte del esquema, el seguimiento mensual de CCS y UFC es indispensable para liquidarlo."}, {"if": [["R3", ">=", 2], ["C2", "==", 0]], "areas": ["rodeo", "cria"], "texto": "Se planifica la reposición del rodeo, pero no se conoce la edad al primer parto de las vaquillonas. Sin ese dato es difícil anticipar cuándo entra cada vaquillona al tambo."}], "niveles": [{"max": 30, "nombre": "Inicial", "desc": "El tambo se maneja por experiencia, con pocos datos registrados", "id": "n0"}, {"max": 55, "nombre": "En desarrollo", "desc": "Hay registros, falta convertirlos en indicadores", "id": "n1"}, {"max": 78, "nombre": "Gestionado", "desc": "Se mide y se decide con datos", "id": "n2"}, {"max": 100, "nombre": "Optimizado", "desc": "Mejora continua y comparación con otros tambos", "id": "n3"}], "orden": ["P1", "P2", "P3", "R1", "R2", "R3", "R4", "F1", "F2", "F3", "E1", "E2", "E3", "C1", "C2", "D1", "D2", "D3"]};
+const LOGO_FULL = "data:image/png;base64,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";
+const WA = "https://wa.me/5492494492344?text=" + encodeURIComponent("Hola Criterya, hice el diagnóstico express de tambos y quiero conversar el resultado.");
+
+const R = {emp:"", per:"", sist:"", resp:{}, idx:0};
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const areaDe = cod => DATA.areas.find(a => a.preg.includes(cod));
+const nivelColor = n => ["var(--n0)","var(--n1)","var(--n2)","var(--n3)"][n];
+const bandaDe = p => DATA.niveles.find(n => p <= n.max) || DATA.niveles[3];
+const N = DATA.orden.length;
+
+function segmentos(){
+  const gG = 5.2, gS = 1.3, nA = DATA.areas.length;
+  const span = (360 - nA*gG - (N-nA)*gS) / N;
+  let ang = -90 + gG/2, out = [];
+  DATA.areas.forEach(a => a.preg.forEach((cod, i) => {
+    out.push({cod, a0:ang, a1:ang+span});
+    ang += span + (i < a.preg.length-1 ? gS : gG);
+  }));
+  return out;
+}
+function arco(cx, cy, r, a0, a1){
+  const p = a => [cx + r*Math.cos(a*Math.PI/180), cy + r*Math.sin(a*Math.PI/180)];
+  const [x0,y0] = p(a0), [x1,y1] = p(a1);
+  return `M ${x0.toFixed(2)} ${y0.toFixed(2)} A ${r} ${r} 0 ${a1-a0>180?1:0} 1 ${x1.toFixed(2)} ${y1.toFixed(2)}`;
+}
+function pintarDial(svg, r, w, anim){
+  svg.innerHTML = segmentos().map((s,i) => {
+    const v = R.resp[s.cod];
+    const col = v === undefined ? (anim ? "rgba(255,255,255,.16)" : "var(--line)") : nivelColor(v);
+    const st = anim ? `stroke-dasharray:100;stroke-dashoffset:100;animation:draw .5s ${0.09*i+0.15}s cubic-bezier(.3,0,.4,1) forwards` : "";
+    return `<path d="${arco(50,50,r,s.a0,s.a1)}" pathLength="100" fill="none" stroke="${col}" stroke-width="${w}" style="${st}"><title>${s.cod}</title></path>`;
+  }).join("");
+}
+
+function irA(i){
+  R.idx = Math.max(0, Math.min(N-1, i));
+  const cod = DATA.orden[R.idx], q = DATA.preguntas[cod], area = areaDe(cod);
+  $("#q-count").innerHTML = `${String(R.idx+1).padStart(2,"0")} <span>/ ${N}</span>`;
+  $("#q-area").textContent = area.nombre;
+  $("#q-track").style.width = (R.idx/N*100) + "%";
+  pintarDial($("#q-dial"), 42, 9, false);
+  const sel = R.resp[cod];
+  $("#q-body").innerHTML = `
+    <div><span class="q__code">${cod}</span>${q.nota ? `<span class="q__flag">${esc(q.nota)}</span>` : ""}</div>
+    <h2>${esc(q.titulo)}</h2>
+    <p class="q__hint">Elegí la opción que describe la situación actual del tambo.</p>
+    <div class="opts" id="opts">
+      ${q.opciones.map(o => `
+        <button class="opt" type="button" data-n="${o.nivel}" aria-pressed="${sel===o.nivel}">
+          <span class="opt__n">${o.nivel+1}</span><span>${esc(o.texto)}</span>
+        </button>`).join("")}
+    </div>
+    <div class="nav">
+      <button class="back" type="button" id="prev" ${R.idx===0?'style="visibility:hidden"':""}>
+        <svg width="15" height="10" viewBox="0 0 15 10" fill="none" aria-hidden="true"><path d="M14 5H1M5 1L.5 5 5 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Pregunta anterior</button>
+      <span class="keys">Teclas <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd><kbd>4</kbd></span>
+    </div>`;
+  $("#opts").querySelectorAll(".opt").forEach(b => b.onclick = () => elegir(cod, +b.dataset.n, b));
+  $("#prev").onclick = () => irA(R.idx-1);
+  window.scrollTo({top:0, behavior:"instant"});
+  const first = $("#opts .opt"); if (first) first.focus({preventScroll:true});
+}
+function elegir(cod, n, btn){
+  R.resp[cod] = n;
+  $("#opts").querySelectorAll(".opt").forEach(b => b.setAttribute("aria-pressed", b === btn));
+  pintarDial($("#q-dial"), 42, 9, false);
+  const wait = matchMedia("(prefers-reduced-motion:reduce)").matches ? 0 : 220;
+  setTimeout(() => { if (R.idx === N-1) resultados(); else irA(R.idx+1); }, wait);
+}
+document.addEventListener("keydown", e => {
+  if ($("#quiz").classList.contains("hidden")) return;
+  if (["1","2","3","4"].includes(e.key)){ const b = $("#opts").querySelector(`.opt[data-n="${+e.key-1}"]`); if (b) b.click(); }
+  if (e.key === "ArrowLeft") irA(R.idx-1);
+  if (e.key === "ArrowRight" && R.resp[DATA.orden[R.idx]] !== undefined) irA(R.idx+1);
+});
+
+function calcular(){
+  const areas = DATA.areas.map(a => {
+    const suma = a.preg.reduce((s,c) => s + (R.resp[c] ?? 0), 0);
+    const pts = Math.round(suma / (3*a.preg.length) * 100);
+    return {...a, pts, banda: bandaDe(pts)};
+  });
+  const global = Math.round(areas.reduce((s,a) => s + a.pts * a.peso/100, 0));
+  const avisos = DATA.coherencia.filter(c => c.if.every(([cod,op,v]) => {
+    const x = R.resp[cod]; return op === ">=" ? x >= v : op === "<=" ? x <= v : x === v;
+  }));
+  const plan = DATA.orden.filter(c => R.resp[c] <= 2).map(c => {
+    const f = DATA.fichas[`${c}-${R.resp[c]}`], a = areaDe(c);
+    return {...f, area:a, prio: a.peso * (3 - R.resp[c]), titulo: DATA.preguntas[c].titulo};
+  }).sort((x,y) => y.prio - x.prio || (x.impacto==="alto"?-1:1)).slice(0,5);
+  return {areas, global, avisos, plan, banda: bandaDe(global)};
+}
+
+function resultados(){
+  const c = calcular();
+  const rapidas = c.plan.filter(p => p.esfuerzo === "bajo");
+  const estruct = c.plan.filter(p => p.esfuerzo !== "bajo");
+  const titulo = R.emp ? esc(R.emp) : "Diagnóstico de gestión del tambo";
+  const sub = [R.per && esc(R.per), R.sist && "Sistema " + esc(R.sist.toLowerCase()),
+    new Date().toLocaleDateString("es-AR",{day:"2-digit",month:"long",year:"numeric"})].filter(Boolean).join(" · ");
+  const ficha = (p, i) => `
+    <article class="act">
+      <div class="act__rank">${i+1}</div>
+      <div>
+        <div class="act__top"><span class="act__code">${p.cod}</span><span class="act__q">${esc(p.titulo)}</span></div>
+        <p class="act__ans">Respuesta registrada: nivel ${p.nivel+1} de 4 — ${esc(p.eco)}</p>
+        <p class="act__do">${esc(p.accion)}</p>
+        <dl class="act__meta">
+          <div><dt>Responsable</dt><dd>${esc(p.responsable)}</dd></div>
+          <div><dt>Plazo</dt><dd>${esc(p.plazo)}</dd></div>
+          <div><dt>Esfuerzo</dt><dd>${esc(p.esfuerzo)}</dd></div>
+          <div><dt>Impacto</dt><dd>${esc(p.impacto)}</dd></div>
+        </dl>
+      </div>
+    </article>`;
+  const grupo = (h, n, arr, off) => arr.length ? `
+    <div class="plan__group"><div class="plan__gh"><h4>${h}</h4><span>${n}</span></div>
+    ${arr.map((p,i) => ficha(p, off+i)).join("")}</div>` : "";
+
+  $("#res").innerHTML = `
+    <div class="res__hero"><div class="wrap">
+      <div class="eyebrow">Resultado del diagnóstico express · Tambos</div>
+      <h1>${titulo}</h1>
+      <p class="res__sub">${sub}</p>
+      <div class="gauge">
+        <div class="gauge__ring">
+          <svg id="r-dial" viewBox="0 0 100 100" aria-label="Nivel alcanzado en cada una de las ${N} preguntas"></svg>
+          <div class="gauge__ctr"><div class="gauge__score" id="r-score">0</div><div class="gauge__of">DE 100</div></div>
+        </div>
+        <div class="gauge__lvl">
+          <div class="gauge__lvlname">${c.banda.nombre}</div>
+          <p class="gauge__lvldesc">${c.banda.desc}</p>
+          <ul class="scale">${DATA.niveles.map((n,i) => `<li ${n.id===c.banda.id?"data-on":""}><i></i>${n.nombre}<span style="opacity:.6;margin-left:auto">${i===0?0:DATA.niveles[i-1].max+1}–${n.max}</span></li>`).join("")}</ul>
+        </div>
+      </div>
+    </div></div>
+    <div class="wrap">
+      <div class="block">
+        <h3 class="sect">Áreas de gestión del tambo</h3>
+        <p class="sect__note">Cada área se puntúa de 0 a 100 según sus respuestas y cae en una de las cuatro bandas. El peso indica cuánto incide en el puntaje global. Están ordenadas de menor a mayor: arriba, lo más débil.</p>
+        <div class="ascale">
+          <div class="ascale__strip">
+            ${DATA.niveles.map((n,i) => { const d = i===0?0:DATA.niveles[i-1].max+1; return `<span style="flex:${n.max-d+1} 1 0;background:${nivelColor(i)}">${n.nombre}</span>`; }).join("")}
+            ${[30,55,78].map(v => `<em style="left:${v}%">${v}</em>`).join("")}
+            <em class="l" style="left:0">0</em><em class="r" style="left:100%">100</em>
+          </div>
+          <div class="ascale__lbl">Puntaje</div>
+        </div>
+        <div class="ascale__legend">${DATA.niveles.map((n,i) => `<span><i style="background:${nivelColor(i)}"></i>${n.nombre}</span>`).join("")}</div>
+        <div class="areas">
+          ${[...c.areas].sort((x,y) => x.pts - y.pts).map(a => {
+            const ci = DATA.niveles.findIndex(n => n.id === a.banda.id), col = nivelColor(ci);
+            return `<div class="arow"><div>
+              <div class="arow__top"><span class="arow__name">${a.nombre}</span><span class="arow__w">${a.peso}% del global</span><span class="arow__q">${a.preg.join(" · ")}</span></div>
+              <div class="arow__bar"><i class="tick" style="left:30%"></i><i class="tick" style="left:55%"></i><i class="tick" style="left:78%"></i><div class="arow__fill" data-w="${a.pts}" style="background:${col}"></div></div>
+            </div><div class="arow__num"><b style="color:${col}">${a.pts}</b><span style="color:${col}">${a.banda.nombre}</span></div></div>`;
+          }).join("")}
+        </div>
+      </div>
+      ${c.avisos.length ? `
+      <div class="block">
+        <h3 class="sect">Consistencia a verificar</h3>
+        <p class="sect__note">Estas combinaciones de respuestas no suelen darse juntas. No invalidan el diagnóstico, pero conviene revisarlas antes de actuar sobre esas áreas.</p>
+        ${c.avisos.map(a => `<div class="warn"><div class="warn__h">${a.areas.map(id => DATA.areas.find(x => x.id === id).nombre).join(" · ")}
+          <span class="mono" style="font-weight:400;letter-spacing:.02em;opacity:.65;margin-left:6px;text-transform:none">${a.if.map(x=>x[0]).join(" + ")}</span></div><p>${esc(a.texto)}</p></div>`).join("")}
+      </div>` : ""}
+      <div class="block">
+        <h3 class="sect">Plan de acción</h3>
+        <p class="sect__note">Las cinco medidas con mejor relación entre el peso del área y la brecha detectada, en orden de prioridad. Las acciones rápidas se pueden encarar sin recursos adicionales.</p>
+        ${c.plan.length ? `
+          ${grupo("Acciones rápidas", `${rapidas.length} de ${c.plan.length} · esfuerzo bajo`, rapidas, 0)}
+          ${grupo("Cambios estructurales", `${estruct.length} de ${c.plan.length} · requieren organización previa`, estruct, rapidas.length)}` : `
+          <div class="empty"><h4>No hay brechas para priorizar</h4>
+          <p>Todas las respuestas quedaron en el nivel más alto. En ese escenario el diagnóstico express llega a su límite: el paso siguiente es un relevamiento del ejercicio con los indicadores propios del tambo y su comparación con tambos de sistema similar.</p></div>`}
+      </div>
+      <details class="log">
+        <summary>Respuestas registradas <span class="mono" style="font-weight:400;color:var(--muted);font-size:.78rem">${N} preguntas</span></summary>
+        <table class="log__t">${DATA.orden.map(cod => `<tr><td>${cod}</td><td>${esc(DATA.preguntas[cod].opciones[R.resp[cod]].texto)}</td><td style="color:${nivelColor(R.resp[cod])}">${R.resp[cod]+1}</td></tr>`).join("")}</table>
+      </details>
+      <div class="actions">
+        <button class="btn" type="button" id="print">Imprimir o guardar en PDF</button>
+        <button class="btn btn--ghost" type="button" id="again">Hacer otro diagnóstico</button>
+        <a class="btn btn--ghost" href="/lecheria/">Volver a Criterya Lechería</a>
+      </div>
+      <div class="contact">
+        <div class="eyebrow">Siguiente paso</div>
+        <h4>Conversemos el resultado de tu tambo</h4>
+        <p>Una primera charla sin costo para revisar las brechas detectadas y ver si conviene avanzar con un diagnóstico integral del ejercicio.</p>
+        <div class="contact__links">
+          <a href="${WA}" target="_blank" rel="noopener">WhatsApp 249 449-2344</a>
+          <a href="mailto:contacto@criterya.com.ar?subject=${encodeURIComponent("Diagnóstico express Tambos" + (R.emp ? " - " + R.emp : ""))}">contacto@criterya.com.ar</a>
+          <a href="tel:+542494614411">2494 61-4411</a>
+        </div>
+      </div>
+      <div class="foot">
+        <img src="${LOGO_FULL}" alt="Criterya · Consultora de gestión empresarial">
+        <p>Este diagnóstico es una primera aproximación construida sobre respuestas declaradas. Sirve para ordenar prioridades y decidir por dónde empezar, no para reemplazar el relevamiento del ejercicio ni el criterio de los asesores del tambo. Las acciones sugeridas son puntos de partida que conviene ajustar al sistema, la escala y la estructura de cada establecimiento.</p>
+      </div>
+    </div>`;
+
+  $("#quiz").classList.add("hidden");
+  $("#res").classList.remove("hidden");
+  window.scrollTo({top:0, behavior:"instant"});
+  pintarDial($("#r-dial"), 42, 10, true);
+  requestAnimationFrame(() => $("#res").querySelectorAll(".arow__fill").forEach(f => f.style.width = f.dataset.w === "0" ? "4px" : f.dataset.w + "%"));
+  const el = $("#r-score");
+  if (matchMedia("(prefers-reduced-motion:reduce)").matches) el.textContent = c.global;
+  else { const t0 = performance.now(), dur = 1150;
+    const tick = t => { const k = Math.min(1,(t-t0)/dur), e = 1-Math.pow(1-k,3); el.textContent = Math.round(c.global*e); if (k<1) requestAnimationFrame(tick); };
+    requestAnimationFrame(tick); }
+  $("#print").onclick = () => window.print();
+  $("#again").onclick = volverInicio;
+}
+function volverInicio(){
+  R.resp = {}; R.idx = 0;
+  $("#res").classList.add("hidden"); $("#quiz").classList.add("hidden");
+  $("#intro").classList.remove("hidden");
+  window.scrollTo({top:0, behavior:"instant"});
+}
+$("#exit").onclick = () => { volverInicio(); };
+$("#start").onclick = () => {
+  R.emp = $("#f-emp").value.trim(); R.per = $("#f-per").value.trim();
+  $("#intro").classList.add("hidden"); $("#quiz").classList.remove("hidden");
+  irA(0);
+};
+document.querySelectorAll(".rubro").forEach(b => b.onclick = () => {
+  const on = b.getAttribute("aria-pressed") !== "true";
+  document.querySelectorAll(".rubro").forEach(x => x.setAttribute("aria-pressed", "false"));
+  b.setAttribute("aria-pressed", String(on)); R.sist = on ? b.dataset.v : "";
+});
+</script>
+</body>
+</html>
