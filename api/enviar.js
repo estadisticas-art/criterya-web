@@ -15,7 +15,8 @@
  *   MAIL_INTERNO  destino de los avisos internos (por defecto, SMTP_USER)
  *
  * Esta función atiende tres tipos de envío. Hoy solo la usa el formulario de
- * contacto; express e integral quedan listos para engancharse después.
+ * contacto y los dos express (distribuidoras y tambos); el integral queda listo
+ * para engancharse después.
  */
 
 const nodemailer = require("nodemailer");
@@ -65,29 +66,52 @@ function cuerpoContacto(d) {
 
 function cuerpoDiagnostico(d, tipo) {
   const areas = Array.isArray(d.areas) ? d.areas : [];
+  const resp = Array.isArray(d.respuestas) ? d.respuestas : [];
+  const plan = Array.isArray(d.plan) ? d.plan : [];
+  const td = "padding:6px 10px 6px 0;border-bottom:1px solid #e4eaee;font-size:14px;vertical-align:top";
+  const h3 = function (t) { return "<h3 style='color:#043760;font-size:14px;margin:22px 0 8px'>" + t + "</h3>"; };
+
   const filasAreas = areas.map(function (a) {
-    return "<tr><td style='padding:6px 10px 6px 0;border-bottom:1px solid #e4eaee;font-size:14px'>" +
-      esc(a.nombre) + "</td><td style='padding:6px 10px;border-bottom:1px solid #e4eaee;" +
-      "text-align:center;font-size:14px;font-weight:600'>" + esc(a.pts) +
-      "</td><td style='padding:6px 0;border-bottom:1px solid #e4eaee;text-align:right;" +
-      "font-size:13px;color:#5F7486'>" + esc(a.banda) + "</td></tr>";
+    return "<tr><td style='" + td + "'>" + esc(a.nombre) + "</td><td style='" + td +
+      ";text-align:center;font-weight:600'>" + esc(a.pts) + "</td><td style='" + td +
+      ";text-align:right;font-size:13px;color:#5F7486;padding-right:0'>" + esc(a.banda) + "</td></tr>";
   }).join("");
 
   const datos = "<table style='border-collapse:collapse;width:100%'>" +
+    fila("Instrumento", d.instrumento) +
+    (d.anonimo ? fila("Contacto", "Anónimo: terminó el diagnóstico sin dejar datos") : "") +
     fila("Empresa", d.empresa) + fila("Persona", d.persona || d.nombre) +
     fila("Correo", d.email) + fila("Teléfono", d.telefono) +
+    fila("Rubro / sistema", d.rubro || d.sistema) +
+    fila("Acepta contacto", d.consiente ? "Sí" : "") +
     fila("Puntaje global", (d.global != null ? d.global + " / 100" : "")) +
     fila("Nivel", d.banda) + "</table>";
 
-  const bloqueAreas = filasAreas
-    ? "<h3 style='color:#043760;font-size:14px;margin:22px 0 8px'>Áreas de gestión</h3>" +
-      "<table style='border-collapse:collapse;width:100%'>" + filasAreas + "</table>"
-    : "";
+  const bloqueAreas = filasAreas ? h3("Áreas de gestión") +
+    "<table style='border-collapse:collapse;width:100%'>" + filasAreas + "</table>" : "";
+
+  const bloquePlan = plan.length ? h3("Plan de acción sugerido") +
+    "<ol style='margin:0;padding-left:20px;font-size:14px;line-height:1.55'>" +
+    plan.map(function (p) {
+      return "<li style='margin-bottom:8px'><b>" + esc(p.cod) + " · " + esc(p.titulo) + "</b><br>" +
+        "<span style='color:#3B4B57'>" + esc(p.accion) + "</span></li>";
+    }).join("") + "</ol>" : "";
+
+  const bloqueResp = resp.length ? h3("Respuestas") +
+    "<table style='border-collapse:collapse;width:100%'>" + resp.map(function (r) {
+      return "<tr><td style='" + td + ";font-family:monospace;font-size:12px;color:#5F7486;width:34px'>" +
+        esc(r.cod) + "</td><td style='" + td + "'><b>" + esc(r.titulo) + "</b><br>" +
+        "<span style='color:#3B4B57;font-size:13px'>" + esc(r.texto) + "</span></td><td style='" + td +
+        ";text-align:right;font-weight:600;padding-right:0;width:44px'>" +
+        esc(r.nivel != null ? (Number(r.nivel) + 1) + "/4" : "") + "</td></tr>";
+    }).join("") + "</table>" : "";
 
   return envoltorio(
     tipo === "integral" ? "Diagnóstico integral completado" : "Diagnóstico express completado",
-    datos + bloqueAreas,
-    "Aviso interno. El detalle completo y el anexo técnico quedan registrados en la planilla."
+    datos + bloqueAreas + bloquePlan + bloqueResp,
+    d.anonimo
+      ? "Aviso interno anónimo: la persona vio su resultado pero no dejó datos de contacto."
+      : "Aviso interno. La persona dejó sus datos para descargar el informe en PDF."
   );
 }
 
@@ -139,6 +163,11 @@ module.exports = async function handler(req, res) {
     }
   }
 
+  if (tipo !== "contacto" && !d.anonimo &&
+      !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(d.email || "").trim())) {
+    return res.status(400).json({ ok: false, error: "Correo inválido" });
+  }
+
   const interno = process.env.MAIL_INTERNO || process.env.SMTP_USER;
   const puerto = Number(process.env.SMTP_PORT || 465);
 
@@ -160,8 +189,9 @@ module.exports = async function handler(req, res) {
              (empresa ? " · " + empresa : "");
     html = cuerpoContacto(d);
   } else {
-    asunto = (tipo === "integral" ? "[Integral] " : "[Express] ") +
-             (empresa || "Sin empresa") +
+    const etiqueta = String(d.instrumento || (tipo === "integral" ? "Integral" : "Express")).slice(0, 60);
+    asunto = "[" + etiqueta + (d.anonimo ? " · anónimo" : "") + "] " +
+             (d.anonimo ? "Diagnóstico completado" : (empresa || String(d.nombre || "").trim() || "Sin empresa")) +
              (d.global != null ? " · " + d.global + "/100" : "");
     html = cuerpoDiagnostico(d, tipo);
   }

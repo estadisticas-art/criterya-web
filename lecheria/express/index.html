@@ -260,7 +260,7 @@ details.log[open] summary::after{content:"–"}
     <button id="start" class="cta" type="button">Comenzar el diagnóstico
       <svg width="17" height="11" viewBox="0 0 17 11" fill="none" aria-hidden="true"><path d="M1 5.5h14M11 1l4.5 4.5L11 10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
-    <p class="note">Las respuestas se procesan en este dispositivo y no se envían a ningún servidor. Al terminar podés imprimir el resultado o guardarlo en PDF.</p>
+    <p class="note">Al terminar ves el resultado completo y Criterya recibe una copia anónima. Para descargar el informe en PDF te pedimos nombre y correo.</p>
   </div></div>
 </section>
 
@@ -468,7 +468,7 @@ function resultados(){
         <table class="log__t">${DATA.orden.map(cod => `<tr><td>${cod}</td><td>${esc(DATA.preguntas[cod].opciones[R.resp[cod]].texto)}</td><td style="color:${nivelColor(R.resp[cod])}">${R.resp[cod]+1}</td></tr>`).join("")}</table>
       </details>
       <div class="actions">
-        <button class="btn" type="button" id="print">Imprimir o guardar en PDF</button>
+        <button class="btn" type="button" id="print">Descargar el informe en PDF</button>
         <button class="btn btn--ghost" type="button" id="again">Hacer otro diagnóstico</button>
         <a class="btn btn--ghost" href="/lecheria/">Volver a Criterya Lechería</a>
       </div>
@@ -488,6 +488,8 @@ function resultados(){
       </div>
     </div>`;
 
+  Envio.alTerminar(c, {instrumento: "Express Tambos", rubro: R.sist ? "Tambo · " + R.sist : "Tambo",
+    empresa: R.emp, persona: R.per, etiquetaEmpresa: "Establecimiento"});
   $("#quiz").classList.add("hidden");
   $("#res").classList.remove("hidden");
   window.scrollTo({top:0, behavior:"instant"});
@@ -498,11 +500,11 @@ function resultados(){
   else { const t0 = performance.now(), dur = 1150;
     const tick = t => { const k = Math.min(1,(t-t0)/dur), e = 1-Math.pow(1-k,3); el.textContent = Math.round(c.global*e); if (k<1) requestAnimationFrame(tick); };
     requestAnimationFrame(tick); }
-  $("#print").onclick = () => window.print();
+  $("#print").onclick = () => Envio.abrir();
   $("#again").onclick = volverInicio;
 }
 function volverInicio(){
-  R.resp = {}; R.idx = 0;
+  R.resp = {}; R.idx = 0; Envio.reiniciar();
   $("#res").classList.add("hidden"); $("#quiz").classList.add("hidden");
   $("#intro").classList.remove("hidden");
   window.scrollTo({top:0, behavior:"instant"});
@@ -519,5 +521,114 @@ document.querySelectorAll(".rubro").forEach(b => b.onclick = () => {
   b.setAttribute("aria-pressed", String(on)); R.sist = on ? b.dataset.v : "";
 });
 </script>
+<!-- ===== envío de resultados (aviso interno + datos para el PDF) ===== -->
+<style>
+.gate{position:fixed;inset:0;z-index:100;background:rgba(10,27,42,.55);display:flex;align-items:center;justify-content:center;padding:18px}
+.gate.hidden{display:none}
+.gate__box{background:var(--card,#fff);color:var(--ink,#0A1B2A);border-radius:10px;max-width:460px;width:100%;padding:26px 24px 22px;box-shadow:0 30px 60px -20px rgba(0,0,0,.45);max-height:92vh;overflow:auto}
+.gate__box h3{font-family:var(--disp);font-weight:700;font-size:1.25rem;color:var(--navy);margin:4px 0 6px;letter-spacing:-.01em}
+.gate__box > p{margin:0 0 18px;font-size:.9rem;color:var(--muted)}
+.gate__f{display:grid;gap:12px}
+.gate__f label{display:flex;flex-direction:column;gap:6px;font-family:var(--disp);font-weight:600;font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.gate__f label span.op{font-weight:400;letter-spacing:.04em;text-transform:none;font-family:var(--body)}
+.gate__f input[type=text],.gate__f input[type=email],.gate__f input[type=tel]{font:inherit;font-family:var(--body);font-size:.96rem;letter-spacing:0;text-transform:none;color:var(--ink);padding:11px 12px;border:1px solid var(--line);border-radius:5px;background:#fff;width:100%}
+.gate__f input:focus{border-color:var(--cyan);outline:none;box-shadow:0 0 0 3px rgba(47,143,160,.15)}
+.gate__ok{display:flex !important;flex-direction:row !important;align-items:flex-start;gap:10px !important;font-family:var(--body) !important;font-size:.84rem !important;letter-spacing:0 !important;text-transform:none !important;color:var(--ink) !important;font-weight:400 !important;line-height:1.45}
+.gate__ok input{margin-top:3px;width:18px;height:18px;flex:none;accent-color:var(--navy)}
+.gate__err{color:#9A3B2C;font-size:.84rem;min-height:1.2em;margin:2px 0 0}
+.gate__btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+.gate__btns .btn{min-height:44px}
+.gate__btns .btn--main{background:var(--navy);color:#fff;border-color:var(--navy)}
+.gate__btns .btn--main:hover{background:#052c4c}
+.gate__btns .btn[disabled]{opacity:.6;cursor:wait}
+.gate__priv{font-size:.74rem;color:var(--muted);margin:14px 0 0;line-height:1.5}
+@media print{.gate{display:none !important}}
+</style>
+<div class="gate hidden" id="gate" role="dialog" aria-modal="true" aria-labelledby="gate-t">
+  <div class="gate__box">
+    <div class="eyebrow">Informe en PDF</div>
+    <h3 id="gate-t">Dejanos tus datos para descargar el informe</h3>
+    <p>Te habilitamos el PDF al instante. Si querés, te contactamos para conversar el resultado.</p>
+    <form class="gate__f" id="gate-f" novalidate>
+      <label>Nombre<input type="text" id="g-nom" autocomplete="name" required></label>
+      <label id="g-emp-l">Empresa<input type="text" id="g-emp" autocomplete="organization"></label>
+      <label>Correo electrónico<input type="email" id="g-mail" autocomplete="email" required></label>
+      <label><span>Teléfono <span class="op">(opcional)</span></span><input type="tel" id="g-tel" autocomplete="tel"></label>
+      <label class="gate__ok"><input type="checkbox" id="g-ok"><span>Acepto que Criterya use estos datos para enviarme información sobre este diagnóstico y contactarme.</span></label>
+      <p class="gate__err" id="g-err" role="alert"></p>
+      <div class="gate__btns">
+        <button class="btn btn--main" type="submit" id="g-send">Descargar el PDF</button>
+        <button class="btn btn--ghost" type="button" id="g-cancel">Cancelar</button>
+      </div>
+    </form>
+    <p class="gate__priv">Los datos llegan sólo a Criterya y no se comparten con terceros.</p>
+  </div>
+</div>
+<script>
+/* Envío de resultados a Criterya por /api/enviar:
+   - al terminar: aviso anónimo (puntaje, áreas y respuestas, sin datos personales);
+   - al pedir el PDF: los datos de contacto + el resultado completo, y se imprime. */
+const Envio = (function(){
+  let ultimo = null, anonEnviado = false, contactoEnviado = false, ctx = {};
+  const q = s => document.querySelector(s);
+  function base(c){
+    return {
+      tipo: "express",
+      instrumento: ctx.instrumento,
+      rubro: ctx.rubro || "",
+      global: c.global,
+      banda: c.banda.nombre,
+      areas: c.areas.map(a => ({nombre:a.nombre, pts:a.pts, banda:a.banda.nombre})),
+      respuestas: DATA.orden.map(cod => ({cod, titulo:DATA.preguntas[cod].titulo, nivel:R.resp[cod],
+        texto: DATA.preguntas[cod].opciones[R.resp[cod]].texto})),
+      plan: c.plan.map(p => ({cod:p.cod, titulo:p.titulo, accion:p.accion}))
+    };
+  }
+  function post(data){
+    return fetch("/api/enviar", {method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify(data)}).then(r => r.json().catch(() => ({ok:false})).then(j => r.ok && j.ok));
+  }
+  function alTerminar(c, contexto){
+    ctx = contexto || {}; ultimo = c;
+    if (anonEnviado) return;
+    anonEnviado = true;
+    post(Object.assign(base(c), {anonimo:true})).catch(() => {});
+  }
+  function abrir(){
+    if (contactoEnviado){ window.print(); return; }
+    q("#g-nom").value = q("#g-nom").value || ctx.persona || "";
+    q("#g-emp").value = q("#g-emp").value || ctx.empresa || "";
+    if (ctx.etiquetaEmpresa) q("#g-emp-l").firstChild.textContent = ctx.etiquetaEmpresa;
+    q("#g-err").textContent = "";
+    q("#gate").classList.remove("hidden");
+    setTimeout(() => q(q("#g-nom").value ? "#g-mail" : "#g-nom").focus(), 30);
+  }
+  function cerrar(){ q("#gate").classList.add("hidden"); }
+  q("#g-cancel").onclick = cerrar;
+  q("#gate").addEventListener("click", e => { if (e.target.id === "gate") cerrar(); });
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && !q("#gate").classList.contains("hidden")) cerrar(); });
+  q("#gate-f").onsubmit = async e => {
+    e.preventDefault();
+    const nom = q("#g-nom").value.trim(), mail = q("#g-mail").value.trim();
+    const err = q("#g-err");
+    if (!nom){ err.textContent = "Ingresá tu nombre."; q("#g-nom").focus(); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(mail)){ err.textContent = "Revisá el correo electrónico."; q("#g-mail").focus(); return; }
+    if (!q("#g-ok").checked){ err.textContent = "Para descargar el informe tenés que aceptar el uso de los datos."; return; }
+    const btn = q("#g-send"); btn.disabled = true; btn.textContent = "Enviando…"; err.textContent = "";
+    const ok = await post(Object.assign(base(ultimo), {
+      anonimo:false, nombre:nom, persona:nom, email:mail, telefono:q("#g-tel").value.trim(),
+      empresa:q("#g-emp").value.trim(), consiente:true
+    })).catch(() => false);
+    btn.disabled = false; btn.textContent = "Descargar el PDF";
+    /* Si el envío falla igual se habilita el PDF: no se castiga al que respondió. */
+    contactoEnviado = true;
+    cerrar();
+    if (!ok) console.warn("No se pudo registrar el envío del diagnóstico.");
+    setTimeout(() => window.print(), 120);
+  };
+  return {alTerminar, abrir, reiniciar(){ anonEnviado = false; }};
+})();
+</script>
+<!-- ===== fin envío de resultados ===== -->
 </body>
 </html>
