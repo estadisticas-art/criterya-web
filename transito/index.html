@@ -1,0 +1,734 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Criterya · Contador de tránsito en vivo · Tandil</title>
+<link rel="icon" href="/favicon.png">
+<meta name="description" content="Conteo automático de vehículos y peatones sobre la cámara pública de la Municipalidad de Tandil.">
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3/dist/coco-ssd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script>
+<style>
+  :root{
+    --bg:#0f1720; --panel:#16212c; --line:#253545; --txt:#e6edf3; --mut:#8aa0b4;
+    --veh:#f5a524; --ped:#2fbf9b; --roi:#5aa9ff; --bad:#ff6b6b;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font:14px/1.45 system-ui,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--txt)}
+  header{display:flex;align-items:center;gap:16px;padding:12px 18px;border-bottom:1px solid var(--line)}
+  header h1{font-size:17px;margin:0;font-weight:600}
+  #status{margin-left:auto;font-size:12px;color:var(--mut)}
+  #status b{color:var(--txt)}
+  main{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:14px;padding:14px}
+  @media(max-width:1100px){main{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px}
+  .card h2{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);margin:0 0 10px}
+  .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  button,select,input{font:inherit;color:var(--txt);background:#1d2a37;border:1px solid var(--line);border-radius:7px;padding:6px 10px}
+  button{cursor:pointer}
+  button:hover{border-color:#3b536a}
+  button.primary{background:#2563eb;border-color:#2563eb}
+  button.danger{background:#7f1d1d;border-color:#7f1d1d}
+  button.on{outline:2px solid var(--roi)}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  input[type=number]{width:80px}
+  input[type=text]{width:130px}
+  label.f{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--mut)}
+  #viewer{position:relative;background:#000;border-radius:8px;overflow:hidden;min-height:240px}
+  #stage{position:relative;display:none;line-height:0}
+  #stage.on{display:block}
+  #video{width:100%;height:auto;display:block}
+  #canvas{position:absolute;inset:0;width:100%;height:100%;cursor:crosshair;touch-action:none}
+  #placeholder{color:var(--mut);padding:40px;margin:0 auto;text-align:center;max-width:580px}
+  #placeholder[hidden]{display:none}
+  #guide{background:#1e3a5f;border:1px solid var(--roi);border-radius:8px;padding:8px 12px;margin-bottom:10px;font-size:13.5px}
+  #guide b{color:#fff}
+  .hint{font-size:12px;color:var(--mut);margin-top:6px}
+  .totals{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .big{font-size:30px;font-weight:700;line-height:1.1}
+  .veh .big{color:var(--veh)} .ped .big{color:var(--ped)}
+  table{width:100%;border-collapse:collapse;font-size:12.5px}
+  th,td{padding:5px 6px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+  th:first-child,td:first-child{text-align:left}
+  th{color:var(--mut);font-weight:500}
+  tr.peak td{background:rgba(245,165,36,.12)}
+  #tblWrap{max-height:340px;overflow:auto}
+  #log{max-height:180px;overflow:auto;font-family:ui-monospace,Consolas,monospace;font-size:12px;color:var(--mut)}
+  .bottom{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:14px}
+  @media(max-width:1100px){.bottom{grid-template-columns:1fr}}
+  #chart{width:100%;height:220px;display:block}
+  .dot{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px}
+  .sep{width:1px;height:24px;background:var(--line)}
+  details summary{cursor:pointer;color:var(--mut);font-size:12px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+</style>
+</head>
+<body>
+<header>
+  <a href="/" style="display:flex"><img src="/logo-blanco.png" alt="Criterya" style="height:26px"></a><h1>Contador de tránsito · vehículos y peatones</h1>
+  <div id="status">Modelo: <b id="stModel">cargando…</b> · Fuente: <b id="stSrc">ninguna</b> · Detección: <b id="stFps">–</b> · Conteo: <b id="stRun">detenido</b> <span id="stTimer"></span></div>
+</header>
+
+<main>
+  <section class="card">
+    <div class="row" style="margin-bottom:10px">
+      <button id="btnTandil" class="primary">🎥 Cámara Tandil en vivo</button>
+      <button id="btnCapture">📺 Capturar pestaña / ventana</button>
+      <button id="btnEndCap" disabled>✖ Cerrar fuente</button>
+      <input id="inpUrl" type="text" placeholder="URL .m3u8 / .mp4" value="https://tandil.gov.ar/camera/stream/output.m3u8" style="width:230px">
+      <button id="btnUrl">Abrir URL</button>
+      <label class="row" style="gap:4px"><input id="inpFile" type="file" accept="video/*" style="width:190px"></label>
+    </div>
+    <div class="row" style="margin-bottom:10px">
+      <button id="btnRoi">▭ Zona de análisis</button>
+      <button id="btnLineVeh">━ Línea vehículos</button>
+      <button id="btnLinePed">━ Línea peatones</button>
+      <button id="btnClearGeo">Borrar dibujo</button>
+      <span class="sep"></span>
+      <button id="btnStart" class="primary" disabled>▶ Iniciar conteo</button>
+      <button id="btnStop" disabled>⏸ Pausar</button>
+      <button id="btnReset" class="danger">Reiniciar datos</button>
+      <label class="row" style="gap:4px;font-size:12px;color:var(--mut)"><input id="chkBoxes" type="checkbox" checked> ver cajas</label>
+    </div>
+    <div id="guide" hidden></div>
+    <div id="viewer">
+      <div id="placeholder">
+        <p><b>1.</b> Tocá <b>Cámara Tandil en vivo</b> (lee el video directo de la Municipalidad). Para otras cámaras, pegá la URL .m3u8 o usá <b>Capturar pestaña / ventana</b>.</p>
+        <p><b>2.</b> Dibujá la <b>zona de análisis</b> sobre la imagen de la cámara (recorta bordes y menús de la página).</p>
+        <p><b>3.</b> Dibujá una línea que cruce <b>la avenida</b> y otra que cruce <b>la senda peatonal</b>.</p>
+        <p><b>4.</b> Tocá <b>Iniciar conteo</b>.</p>
+      </div>
+      <div id="stage"><video id="video" playsinline muted autoplay></video><canvas id="canvas"></canvas></div>
+    </div>
+    <div class="hint" id="hint">Arrastrá con el mouse sobre la imagen para dibujar. El sentido de cada línea define los lados <b>A</b> y <b>B</b>.</div>
+  </section>
+
+  <aside style="display:flex;flex-direction:column;gap:14px">
+    <div class="card">
+      <h2>Totales de la sesión</h2>
+      <div class="totals">
+        <div class="veh"><div style="color:var(--mut);font-size:12px">Vehículos</div><div class="big" id="totVeh">0</div></div>
+        <div class="ped"><div style="color:var(--mut);font-size:12px">Personas</div><div class="big" id="totPed">0</div></div>
+      </div>
+      <table style="margin-top:10px">
+        <thead><tr><th>Categoría</th><th id="hVehA">A→B</th><th id="hVehB">B→A</th><th>Total</th></tr></thead>
+        <tbody id="tbTot"></tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>Configuración</h2>
+      <div class="grid2">
+        <label class="f">Agrupar cada
+          <select id="selBucket">
+            <option value="1">1 min</option><option value="5">5 min</option>
+            <option value="15" selected>15 min</option><option value="30">30 min</option>
+            <option value="60">60 min</option>
+          </select></label>
+        <label class="f">Contar durante (min, 0 = sin límite)<input id="inpDur" type="number" min="0" value="0"></label>
+        <label class="f">Modelo
+          <select id="selModel">
+            <option value="mobilenet_v2" selected>Preciso (mobilenet_v2)</option>
+            <option value="lite_mobilenet_v2">Rápido (lite)</option>
+          </select></label>
+        <label class="f">Detecciones / seg<input id="inpFps" type="number" min="1" max="20" value="6"></label>
+        <label class="f">Confianza mínima<input id="inpScore" type="number" min="0.1" max="0.95" step="0.05" value="0.40"></label>
+        <label class="f">Resolución de análisis (px)<input id="inpW" type="number" min="320" max="1280" step="32" value="640"></label>
+      </div>
+      <details style="margin-top:8px">
+        <summary>Nombres de los sentidos</summary>
+        <div class="grid2" style="margin-top:8px">
+          <label class="f">Vehículos A→B<input id="lblVA" type="text"></label>
+          <label class="f">Vehículos B→A<input id="lblVB" type="text"></label>
+          <label class="f">Peatones A→B<input id="lblPA" type="text"></label>
+          <label class="f">Peatones B→A<input id="lblPB" type="text"></label>
+        </div>
+      </details>
+      <details style="margin-top:6px">
+        <summary>Seguimiento (avanzado)</summary>
+        <div class="grid2" style="margin-top:8px">
+          <label class="f">Salto máx. entre cuadros (% ancho)<input id="inpDist" type="number" min="1" max="40" value="8"></label>
+          <label class="f">Cuadros perdidos tolerados<input id="inpMiss" type="number" min="1" max="40" value="8"></label>
+        </div>
+      </details>
+    </div>
+
+    <div class="card">
+      <h2>Exportar</h2>
+      <div class="row">
+        <button id="btnCsvBuckets">CSV por intervalo</button>
+        <button id="btnCsvEvents">CSV de eventos</button>
+      </div>
+      <div class="hint">Separador “;” para que Excel en español lo abra directamente.</div>
+    </div>
+  </aside>
+
+  <div class="bottom">
+    <section class="card">
+      <h2>Conteo por intervalo <span id="peakInfo" style="text-transform:none;letter-spacing:0;color:var(--veh)"></span></h2>
+      <div id="tblWrap">
+        <table>
+          <thead><tr><th>Desde – Hasta</th><th>Autos</th><th>Motos</th><th>Camiones</th><th>Colectivos</th><th>Total veh.</th><th>Personas</th><th>Bicicletas</th></tr></thead>
+          <tbody id="tbBuckets"></tbody>
+        </table>
+      </div>
+    </section>
+    <section class="card">
+      <h2>Gráfico <span style="text-transform:none;letter-spacing:0;font-size:12px"><span class="dot" style="background:var(--veh)"></span>vehículos <span class="dot" style="background:var(--ped);margin-left:8px"></span>personas</span></h2>
+      <canvas id="chart"></canvas>
+      <h2 style="margin-top:12px">Últimos eventos</h2>
+      <div id="log"></div>
+    </section>
+  </div>
+</main>
+<footer style="padding:4px 18px 18px;font-size:12px;color:var(--mut)">Imagen: cámara pública de la <a href="https://tandil.gov.ar/camara-vivo" target="_blank" rel="noopener" style="color:var(--roi)">Municipalidad de Tandil</a>. El análisis corre en tu navegador: no se graban ni se envían imágenes. Desarrollado por <a href="/" style="color:var(--roi)">Criterya</a>.</footer>
+
+<script>
+// ---------------------------------------------------------------------------
+// Estado y constantes
+// ---------------------------------------------------------------------------
+const CLASS_GROUP = {car:'veh', truck:'veh', bus:'veh', motorcycle:'veh', person:'ped', bicycle:'ped'};
+const CAT_NAME = {car:'Autos', motorcycle:'Motos', truck:'Camiones', bus:'Colectivos', person:'Personas', bicycle:'Bicicletas'};
+const VEH_CLS = ['car','motorcycle','truck','bus'];
+const PED_CLS = ['person','bicycle'];
+const COLORS = {veh:'#f5a524', ped:'#2fbf9b', roi:'#5aa9ff'};
+const STORE_KEY = 'contadorTransito.v1';
+
+const S = {
+  model:null, modelBase:'mobilenet_v2', modelLoading:false,
+  hasSource:false, srcName:'ninguna', hls:null, stream:null,
+  counting:false, startedAt:null, accumMs:0,
+  roi:null, lines:{veh:null, ped:null},
+  labels:{veh:['A→B','B→A'], ped:['A→B','B→A']},
+  events:[], sessionStart:null,
+  tracks:[], nextId:1, lastDets:[],
+  drawMode:null, dragStart:null, dragCur:null,
+  busy:false, fpsMeasured:0, lastDetectAt:0,
+  cfg:{fps:6, score:0.40, maxDist:0.08, maxMiss:8, bucket:15, inputW:640, durationMin:0, boxes:true}
+};
+
+const $ = id => document.getElementById(id);
+const video = $('video'), canvas = $('canvas'), ctx = canvas.getContext('2d');
+const off = document.createElement('canvas'), offCtx = off.getContext('2d', {willReadFrequently:true});
+
+// ---------------------------------------------------------------------------
+// Persistencia
+// ---------------------------------------------------------------------------
+function save(){
+  try{
+    localStorage.setItem(STORE_KEY, JSON.stringify({
+      roi:S.roi, lines:S.lines, labels:S.labels, events:S.events,
+      sessionStart:S.sessionStart, cfg:S.cfg, modelBase:S.modelBase
+    }));
+  }catch(e){ /* almacenamiento no disponible */ }
+}
+function load(){
+  try{
+    const d = JSON.parse(localStorage.getItem(STORE_KEY) || 'null');
+    if(!d) return;
+    Object.assign(S.cfg, d.cfg || {});
+    S.roi = d.roi || null; S.lines = d.lines || {veh:null, ped:null};
+    S.labels = d.labels || S.labels; S.events = d.events || [];
+    S.sessionStart = d.sessionStart || null; S.modelBase = d.modelBase || S.modelBase;
+  }catch(e){}
+}
+
+// ---------------------------------------------------------------------------
+// Modelo
+// ---------------------------------------------------------------------------
+async function loadModel(){
+  S.modelLoading = true; S.model = null;
+  $('stModel').textContent = 'cargando…';
+  try{
+    await tf.ready();
+    S.model = await cocoSsd.load({base:S.modelBase});
+    $('stModel').textContent = (S.modelBase === 'mobilenet_v2' ? 'preciso' : 'rápido') + ' (' + tf.getBackend() + ')';
+  }catch(e){
+    $('stModel').textContent = 'error'; console.error(e);
+    alert('No se pudo cargar el modelo de detección. Revisá la conexión a Internet (se descarga de jsdelivr la primera vez).');
+  }
+  S.modelLoading = false; updateButtons();
+}
+
+// ---------------------------------------------------------------------------
+// Fuentes de video
+// ---------------------------------------------------------------------------
+function resetSource(){
+  if(S.hls){ S.hls.destroy(); S.hls = null; }
+  if(S.stream){ S.stream.getTracks().forEach(t => t.stop()); S.stream = null; }
+  video.srcObject = null; video.removeAttribute('src'); video.load(); video.loop = false;
+  S.tracks = []; S.lastDets = [];
+}
+function onSourceReady(name){
+  S.hasSource = true; S.srcName = name; $('stSrc').textContent = name;
+  $('placeholder').hidden = true; $('stage').classList.add('on');
+  updateButtons(); window.focus();
+  // Modo guiado: pide lo que falte dibujar
+  if(!S.roi) setMode('roi'); else if(!S.lines.veh) setMode('veh'); else if(!S.lines.ped) setMode('ped');
+  updateGuide();
+}
+function endSource(msg){
+  stopCounting(); resetSource(); S.hasSource = false;
+  $('stSrc').textContent = msg || 'ninguna';
+  $('stage').classList.remove('on'); $('placeholder').hidden = false;
+  setMode(null); updateButtons(); updateGuide();
+}
+async function startCapture(){
+  try{
+    const opts = {video:{frameRate:{ideal:15}}, audio:false, selfBrowserSurface:'exclude', surfaceSwitching:'exclude', monitorTypeSurfaces:'exclude'};
+    let controller = null;
+    if(window.CaptureController){ controller = new CaptureController(); opts.controller = controller; }
+    const stream = await navigator.mediaDevices.getDisplayMedia(opts);
+    // Que Chrome no salte a la pestaña/ventana capturada: la app queda al frente
+    try{ controller && controller.setFocusBehavior('no-focus-change'); }catch(e){}
+    resetSource(); S.stream = stream; video.srcObject = stream; await video.play();
+    stream.getVideoTracks()[0].addEventListener('ended', () => {
+      endSource('captura finalizada');
+    });
+    onSourceReady('captura de pantalla');
+  }catch(e){ if(e.name !== 'NotAllowedError') alert('No se pudo iniciar la captura: ' + e.message); }
+}
+async function openUrl(){
+  const url = $('inpUrl').value.trim(); if(!url) return;
+  resetSource(); video.crossOrigin = 'anonymous';
+  S.fragClock = null;
+  if(/\.m3u8(\?|$)/i.test(url) && window.Hls && Hls.isSupported()){
+    const hls = S.hls = new Hls({liveSyncDurationCount:2, maxBufferLength:30, manifestLoadingMaxRetry:10, levelLoadingMaxRetry:10, fragLoadingMaxRetry:10});
+    hls.loadSource(url); hls.attachMedia(video);
+    hls.on(Hls.Events.FRAG_CHANGED, (_, d) => {
+      // Los segmentos se llaman file-AAAAMMDDhhmmss.ts: es la hora real de grabación (Argentina, UTC-3)
+      const m = /(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})\.ts/.exec(d.frag.relurl || d.frag.url || '');
+      S.fragClock = m ? {wall: Date.UTC(+m[1], m[2]-1, +m[3], +m[4]+3, +m[5], +m[6]), start: d.frag.start} : null;
+    });
+    let retries = 0;
+    hls.on(Hls.Events.ERROR, (_, d) => {
+      if(!d.fatal) return;
+      if(d.type === Hls.ErrorTypes.NETWORK_ERROR && retries++ < 30){ $('stSrc').textContent = 'reconectando…'; setTimeout(() => hls.startLoad(), 3000); }
+      else if(d.type === Hls.ErrorTypes.MEDIA_ERROR) hls.recoverMediaError();
+      else alert('Error del stream: ' + d.details);
+    });
+    hls.on(Hls.Events.FRAG_LOADED, () => { retries = 0; if(S.hasSource) $('stSrc').textContent = S.srcName; });
+  } else video.src = url;
+  try{ await video.play(); onSourceReady(/tandil\.gov\.ar/.test(url) ? 'Cámara Tandil' : 'URL'); }
+  catch(e){ alert('No se pudo reproducir la URL: ' + e.message); }
+}
+async function openFile(f){
+  if(!f) return; resetSource(); video.crossOrigin = null;
+  video.src = URL.createObjectURL(f); video.loop = true;
+  try{ await video.play(); onSourceReady('archivo: ' + f.name); }catch(e){ alert(e.message); }
+}
+
+// ---------------------------------------------------------------------------
+// Geometría
+// ---------------------------------------------------------------------------
+const VW = () => video.videoWidth || 1, VH = () => video.videoHeight || 1;
+function crossSide(L, px, py){ // L en coordenadas normalizadas, p en px
+  const x1=L.x1*VW(), y1=L.y1*VH(), x2=L.x2*VW(), y2=L.y2*VH();
+  return (x2-x1)*(py-y1) - (y2-y1)*(px-x1);
+}
+function segCross(L, ax, ay, bx, by){
+  const s0 = crossSide(L, ax, ay), s1 = crossSide(L, bx, by);
+  if(s0 === 0 || (s0 < 0) === (s1 < 0)) return null;
+  // ¿Los extremos de la línea quedan a ambos lados del movimiento?
+  const x1=L.x1*VW(), y1=L.y1*VH(), x2=L.x2*VW(), y2=L.y2*VH();
+  const c = (x,y) => (bx-ax)*(y-ay) - (by-ay)*(x-ax);
+  if((c(x1,y1) < 0) === (c(x2,y2) < 0)) return null;
+  return s0 < 0 ? 0 : 1; // 0 = A→B, 1 = B→A
+}
+function inRoi(px, py){
+  if(!S.roi) return true;
+  const r = S.roi, x = px/VW(), y = py/VH();
+  return x >= r.x && x <= r.x+r.w && y >= r.y && y <= r.y+r.h;
+}
+
+// ---------------------------------------------------------------------------
+// Detección + seguimiento
+// ---------------------------------------------------------------------------
+async function detectOnce(){
+  if(!S.model || !S.hasSource || S.busy || video.readyState < 2 || !video.videoWidth) return;
+  S.busy = true;
+  const t0 = performance.now();
+  try{
+    const vw = VW(), vh = VH();
+    const r = S.roi || {x:0,y:0,w:1,h:1};
+    const sx = r.x*vw, sy = r.y*vh, sw = Math.max(8, r.w*vw), sh = Math.max(8, r.h*vh);
+    const ow = S.cfg.inputW, oh = Math.round(ow * sh / sw);
+    if(off.width !== ow || off.height !== oh){ off.width = ow; off.height = oh; }
+    offCtx.drawImage(video, sx, sy, sw, sh, 0, 0, ow, oh);
+    const preds = await S.model.detect(off, 60, S.cfg.score);
+    const dets = [];
+    for(const p of preds){
+      const g = CLASS_GROUP[p.class]; if(!g) continue;
+      const [bx,by,bw,bh] = p.bbox;
+      const x = sx + bx*sw/ow, y = sy + by*sh/oh, w = bw*sw/ow, h = bh*sh/oh;
+      dets.push({cls:p.class, group:g, score:p.score, x, y, w, h, cx:x+w/2, cy:y+h}); // punto = base de la caja
+    }
+    S.lastDets = dets;
+    updateTracks(dets);
+  }catch(e){
+    console.error(e);
+    if(e.name === 'SecurityError'){
+      stopCounting();
+      alert('El navegador bloquea leer este video (CORS). Usá “Capturar pestaña / ventana”.');
+    }
+  }
+  const dt = performance.now() - t0;
+  S.fpsMeasured = S.fpsMeasured ? S.fpsMeasured*0.8 + (1000/Math.max(dt, 1000/S.cfg.fps))*0.2 : S.cfg.fps;
+  $('stFps').textContent = S.fpsMeasured.toFixed(1) + ' /s';
+  S.busy = false;
+}
+
+function updateTracks(dets){
+  const vw = VW();
+  const pairs = [];
+  S.tracks.forEach((t, ti) => {
+    const px = t.x + t.vx, py = t.y + t.vy;
+    const thr = Math.max(S.cfg.maxDist*vw, 0.8*Math.max(t.w, t.h));
+    dets.forEach((d, di) => {
+      if(d.group !== t.group) return;
+      const dist = Math.hypot(d.cx - px, d.cy - py);
+      if(dist < thr) pairs.push([dist, ti, di]);
+    });
+  });
+  pairs.sort((a,b) => a[0]-b[0]);
+  const usedT = new Set(), usedD = new Set();
+  for(const [, ti, di] of pairs){
+    if(usedT.has(ti) || usedD.has(di)) continue;
+    usedT.add(ti); usedD.add(di);
+    const t = S.tracks[ti], d = dets[di];
+    const lx = t.lx, ly = t.ly;
+    t.vx = 0.5*t.vx + 0.5*(d.cx - t.x); t.vy = 0.5*t.vy + 0.5*(d.cy - t.y);
+    t.x = d.cx; t.y = d.cy; t.w = d.w; t.h = d.h; t.bx = d.x; t.by = d.y;
+    t.lx = d.cx; t.ly = d.cy; t.miss = 0; t.hits++;
+    t.votes[d.cls] = (t.votes[d.cls] || 0) + 1;
+    checkCrossing(t, lx, ly, d.cx, d.cy);
+  }
+  S.tracks.forEach((t, ti) => {
+    if(usedT.has(ti)) return;
+    t.miss++; t.x += t.vx; t.y += t.vy; // predicción mientras no se ve
+  });
+  S.tracks = S.tracks.filter(t => t.miss <= S.cfg.maxMiss);
+  dets.forEach((d, di) => {
+    if(usedD.has(di) || !inRoi(d.cx, d.cy)) return;
+    S.tracks.push({id:S.nextId++, group:d.group, x:d.cx, y:d.cy, lx:d.cx, ly:d.cy, vx:0, vy:0,
+      w:d.w, h:d.h, bx:d.x, by:d.y, miss:0, hits:1, votes:{[d.cls]:1}, counted:false});
+  });
+}
+
+// Hora real del cuadro analizado (los streams en vivo llegan con 20–60 s de retraso)
+function eventTime(){
+  const f = S.fragClock;
+  if(f && S.hls){ const t = f.wall + (video.currentTime - f.start)*1000; if(Math.abs(t - Date.now()) < 10*60000) return Math.round(t); }
+  return Date.now();
+}
+function majorityClass(t){
+  let best = null, n = -1;
+  for(const k in t.votes) if(t.votes[k] > n){ n = t.votes[k]; best = k; }
+  return best;
+}
+
+function checkCrossing(t, ax, ay, bx, by){
+  if(!S.counting || t.counted || t.hits < 2) return;
+  const L = S.lines[t.group]; if(!L) return;
+  const dir = segCross(L, ax, ay, bx, by);
+  if(dir === null) return;
+  t.counted = true; t.flash = 12;
+  const cls = majorityClass(t);
+  const ev = {t:eventTime(), line:t.group, cls, dir};
+  S.events.push(ev);
+  addLog(ev); renderStats(); save();
+}
+
+// Reloj en un Worker: sigue funcionando aunque la pestaña quede en segundo plano
+const ticker = new Worker(URL.createObjectURL(new Blob([
+  'let id=null;onmessage=e=>{clearInterval(id);id=setInterval(()=>postMessage(0),e.data);}'
+], {type:'text/javascript'})));
+ticker.onmessage = () => { detectOnce(); checkTimer(); };
+function setTicker(){ ticker.postMessage(Math.round(1000 / S.cfg.fps)); }
+
+// ---------------------------------------------------------------------------
+// Dibujo del visor
+// ---------------------------------------------------------------------------
+function drawLine(L, color, labels){
+  const x1=L.x1*canvas.width, y1=L.y1*canvas.height, x2=L.x2*canvas.width, y2=L.y2*canvas.height;
+  const k = canvas.width / 900;
+  ctx.strokeStyle = color; ctx.lineWidth = 4*k; ctx.setLineDash([]);
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  const dx=x2-x1, dy=y2-y1, len=Math.hypot(dx,dy)||1, nx=-dy/len, ny=dx/len, mx=(x1+x2)/2, my=(y1+y2)/2, off=26*k;
+  ctx.font = `bold ${16*k}px system-ui`; ctx.textAlign='center'; ctx.textBaseline='middle';
+  const tag = (txt, x, y) => {
+    const w = ctx.measureText(txt).width + 10*k;
+    ctx.fillStyle='rgba(0,0,0,.65)'; ctx.fillRect(x-w/2, y-11*k, w, 22*k);
+    ctx.fillStyle=color; ctx.fillText(txt, x, y);
+  };
+  tag('A', mx - nx*off, my - ny*off);
+  tag('B', mx + nx*off, my + ny*off);
+}
+
+function render(){
+  requestAnimationFrame(render);
+  if(!S.hasSource || !video.videoWidth) return;
+  if(canvas.width !== video.videoWidth || canvas.height !== video.videoHeight){
+    canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+  }
+  const W = canvas.width, H = canvas.height, k = W/900;
+  ctx.clearRect(0, 0, W, H);
+
+  if(S.roi){
+    const r = S.roi;
+    ctx.fillStyle = 'rgba(0,0,0,.55)';
+    ctx.fillRect(0,0,W,r.y*H); ctx.fillRect(0,(r.y+r.h)*H,W,H-(r.y+r.h)*H);
+    ctx.fillRect(0,r.y*H,r.x*W,r.h*H); ctx.fillRect((r.x+r.w)*W,r.y*H,W-(r.x+r.w)*W,r.h*H);
+    ctx.strokeStyle = COLORS.roi; ctx.lineWidth = 2*k; ctx.setLineDash([8*k,6*k]);
+    ctx.strokeRect(r.x*W, r.y*H, r.w*W, r.h*H); ctx.setLineDash([]);
+  }
+  if(S.lines.veh) drawLine(S.lines.veh, COLORS.veh);
+  if(S.lines.ped) drawLine(S.lines.ped, COLORS.ped);
+
+  if(S.cfg.boxes){
+    ctx.lineWidth = 2*k; ctx.font = `${12*k}px system-ui`; ctx.textAlign='left'; ctx.textBaseline='bottom';
+    for(const t of S.tracks){
+      if(t.miss > 0) continue;
+      const col = t.flash > 0 ? '#ffffff' : (t.counted ? '#9aa5b1' : COLORS[t.group]);
+      if(t.flash > 0) t.flash--;
+      ctx.strokeStyle = col; ctx.strokeRect(t.bx, t.by, t.w, t.h);
+      ctx.fillStyle = col; ctx.beginPath(); ctx.arc(t.x, t.y, 3.5*k, 0, 7); ctx.fill();
+      ctx.fillText(`${CAT_NAME[majorityClass(t)] || ''} #${t.id}`, t.bx, t.by - 2);
+    }
+  }
+  if(S.drawMode && S.dragStart && S.dragCur){
+    const a = S.dragStart, b = S.dragCur;
+    ctx.strokeStyle = S.drawMode === 'roi' ? COLORS.roi : COLORS[S.drawMode];
+    ctx.lineWidth = 3*k; ctx.setLineDash([6*k,4*k]);
+    if(S.drawMode === 'roi') ctx.strokeRect(a.x*W, a.y*H, (b.x-a.x)*W, (b.y-a.y)*H);
+    else { ctx.beginPath(); ctx.moveTo(a.x*W,a.y*H); ctx.lineTo(b.x*W,b.y*H); ctx.stroke(); }
+    ctx.setLineDash([]);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Interacción de dibujo
+// ---------------------------------------------------------------------------
+function normPos(e){
+  const r = canvas.getBoundingClientRect();
+  return {x:Math.min(1,Math.max(0,(e.clientX-r.left)/r.width)), y:Math.min(1,Math.max(0,(e.clientY-r.top)/r.height))};
+}
+function setMode(m){
+  S.drawMode = (m === null || S.drawMode === m) ? null : m;
+  $('btnRoi').classList.toggle('on', S.drawMode === 'roi');
+  $('btnLineVeh').classList.toggle('on', S.drawMode === 'veh');
+  $('btnLinePed').classList.toggle('on', S.drawMode === 'ped');
+  updateGuide();
+  $('hint').innerHTML = S.drawMode
+    ? (S.drawMode === 'roi' ? 'Arrastrá un rectángulo sobre la imagen útil de la cámara.' :
+       'Arrastrá una línea que <b>atraviese</b> ' + (S.drawMode === 'veh' ? 'todos los carriles de la avenida.' : 'la senda peatonal de lado a lado.'))
+    : 'Arrastrá con el mouse sobre la imagen para dibujar. El sentido de cada línea define los lados <b>A</b> y <b>B</b>.';
+}
+canvas.addEventListener('pointerdown', e => {
+  if(!S.drawMode) return; canvas.setPointerCapture(e.pointerId);
+  S.dragStart = normPos(e); S.dragCur = S.dragStart;
+});
+canvas.addEventListener('pointermove', e => { if(S.dragStart) S.dragCur = normPos(e); });
+canvas.addEventListener('pointerup', e => {
+  if(!S.dragStart) return;
+  const a = S.dragStart, b = normPos(e); S.dragStart = S.dragCur = null;
+  if(Math.hypot(a.x-b.x, a.y-b.y) < 0.02) return;
+  if(S.drawMode === 'roi') S.roi = {x:Math.min(a.x,b.x), y:Math.min(a.y,b.y), w:Math.abs(a.x-b.x), h:Math.abs(a.y-b.y)};
+  else S.lines[S.drawMode] = {x1:a.x, y1:a.y, x2:b.x, y2:b.y};
+  const done = S.drawMode;
+  S.tracks = []; save(); updateButtons();
+  // Paso siguiente del modo guiado
+  if(done === 'roi' && !S.lines.veh) setMode('veh');
+  else if(done !== 'ped' && !S.lines.ped) setMode('ped');
+  else setMode(null);
+  updateGuide();
+});
+function updateGuide(){
+  const g = $('guide');
+  if(!S.hasSource){ g.hidden = true; return; }
+  g.hidden = false;
+  if(S.drawMode === 'roi') g.innerHTML = '<b>Paso 1 de 3:</b> arrastrá un rectángulo sobre la parte de la imagen que es la cámara (dejá afuera menús y bordes de la página).';
+  else if(S.drawMode === 'veh') g.innerHTML = '<b>Paso 2 de 3:</b> arrastrá una línea <span style="color:var(--veh)">naranja</span> que atraviese <b>todos los carriles de la avenida</b>, de vereda a vereda.';
+  else if(S.drawMode === 'ped') g.innerHTML = '<b>Paso 3 de 3:</b> arrastrá una línea <span style="color:var(--ped)">verde</span> que corte la <b>senda peatonal</b> de lado a lado.';
+  else if(!S.counting) g.innerHTML = 'Listo. Revisá que las cajas aparezcan sobre autos y personas y tocá <b>▶ Iniciar conteo</b>. Para corregir, volvé a tocar el botón de la zona o línea.';
+  else g.innerHTML = 'Contando… Podés tapar esta ventana con otras, pero <b>no la minimices</b> ni minimices la de la cámara.';
+}
+
+// ---------------------------------------------------------------------------
+// Conteo: iniciar / pausar / reiniciar
+// ---------------------------------------------------------------------------
+function startCounting(){
+  if(!S.lines.veh && !S.lines.ped){ alert('Dibujá al menos una línea de conteo.'); return; }
+  S.counting = true; S.startedAt = Date.now();
+  if(!S.sessionStart) S.sessionStart = Date.now();
+  S.tracks.forEach(t => t.counted = true); // lo que ya está en pantalla no se cuenta a medias
+  updateButtons(); updateGuide(); save();
+}
+function stopCounting(){
+  if(S.counting && S.startedAt) S.accumMs += Date.now() - S.startedAt;
+  S.counting = false; S.startedAt = null; updateButtons(); updateGuide();
+}
+function elapsedMs(){ return S.accumMs + (S.counting && S.startedAt ? Date.now() - S.startedAt : 0); }
+function checkTimer(){
+  const ms = elapsedMs(), m = Math.floor(ms/60000), s = Math.floor(ms/1000)%60;
+  $('stTimer').textContent = ms ? `· ${m}:${String(s).padStart(2,'0')}` : '';
+  if(S.counting && S.cfg.durationMin > 0 && ms >= S.cfg.durationMin*60000){ stopCounting(); renderStats(); }
+}
+function resetData(){
+  if(!confirm('¿Borrar todos los conteos registrados? (las líneas y la zona se mantienen)')) return;
+  stopCounting(); S.events = []; S.sessionStart = null; S.accumMs = 0; S.tracks = [];
+  $('log').innerHTML = ''; save(); renderStats();
+}
+function updateButtons(){
+  $('btnEndCap').disabled = !S.hasSource;
+  const ready = S.hasSource && S.model && (S.lines.veh || S.lines.ped);
+  $('btnStart').disabled = !ready || S.counting;
+  $('btnStop').disabled = !S.counting;
+  $('stRun').textContent = S.counting ? 'activo' : 'detenido';
+  $('stRun').style.color = S.counting ? 'var(--ped)' : '';
+}
+
+// ---------------------------------------------------------------------------
+// Estadísticas
+// ---------------------------------------------------------------------------
+const fmtT = ms => new Date(ms).toLocaleTimeString('es-AR', {hour:'2-digit', minute:'2-digit'});
+const fmtD = ms => new Date(ms).toLocaleDateString('es-AR');
+const dirLabel = ev => S.labels[ev.line][ev.dir];
+
+function addLog(ev){
+  const div = document.createElement('div');
+  div.textContent = `${new Date(ev.t).toLocaleTimeString('es-AR')}  ${CAT_NAME[ev.cls]}  ${dirLabel(ev)}`;
+  div.style.color = COLORS[ev.line];
+  const log = $('log'); log.prepend(div);
+  while(log.children.length > 200) log.lastChild.remove();
+}
+
+function buildBuckets(){
+  const size = S.cfg.bucket*60000;
+  if(!S.events.length) return [];
+  const first = Math.floor(Math.min(S.sessionStart || S.events[0].t, S.events[0].t)/size)*size;
+  const last = Math.floor(Math.max(Date.now(), S.events[S.events.length-1].t)/size)*size;
+  const map = new Map();
+  for(let b = first; b <= last; b += size) map.set(b, {from:b, to:b+size, car:0, motorcycle:0, truck:0, bus:0, person:0, bicycle:0});
+  for(const ev of S.events){ const b = map.get(Math.floor(ev.t/size)*size); if(b) b[ev.cls]++; }
+  return [...map.values()].map(b => ({...b, veh:b.car+b.motorcycle+b.truck+b.bus}));
+}
+
+function renderStats(){
+  const cnt = {}; for(const c of [...VEH_CLS, ...PED_CLS]) cnt[c] = [0,0];
+  for(const ev of S.events) cnt[ev.cls][ev.dir]++;
+  const sum = arr => arr.reduce((a,c) => a + cnt[c][0] + cnt[c][1], 0);
+  $('totVeh').textContent = sum(VEH_CLS); $('totPed').textContent = cnt.person[0] + cnt.person[1];
+
+  let html = `<tr><td colspan="4" style="color:${COLORS.veh};padding-top:8px">Avenida · ${S.labels.veh[0]} / ${S.labels.veh[1]}</td></tr>`;
+  for(const c of VEH_CLS) html += `<tr><td>${CAT_NAME[c]}</td><td>${cnt[c][0]}</td><td>${cnt[c][1]}</td><td>${cnt[c][0]+cnt[c][1]}</td></tr>`;
+  html += `<tr><td colspan="4" style="color:${COLORS.ped};padding-top:8px">Senda · ${S.labels.ped[0]} / ${S.labels.ped[1]}</td></tr>`;
+  for(const c of PED_CLS) html += `<tr><td>${CAT_NAME[c]}</td><td>${cnt[c][0]}</td><td>${cnt[c][1]}</td><td>${cnt[c][0]+cnt[c][1]}</td></tr>`;
+  $('tbTot').innerHTML = html;
+
+  const buckets = buildBuckets();
+  let peak = null; for(const b of buckets) if(!peak || b.veh > peak.veh) peak = b;
+  $('tbBuckets').innerHTML = buckets.slice().reverse().map(b =>
+    `<tr class="${peak && b === peak && b.veh > 0 ? 'peak' : ''}"><td>${fmtD(b.from)} ${fmtT(b.from)} – ${fmtT(b.to)}</td>
+     <td>${b.car}</td><td>${b.motorcycle}</td><td>${b.truck}</td><td>${b.bus}</td><td><b>${b.veh}</b></td><td><b>${b.person}</b></td><td>${b.bicycle}</td></tr>`
+  ).join('') || '<tr><td colspan="8" style="text-align:left;color:var(--mut)">Todavía no hay conteos.</td></tr>';
+  $('peakInfo').textContent = peak && peak.veh > 0 ? ` · pico vehicular ${fmtT(peak.from)}–${fmtT(peak.to)} (${peak.veh})` : '';
+  drawChart(buckets);
+}
+
+function drawChart(buckets){
+  const c = $('chart'), dpr = window.devicePixelRatio || 1;
+  const W = c.clientWidth, H = c.clientHeight;
+  c.width = W*dpr; c.height = H*dpr;
+  const g = c.getContext('2d'); g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,W,H);
+  const data = buckets.slice(-36);
+  const padL = 34, padB = 22, padT = 8, cw = W - padL - 6, ch = H - padB - padT;
+  const max = Math.max(1, ...data.map(b => Math.max(b.veh, b.person)));
+  g.strokeStyle = '#253545'; g.fillStyle = '#8aa0b4'; g.font = '11px system-ui'; g.textAlign = 'right'; g.textBaseline = 'middle';
+  for(let i = 0; i <= 4; i++){
+    const v = Math.round(max*i/4), y = padT + ch - ch*i/4;
+    g.beginPath(); g.moveTo(padL, y); g.lineTo(W-6, y); g.stroke(); g.fillText(v, padL-5, y);
+  }
+  if(!data.length) return;
+  const slot = cw / data.length, bw = Math.max(2, Math.min(14, slot*0.38));
+  g.textAlign = 'center'; g.textBaseline = 'top';
+  const every = Math.ceil(data.length / 8);
+  data.forEach((b, i) => {
+    const x = padL + slot*i + slot/2;
+    g.fillStyle = COLORS.veh; const hv = ch*b.veh/max; g.fillRect(x - bw - 1, padT + ch - hv, bw, hv);
+    g.fillStyle = COLORS.ped; const hp = ch*b.person/max; g.fillRect(x + 1, padT + ch - hp, bw, hp);
+    if(i % every === 0){ g.fillStyle = '#8aa0b4'; g.fillText(fmtT(b.from), x, padT + ch + 5); }
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Exportación CSV
+// ---------------------------------------------------------------------------
+function downloadCsv(name, rows){
+  const csv = '﻿' + rows.map(r => r.map(v => {
+    const s = String(v); return /[;"\n]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s;
+  }).join(';')).join('\r\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8'}));
+  a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+}
+const stamp = () => new Date().toISOString().slice(0,16).replace(/[-:T]/g,'');
+$('btnCsvBuckets').onclick = () => {
+  const rows = [['Fecha','Desde','Hasta','Autos','Motos','Camiones','Colectivos','Total vehículos','Personas','Bicicletas']];
+  for(const b of buildBuckets()) rows.push([fmtD(b.from), fmtT(b.from), fmtT(b.to), b.car, b.motorcycle, b.truck, b.bus, b.veh, b.person, b.bicycle]);
+  downloadCsv(`conteo_intervalos_${S.cfg.bucket}min_${stamp()}.csv`, rows);
+};
+$('btnCsvEvents').onclick = () => {
+  const rows = [['Fecha','Hora','Línea','Categoría','Sentido']];
+  for(const ev of S.events) rows.push([fmtD(ev.t), new Date(ev.t).toLocaleTimeString('es-AR'), ev.line === 'veh' ? 'Avenida' : 'Senda', CAT_NAME[ev.cls], dirLabel(ev)]);
+  downloadCsv(`conteo_eventos_${stamp()}.csv`, rows);
+};
+
+// ---------------------------------------------------------------------------
+// Controles
+// ---------------------------------------------------------------------------
+function bindCfg(){
+  const c = S.cfg;
+  $('selBucket').value = c.bucket; $('inpDur').value = c.durationMin; $('selModel').value = S.modelBase;
+  $('inpFps').value = c.fps; $('inpScore').value = c.score; $('inpW').value = c.inputW;
+  $('inpDist').value = Math.round(c.maxDist*100); $('inpMiss').value = c.maxMiss; $('chkBoxes').checked = c.boxes;
+  $('lblVA').value = S.labels.veh[0]; $('lblVB').value = S.labels.veh[1];
+  $('lblPA').value = S.labels.ped[0]; $('lblPB').value = S.labels.ped[1];
+  const num = (id, f) => $(id).addEventListener('change', e => { f(+e.target.value); save(); renderStats(); });
+  num('selBucket', v => c.bucket = v);
+  num('inpDur', v => c.durationMin = Math.max(0, v));
+  num('inpFps', v => { c.fps = Math.min(20, Math.max(1, v)); setTicker(); });
+  num('inpScore', v => c.score = Math.min(.95, Math.max(.1, v)));
+  num('inpW', v => c.inputW = Math.min(1280, Math.max(320, v)));
+  num('inpDist', v => c.maxDist = Math.max(1, v)/100);
+  num('inpMiss', v => c.maxMiss = Math.max(1, v));
+  $('chkBoxes').onchange = e => { c.boxes = e.target.checked; save(); };
+  $('selModel').onchange = e => { S.modelBase = e.target.value; save(); loadModel(); };
+  const lbl = (id, g, i) => $(id).addEventListener('input', e => { S.labels[g][i] = e.target.value || (i ? 'B→A' : 'A→B'); updateHeaders(); save(); renderStats(); });
+  lbl('lblVA','veh',0); lbl('lblVB','veh',1); lbl('lblPA','ped',0); lbl('lblPB','ped',1);
+}
+function updateHeaders(){ $('hVehA').textContent = 'A→B'; $('hVehB').textContent = 'B→A'; }
+
+$('btnCapture').onclick = startCapture;
+$('btnUrl').onclick = openUrl;
+$('btnTandil').onclick = () => { $('inpUrl').value = 'https://tandil.gov.ar/camera/stream/output.m3u8'; openUrl(); };
+$('btnEndCap').onclick = () => endSource();
+$('inpFile').onchange = e => openFile(e.target.files[0]);
+$('btnRoi').onclick = () => setMode('roi');
+$('btnLineVeh').onclick = () => setMode('veh');
+$('btnLinePed').onclick = () => setMode('ped');
+$('btnClearGeo').onclick = () => { S.roi = null; S.lines = {veh:null, ped:null}; S.tracks = []; save(); updateButtons(); if(S.hasSource) setMode('roi'); updateGuide(); };
+$('btnStart').onclick = startCounting;
+$('btnStop').onclick = () => { stopCounting(); save(); };
+$('btnReset').onclick = resetData;
+window.addEventListener('resize', () => renderStats());
+
+// Inicio
+load(); bindCfg(); updateHeaders(); renderStats();
+S.events.slice(-50).forEach(addLog);
+setTicker(); requestAnimationFrame(render); loadModel();
+setInterval(renderStats, 30000); // refresca intervalos vacíos
+</script>
+</body>
+</html>
