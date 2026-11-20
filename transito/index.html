@@ -186,7 +186,7 @@
       <h2>Conteo por intervalo <span id="peakInfo" style="text-transform:none;letter-spacing:0;color:var(--veh)"></span></h2>
       <div id="tblWrap">
         <table>
-          <thead><tr><th>Desde – Hasta</th><th>Autos</th><th>Motos</th><th>Camiones</th><th>Colectivos</th><th>Total veh.</th><th>Personas</th><th>Bicicletas</th><th title="Porcentaje del intervalo con video analizado. Bajo 80% hubo cortes de la cámara.">Video</th></tr></thead>
+          <thead><tr><th>Desde – Hasta</th><th>Autos</th><th>Motos</th><th>Camiones</th><th>Colectivos</th><th>Total veh.</th><th title="Bicicletas que cruzan la línea de la avenida">Bicis calle</th><th>Personas</th><th title="Bicicletas que cruzan la línea de la senda">Bicis senda</th><th title="Porcentaje del intervalo con video analizado. Bajo 80% hubo cortes de la cámara.">Video</th></tr></thead>
           <tbody id="tbBuckets"></tbody>
         </table>
       </div>
@@ -214,11 +214,14 @@
 // ---------------------------------------------------------------------------
 // Estado y constantes
 // ---------------------------------------------------------------------------
-const CLASS_GROUP = {car:'veh', truck:'veh', bus:'veh', motorcycle:'veh', person:'ped', bicycle:'ped'};
+const CLASS_GROUP = {car:'veh', truck:'veh', bus:'veh', motorcycle:'veh', person:'ped', bicycle:'bike'};
+// Qué líneas puede cruzar cada grupo: las bicicletas cuentan en la avenida y en la senda
+const GROUP_LINES = {veh:['veh'], ped:['ped'], bike:['veh','ped']};
 const CAT_NAME = {car:'Autos', motorcycle:'Motos', truck:'Camiones', bus:'Colectivos', person:'Personas', bicycle:'Bicicletas'};
 const VEH_CLS = ['car','motorcycle','truck','bus'];
+const VEH_LINE_CLS = [...VEH_CLS, 'bicycle'];
 const PED_CLS = ['person','bicycle'];
-const COLORS = {veh:'#f5a524', ped:'#2fbf9b', roi:'#5aa9ff'};
+const COLORS = {veh:'#f5a524', ped:'#2fbf9b', bike:'#e879f9', roi:'#5aa9ff'};
 const STORE_KEY = 'contadorTransito.v1';
 
 const S = {
@@ -527,6 +530,10 @@ async function detectOnce(){
       }
     }
     dets = nms(dets, S.model.kind === 'yolo' ? 0.6 : 0.45);
+    // Ciclista: la persona encima de una bicicleta se cuenta como bicicleta, no como peatón
+    const bikes = dets.filter(d => d.group === 'bike');
+    for(const d of dets) if(d.group === 'ped') d.rider = bikes.some(b =>
+      d.cx > b.x - 0.1*b.w && d.cx < b.x + 1.1*b.w && d.cy > b.y && d.cy < b.y + b.h*1.25 && iou(d, b) > 0.08);
     S.lastDets = dets;
     updateTracks(dets, vt);
     updateZones(vt, S.pendingRemoved || []); S.pendingRemoved = null;
@@ -557,7 +564,7 @@ function nms(dets, thr){
 }
 
 // Seguimiento estilo ByteTrack: cada objeto conserva su "rastro" aunque el modelo lo pierda unos segundos
-function lostLimit(t){ return t.hits < 3 ? 0.8 : (t.group === 'ped' ? S.cfg.lostPed : S.cfg.lostVeh); }
+function lostLimit(t){ return t.hits < 3 ? 0.8 : (t.group === 'veh' ? S.cfg.lostVeh : S.cfg.lostPed); }
 
 function associate(tracks, dets, strict){
   const pairs = [];
@@ -614,7 +621,7 @@ function updateTracks(dets, vt){
     if(a1.usedD.has(di) || !inRoi(d.cx, d.cy)) return;
     if(S.tracks.some(t => t.group === d.group && t.miss === 0 && iou(d, {x:t.bx, y:t.by, w:t.w, h:t.h}) > 0.5)) return;
     const t = {id:S.nextId++, group:d.group, lx:d.cx, ly:d.cy, px:d.cx, py:d.cy, vx:0, vy:0, lastT:vt,
-      w:d.w, h:d.h, bx:d.x, by:d.y, miss:0, hits:1, votes:{[d.cls]:1}, counted:false, side:null, trail:[[d.cx, d.cy]]};
+      w:d.w, h:d.h, bx:d.x, by:d.y, miss:0, hits:1, votes:{[d.cls]:1}, counted:{}, side:{}, rider:d.rider ? 1 : 0, trail:[[d.cx, d.cy]]};
     S.tracks.push(t); updateSide(t);
   });
 }
@@ -625,7 +632,7 @@ function updateTracks(dets, vt){
 function heatAdd(t){
   if(!S.counting) return;
   if(!S.heat){ const gw = 192, gh = Math.max(16, Math.round(192*VH()/VW())); S.heat = {gw, gh, ped:new Float32Array(gw*gh), veh:new Float32Array(gw*gh)}; }
-  const H = S.heat, g = H[t.group]; if(!g) return;
+  const H = S.heat, g = H[t.group === 'ped' ? 'ped' : 'veh']; if(!g) return;
   const gx = t.lx/VW()*H.gw, gy = t.ly/VH()*H.gh;
   for(let dy = -2; dy <= 2; dy++) for(let dx = -2; dx <= 2; dx++){
     const x = Math.floor(gx)+dx, y = Math.floor(gy)+dy;
@@ -714,6 +721,7 @@ function applyMatch(t, d, vt){
   t.w = 0.7*t.w + 0.3*d.w; t.h = 0.7*t.h + 0.3*d.h; t.bx = d.x; t.by = d.y;
   t.miss = 0; t.hits++;
   t.votes[d.cls] = (t.votes[d.cls] || 0) + d.score;
+  if(d.rider) t.rider = (t.rider || 0) + 1;
   t.trail.push([d.cx, d.cy]); if(t.trail.length > 60) t.trail.shift();
   updateSide(t);
   if(t.hits >= 3) heatAdd(t);
@@ -739,7 +747,10 @@ function majorityClass(t){
 
 // Cuenta cuando el rastro pasa de un lado de la línea al otro (aunque no se haya visto el instante exacto)
 function updateSide(t){
-  const L = S.lines[t.group]; if(!L) return;
+  for(const key of GROUP_LINES[t.group]) updateSideLine(t, key);
+}
+function updateSideLine(t, key){
+  const L = S.lines[key]; if(!L) return;
   const x1=L.x1*VW(), y1=L.y1*VH(), x2=L.x2*VW(), y2=L.y2*VH();
   const dx = x2-x1, dy = y2-y1, len2 = dx*dx + dy*dy || 1;
   const u = ((t.lx-x1)*dx + (t.ly-y1)*dy) / len2;
@@ -748,12 +759,13 @@ function updateSide(t){
   const margin = Math.max(3, 0.2*(t.group === 'ped' ? t.h : Math.min(t.w, t.h)));
   if(Math.abs(dist) < margin) return;                               // sobre la línea: esperar a que termine de cruzar
   const s = dist < 0 ? -1 : 1;
-  if(t.side === null || !S.counting || t.counted){ if(t.side === null || !S.counting) t.side = s; return; }
-  if(s !== t.side && t.hits >= 3){
-    t.counted = true; t.flash = 12;
-    const ev = {t:eventTime(), line:t.group, cls:majorityClass(t), dir:t.side < 0 ? 0 : 1};
-    S.events.push(ev); addLog(ev); renderStats(); save();
-  }
+  if(t.side[key] == null || !S.counting){ t.side[key] = s; return; }
+  if(t.counted[key] || s === t.side[key] || t.hits < 3) return;
+  t.counted[key] = true;
+  if(t.group === 'ped' && t.rider >= 0.4*t.hits) return;           // era un ciclista: ya cuenta su bicicleta
+  t.flash = 12;
+  const ev = {t:eventTime(), line:key, cls:majorityClass(t), dir:t.side[key] < 0 ? 0 : 1};
+  S.events.push(ev); addLog(ev); renderStats(); save();
 }
 
 // Reloj en un Worker: sigue funcionando aunque la pestaña quede en segundo plano
@@ -833,7 +845,7 @@ function render(){
     ctx.lineWidth = 2*k; ctx.font = `${12*k}px system-ui`; ctx.textAlign='left'; ctx.textBaseline='bottom';
     for(const t of S.tracks){
       if(t.hits < 2) continue;
-      const col = t.flash > 0 ? '#ffffff' : (t.counted ? '#9aa5b1' : COLORS[t.group]);
+      const col = t.flash > 0 ? '#ffffff' : (Object.keys(t.counted).length ? '#9aa5b1' : COLORS[t.group]);
       if(t.flash > 0) t.flash--;
       // Rastro
       if(t.trail.length > 1){
@@ -1006,31 +1018,33 @@ function buildBuckets(){
   const first = Math.floor(Math.min(...times)/size)*size;
   const last = Math.floor(Math.max(...times)/size)*size;
   const map = new Map();
-  for(let b = first; b <= last; b += size) map.set(b, {from:b, to:b+size, car:0, motorcycle:0, truck:0, bus:0, person:0, bicycle:0});
-  for(const ev of S.events){ const b = map.get(Math.floor(ev.t/size)*size); if(b) b[ev.cls]++; }
+  for(let b = first; b <= last; b += size) map.set(b, {from:b, to:b+size, car:0, motorcycle:0, truck:0, bus:0, person:0, bicycle:0, bikeVeh:0});
+  for(const ev of S.events){ const b = map.get(Math.floor(ev.t/size)*size); if(b) b[ev.cls === 'bicycle' && ev.line === 'veh' ? 'bikeVeh' : ev.cls]++; }
   for(const k of covKeys){ const b = map.get(Math.floor(k/size)*size); if(b) b.covSec = (b.covSec || 0) + S.cov[k]; }
   return [...map.values()].map(b => ({...b, veh:b.car+b.motorcycle+b.truck+b.bus, cov:Math.min(1, (b.covSec || 0)/(size/1000))}));
 }
 
 function renderStats(){
-  const cnt = {}; for(const c of [...VEH_CLS, ...PED_CLS]) cnt[c] = [0,0];
-  for(const ev of S.events) cnt[ev.cls][ev.dir]++;
-  const sum = arr => arr.reduce((a,c) => a + cnt[c][0] + cnt[c][1], 0);
-  $('totVeh').textContent = sum(VEH_CLS); $('totPed').textContent = cnt.person[0] + cnt.person[1];
+  const cnt = {veh:{}, ped:{}};
+  for(const c of VEH_LINE_CLS) cnt.veh[c] = [0,0];
+  for(const c of PED_CLS) cnt.ped[c] = [0,0];
+  for(const ev of S.events){ const l = cnt[ev.line]; if(l && l[ev.cls]) l[ev.cls][ev.dir]++; }
+  const tot = (l, c) => cnt[l][c][0] + cnt[l][c][1];
+  $('totVeh').textContent = VEH_CLS.reduce((a,c) => a + tot('veh', c), 0); $('totPed').textContent = tot('ped', 'person');
 
   let html = `<tr><td colspan="4" style="color:${COLORS.veh};padding-top:8px">Avenida · ${S.labels.veh[0]} / ${S.labels.veh[1]}</td></tr>`;
-  for(const c of VEH_CLS) html += `<tr><td>${CAT_NAME[c]}</td><td>${cnt[c][0]}</td><td>${cnt[c][1]}</td><td>${cnt[c][0]+cnt[c][1]}</td></tr>`;
+  for(const c of VEH_LINE_CLS) html += `<tr><td>${CAT_NAME[c]}</td><td>${cnt.veh[c][0]}</td><td>${cnt.veh[c][1]}</td><td>${tot('veh', c)}</td></tr>`;
   html += `<tr><td colspan="4" style="color:${COLORS.ped};padding-top:8px">Senda · ${S.labels.ped[0]} / ${S.labels.ped[1]}</td></tr>`;
-  for(const c of PED_CLS) html += `<tr><td>${CAT_NAME[c]}</td><td>${cnt[c][0]}</td><td>${cnt[c][1]}</td><td>${cnt[c][0]+cnt[c][1]}</td></tr>`;
+  for(const c of PED_CLS) html += `<tr><td>${CAT_NAME[c]}</td><td>${cnt.ped[c][0]}</td><td>${cnt.ped[c][1]}</td><td>${tot('ped', c)}</td></tr>`;
   $('tbTot').innerHTML = html;
 
   const buckets = buildBuckets();
   let peak = null; for(const b of buckets) if(b.cov >= 0.8 && (!peak || b.veh > peak.veh)) peak = b;
   $('tbBuckets').innerHTML = buckets.slice().reverse().map(b =>
     `<tr class="${peak && b === peak && b.veh > 0 ? 'peak' : ''}"${b.cov < 0.8 ? ' style="opacity:.6"' : ''}><td>${fmtD(b.from)} ${fmtT(b.from)} – ${fmtT(b.to)}</td>
-     <td>${b.car}</td><td>${b.motorcycle}</td><td>${b.truck}</td><td>${b.bus}</td><td><b>${b.veh}</b></td><td><b>${b.person}</b></td><td>${b.bicycle}</td>
+     <td>${b.car}</td><td>${b.motorcycle}</td><td>${b.truck}</td><td>${b.bus}</td><td><b>${b.veh}</b></td><td>${b.bikeVeh}</td><td><b>${b.person}</b></td><td>${b.bicycle}</td>
      <td style="color:${b.cov < 0.8 ? 'var(--bad)' : 'var(--mut)'}">${b.cov < 0.8 ? '⚠ ' : ''}${Math.round(b.cov*100)}%</td></tr>`
-  ).join('') || '<tr><td colspan="9" style="text-align:left;color:var(--mut)">Todavía no hay conteos.</td></tr>';
+  ).join('') || '<tr><td colspan="10" style="text-align:left;color:var(--mut)">Todavía no hay conteos.</td></tr>';
   $('peakInfo').textContent = peak && peak.veh > 0 ? ` · pico vehicular ${fmtT(peak.from)}–${fmtT(peak.to)} (${peak.veh})` : '';
   drawChart(buckets);
   renderZoneTable();
@@ -1101,10 +1115,10 @@ function downloadCsv(name, rows){
 }
 const stamp = () => new Date().toISOString().slice(0,16).replace(/[-:T]/g,'');
 $('btnCsvBuckets').onclick = () => {
-  const rows = [['Fecha','Desde','Hasta','Autos','Motos','Camiones','Colectivos','Total vehículos','Personas','Bicicletas','% video analizado','Vehículos/hora estimado','Personas/hora estimado']];
+  const rows = [['Fecha','Desde','Hasta','Autos','Motos','Camiones','Colectivos','Total vehículos','Bicicletas calle','Personas','Bicicletas senda','% video analizado','Vehículos/hora estimado','Personas/hora estimado']];
   const pct = v => String(Math.round(v*1000)/10).replace('.', ',');
   const perH = (n, b) => b.covSec > 60 ? String(Math.round(n / b.covSec * 36000)/10).replace('.', ',') : '';
-  for(const b of buildBuckets()) rows.push([fmtD(b.from), fmtT(b.from), fmtT(b.to), b.car, b.motorcycle, b.truck, b.bus, b.veh, b.person, b.bicycle, pct(b.cov), perH(b.veh, b), perH(b.person, b)]);
+  for(const b of buildBuckets()) rows.push([fmtD(b.from), fmtT(b.from), fmtT(b.to), b.car, b.motorcycle, b.truck, b.bus, b.veh, b.bikeVeh, b.person, b.bicycle, pct(b.cov), perH(b.veh, b), perH(b.person, b)]);
   downloadCsv(`conteo_intervalos_${S.cfg.bucket}min_${stamp()}.csv`, rows);
 };
 $('btnCsvZones').onclick = () => {
