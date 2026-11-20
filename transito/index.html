@@ -135,6 +135,8 @@
         <label class="f">Detecciones / seg<input id="inpFps" type="number" min="1" max="20" value="6"></label>
         <label class="f">Confianza mínima<input id="inpScore" type="number" min="0.1" max="0.95" step="0.05" value="0.40"></label>
         <label class="f">Resolución de análisis (px)<input id="inpW" type="number" min="320" max="1280" step="32" value="640"></label>
+        <label class="f">Detección de personas lejanas
+          <select id="selTiles"><option value="1">Normal</option><option value="2">Mejorada ×2 (más lento)</option><option value="4">Máxima ×4 (mucho más lento)</option></select></label>
       </div>
       <details style="margin-top:8px">
         <summary>Nombres de los sentidos</summary>
@@ -148,8 +150,9 @@
       <details style="margin-top:6px">
         <summary>Seguimiento (avanzado)</summary>
         <div class="grid2" style="margin-top:8px">
-          <label class="f">Salto máx. entre cuadros (% ancho)<input id="inpDist" type="number" min="1" max="40" value="8"></label>
-          <label class="f">Cuadros perdidos tolerados<input id="inpMiss" type="number" min="1" max="40" value="8"></label>
+          <label class="f">Radio mínimo de búsqueda (% ancho)<input id="inpDist" type="number" min="1" max="40" value="4"></label>
+          <label class="f">Memoria personas (seg)<input id="inpLostPed" type="number" min="1" max="15" step="0.5" value="4"></label>
+          <label class="f">Memoria vehículos (seg)<input id="inpLostVeh" type="number" min="0.5" max="10" step="0.5" value="1.5"></label>
         </div>
       </details>
     </div>
@@ -205,7 +208,7 @@ const S = {
   tracks:[], nextId:1, lastDets:[],
   drawMode:null, dragStart:null, dragCur:null,
   busy:false, fpsMeasured:0, lastDetectAt:0,
-  cfg:{fps:6, score:0.40, maxDist:0.08, maxMiss:8, bucket:15, inputW:640, durationMin:0, boxes:true}
+  cfg:{fps:6, score:0.40, maxDist:0.04, lostPed:4, lostVeh:1.5, tiles:1, bucket:15, inputW:640, durationMin:0, boxes:true}
 };
 
 const $ = id => document.getElementById(id);
@@ -411,19 +414,27 @@ async function detectOnce(){
     const vw = VW(), vh = VH();
     const r = S.roi || {x:0,y:0,w:1,h:1};
     const sx = r.x*vw, sy = r.y*vh, sw = Math.max(8, r.w*vw), sh = Math.max(8, r.h*vh);
-    const ow = S.cfg.inputW, oh = Math.round(ow * sh / sw);
+    // Mosaico: dividir la zona en partes agranda a las personas lejanas para el modelo
+    const nx = S.cfg.tiles >= 2 ? 2 : 1, ny = S.cfg.tiles >= 4 ? 2 : 1, ovl = 0.15;
+    const tw = sw / (nx - (nx-1)*ovl), th = sh / (ny - (ny-1)*ovl);
+    const ow = S.cfg.inputW, oh = Math.round(ow * th / tw);
     if(off.width !== ow || off.height !== oh){ off.width = ow; off.height = oh; }
-    offCtx.drawImage(video, sx, sy, sw, sh, 0, 0, ow, oh);
-    const preds = await S.model.detect(off, 60, S.cfg.score);
-    const dets = [];
-    for(const p of preds){
-      const g = CLASS_GROUP[p.class]; if(!g) continue;
-      const [bx,by,bw,bh] = p.bbox;
-      const x = sx + bx*sw/ow, y = sy + by*sh/oh, w = bw*sw/ow, h = bh*sh/oh;
-      dets.push({cls:p.class, group:g, score:p.score, x, y, w, h, cx:x+w/2, cy:y+h}); // punto = base de la caja
+    const minScore = Math.min(0.2, S.cfg.score);
+    let dets = [];
+    for(let iy = 0; iy < ny; iy++) for(let ix = 0; ix < nx; ix++){
+      const tx = sx + ix*tw*(1-ovl), ty = sy + iy*th*(1-ovl);
+      offCtx.drawImage(video, tx, ty, tw, th, 0, 0, ow, oh);
+      const preds = await S.model.detect(off, 100, minScore);
+      for(const p of preds){
+        const g = CLASS_GROUP[p.class]; if(!g) continue;
+        const [bx,by,bw,bh] = p.bbox;
+        const x = tx + bx*tw/ow, y = ty + by*th/oh, w = bw*tw/ow, h = bh*th/oh;
+        dets.push({cls:p.class, group:g, score:p.score, x, y, w, h, cx:x+w/2, cy:y+h}); // punto = pies / base
+      }
     }
+    if(nx*ny > 1) dets = nms(dets, 0.45);
     S.lastDets = dets;
-    updateTracks(dets);
+    updateTracks(dets, vt);
   }catch(e){
     console.error(e);
     if(e.name === 'SecurityError'){
@@ -437,41 +448,90 @@ async function detectOnce(){
   S.busy = false;
 }
 
-function updateTracks(dets){
-  const vw = VW();
+function iou(a, b){
+  const x1 = Math.max(a.x, b.x), y1 = Math.max(a.y, b.y), x2 = Math.min(a.x+a.w, b.x+b.w), y2 = Math.min(a.y+a.h, b.y+b.h);
+  const inter = Math.max(0, x2-x1) * Math.max(0, y2-y1);
+  return inter / (a.w*a.h + b.w*b.h - inter || 1);
+}
+function nms(dets, thr){
+  dets.sort((a,b) => b.score - a.score);
+  const keep = [];
+  for(const d of dets) if(!keep.some(k => k.group === d.group && iou(k, d) > thr)) keep.push(d);
+  return keep;
+}
+
+// Seguimiento estilo ByteTrack: cada objeto conserva su "rastro" aunque el modelo lo pierda unos segundos
+function lostLimit(t){ return t.hits < 3 ? 0.8 : (t.group === 'ped' ? S.cfg.lostPed : S.cfg.lostVeh); }
+
+function associate(tracks, dets, strict){
   const pairs = [];
-  S.tracks.forEach((t, ti) => {
-    const px = t.x + t.vx, py = t.y + t.vy;
-    const thr = Math.max(S.cfg.maxDist*vw, 0.8*Math.max(t.w, t.h));
+  tracks.forEach((t, ti) => {
+    const lost = Math.max(0, S.vt - t.lastT);
+    const scale = Math.max(12, t.group === 'ped' ? t.h : 0.5*(t.w + t.h));
+    // La zona de búsqueda crece con el tiempo que lleva sin verse
+    const gate = Math.max(S.cfg.maxDist*VW()*(strict ? 0.5 : 1), scale*(strict ? 0.8 : 1.3)*(1 + 0.8*Math.min(lost, 4)));
     dets.forEach((d, di) => {
       if(d.group !== t.group) return;
-      const dist = Math.hypot(d.cx - px, d.cy - py);
-      if(dist < thr) pairs.push([dist, ti, di]);
+      const hr = d.h / (t.h || d.h); if(hr < 0.5 || hr > 2) return;           // tamaño parecido
+      const dist = Math.hypot(d.cx - t.px, d.cy - t.py);
+      if(dist > gate) return;
+      const cost = dist/scale + 0.5*(1 - iou(d, {x:t.px - t.w/2, y:t.py - t.h, w:t.w, h:t.h})) + 0.15*Math.min(lost, 4);
+      pairs.push([cost, ti, di]);
     });
   });
   pairs.sort((a,b) => a[0]-b[0]);
-  const usedT = new Set(), usedD = new Set();
+  const mt = new Map();
+  const usedD = new Set();
   for(const [, ti, di] of pairs){
-    if(usedT.has(ti) || usedD.has(di)) continue;
-    usedT.add(ti); usedD.add(di);
-    const t = S.tracks[ti], d = dets[di];
-    const lx = t.lx, ly = t.ly;
-    t.vx = 0.5*t.vx + 0.5*(d.cx - t.x); t.vy = 0.5*t.vy + 0.5*(d.cy - t.y);
-    t.x = d.cx; t.y = d.cy; t.w = d.w; t.h = d.h; t.bx = d.x; t.by = d.y;
-    t.lx = d.cx; t.ly = d.cy; t.miss = 0; t.hits++;
-    t.votes[d.cls] = (t.votes[d.cls] || 0) + 1;
-    checkCrossing(t, lx, ly, d.cx, d.cy);
+    if(mt.has(ti) || usedD.has(di)) continue;
+    mt.set(ti, di); usedD.add(di);
   }
-  S.tracks.forEach((t, ti) => {
-    if(usedT.has(ti)) return;
-    t.miss++; t.x += t.vx; t.y += t.vy; // predicción mientras no se ve
+  return {mt, usedD};
+}
+
+function updateTracks(dets, vt){
+  S.vt = vt;
+  // Predicción de dónde debería estar cada rastro ahora (velocidad en px/seg)
+  for(const t of S.tracks){
+    const dt = Math.min(vt - t.lastT, 4);
+    t.px = t.lx + t.vx*dt; t.py = t.ly + t.vy*dt;
+  }
+  const high = dets.filter(d => d.score >= S.cfg.score);
+  const low = dets.filter(d => d.score < S.cfg.score);
+
+  // 1) Detecciones seguras contra todos los rastros (activos y perdidos)
+  const a1 = associate(S.tracks, high, false);
+  const matched = new Set();
+  a1.mt.forEach((di, ti) => { applyMatch(S.tracks[ti], high[di], vt); matched.add(ti); });
+  // 2) Detecciones dudosas solo para continuar rastros que ya existen (no crean nuevos)
+  const rest = S.tracks.map((t, i) => i).filter(i => !matched.has(i) && S.tracks[i].hits >= 2);
+  const a2 = associate(rest.map(i => S.tracks[i]), low, true);
+  a2.mt.forEach((di, k) => { applyMatch(S.tracks[rest[k]], low[di], vt); matched.add(rest[k]); });
+
+  S.tracks.forEach((t, i) => { if(!matched.has(i)) t.miss++; });
+  S.tracks = S.tracks.filter(t => vt - t.lastT <= lostLimit(t));
+
+  // 3) Rastros nuevos (solo con detecciones seguras, dentro de la zona y sin duplicar uno activo)
+  high.forEach((d, di) => {
+    if(a1.usedD.has(di) || !inRoi(d.cx, d.cy)) return;
+    if(S.tracks.some(t => t.group === d.group && t.miss === 0 && iou(d, {x:t.bx, y:t.by, w:t.w, h:t.h}) > 0.5)) return;
+    const t = {id:S.nextId++, group:d.group, lx:d.cx, ly:d.cy, px:d.cx, py:d.cy, vx:0, vy:0, lastT:vt,
+      w:d.w, h:d.h, bx:d.x, by:d.y, miss:0, hits:1, votes:{[d.cls]:1}, counted:false, side:null, trail:[[d.cx, d.cy]]};
+    S.tracks.push(t); updateSide(t);
   });
-  S.tracks = S.tracks.filter(t => t.miss <= S.cfg.maxMiss);
-  dets.forEach((d, di) => {
-    if(usedD.has(di) || !inRoi(d.cx, d.cy)) return;
-    S.tracks.push({id:S.nextId++, group:d.group, x:d.cx, y:d.cy, lx:d.cx, ly:d.cy, vx:0, vy:0,
-      w:d.w, h:d.h, bx:d.x, by:d.y, miss:0, hits:1, votes:{[d.cls]:1}, counted:false});
-  });
+}
+
+function applyMatch(t, d, vt){
+  const dt = Math.max(vt - t.lastT, 0.05);
+  const ivx = (d.cx - t.lx)/dt, ivy = (d.cy - t.ly)/dt;
+  const k = t.hits === 1 ? 1 : 0.35;
+  t.vx += k*(ivx - t.vx); t.vy += k*(ivy - t.vy);
+  t.lx = d.cx; t.ly = d.cy; t.lastT = vt;
+  t.w = 0.7*t.w + 0.3*d.w; t.h = 0.7*t.h + 0.3*d.h; t.bx = d.x; t.by = d.y;
+  t.miss = 0; t.hits++;
+  t.votes[d.cls] = (t.votes[d.cls] || 0) + d.score;
+  t.trail.push([d.cx, d.cy]); if(t.trail.length > 60) t.trail.shift();
+  updateSide(t);
 }
 
 // Hora real del cuadro analizado (los streams en vivo llegan con 20–60 s de retraso)
@@ -492,16 +552,23 @@ function majorityClass(t){
   return best;
 }
 
-function checkCrossing(t, ax, ay, bx, by){
-  if(!S.counting || t.counted || t.hits < 2) return;
+// Cuenta cuando el rastro pasa de un lado de la línea al otro (aunque no se haya visto el instante exacto)
+function updateSide(t){
   const L = S.lines[t.group]; if(!L) return;
-  const dir = segCross(L, ax, ay, bx, by);
-  if(dir === null) return;
-  t.counted = true; t.flash = 12;
-  const cls = majorityClass(t);
-  const ev = {t:eventTime(), line:t.group, cls, dir};
-  S.events.push(ev);
-  addLog(ev); renderStats(); save();
+  const x1=L.x1*VW(), y1=L.y1*VH(), x2=L.x2*VW(), y2=L.y2*VH();
+  const dx = x2-x1, dy = y2-y1, len2 = dx*dx + dy*dy || 1;
+  const u = ((t.lx-x1)*dx + (t.ly-y1)*dy) / len2;
+  if(u < -0.1 || u > 1.1) return;                                   // fuera del largo de la línea
+  const dist = crossSide(L, t.lx, t.ly) / Math.sqrt(len2);
+  const margin = Math.max(3, 0.2*(t.group === 'ped' ? t.h : Math.min(t.w, t.h)));
+  if(Math.abs(dist) < margin) return;                               // sobre la línea: esperar a que termine de cruzar
+  const s = dist < 0 ? -1 : 1;
+  if(t.side === null || !S.counting || t.counted){ if(t.side === null || !S.counting) t.side = s; return; }
+  if(s !== t.side && t.hits >= 3){
+    t.counted = true; t.flash = 12;
+    const ev = {t:eventTime(), line:t.group, cls:majorityClass(t), dir:t.side < 0 ? 0 : 1};
+    S.events.push(ev); addLog(ev); renderStats(); save();
+  }
 }
 
 // Reloj en un Worker: sigue funcionando aunque la pestaña quede en segundo plano
@@ -553,11 +620,21 @@ function render(){
   if(S.cfg.boxes){
     ctx.lineWidth = 2*k; ctx.font = `${12*k}px system-ui`; ctx.textAlign='left'; ctx.textBaseline='bottom';
     for(const t of S.tracks){
-      if(t.miss > 0) continue;
+      if(t.hits < 2) continue;
       const col = t.flash > 0 ? '#ffffff' : (t.counted ? '#9aa5b1' : COLORS[t.group]);
       if(t.flash > 0) t.flash--;
-      ctx.strokeStyle = col; ctx.strokeRect(t.bx, t.by, t.w, t.h);
-      ctx.fillStyle = col; ctx.beginPath(); ctx.arc(t.x, t.y, 3.5*k, 0, 7); ctx.fill();
+      // Rastro
+      if(t.trail.length > 1){
+        ctx.strokeStyle = col; ctx.globalAlpha = 0.7; ctx.lineWidth = 2.5*k; ctx.beginPath();
+        t.trail.forEach(([x,y], i) => i ? ctx.lineTo(x,y) : ctx.moveTo(x,y)); ctx.stroke(); ctx.globalAlpha = 1;
+      }
+      if(t.miss > 0){ // perdido momentáneamente: se muestra la posición estimada
+        ctx.setLineDash([4*k,4*k]); ctx.strokeStyle = col; ctx.lineWidth = 1.5*k;
+        ctx.strokeRect(t.px - t.w/2, t.py - t.h, t.w, t.h); ctx.setLineDash([]);
+        continue;
+      }
+      ctx.lineWidth = 2*k; ctx.strokeStyle = col; ctx.strokeRect(t.bx, t.by, t.w, t.h);
+      ctx.fillStyle = col; ctx.beginPath(); ctx.arc(t.lx, t.ly, 3.5*k, 0, 7); ctx.fill();
       ctx.fillText(`${CAT_NAME[majorityClass(t)] || ''} #${t.id}`, t.bx, t.by - 2);
     }
   }
@@ -626,7 +703,6 @@ function startCounting(){
   if(!S.lines.veh && !S.lines.ped){ alert('Dibujá al menos una línea de conteo.'); return; }
   S.counting = true; S.startedAt = Date.now();
   if(!S.sessionStart) S.sessionStart = Date.now();
-  S.tracks.forEach(t => t.counted = true); // lo que ya está en pantalla no se cuenta a medias
   updateButtons(); updateGuide(); save();
 }
 function stopCounting(){
@@ -762,7 +838,9 @@ function bindCfg(){
   const c = S.cfg;
   $('selBucket').value = c.bucket; $('inpDur').value = c.durationMin; $('selModel').value = S.modelBase;
   $('inpFps').value = c.fps; $('inpScore').value = c.score; $('inpW').value = c.inputW;
-  $('inpDist').value = Math.round(c.maxDist*100); $('inpMiss').value = c.maxMiss; $('chkBoxes').checked = c.boxes;
+  if(c.maxMiss !== undefined){ delete c.maxMiss; if(c.maxDist > 0.05) c.maxDist = 0.04; } // config de la versión anterior
+  $('inpDist').value = Math.round(c.maxDist*100); $('inpLostPed').value = c.lostPed; $('inpLostVeh').value = c.lostVeh;
+  $('selTiles').value = c.tiles; $('chkBoxes').checked = c.boxes;
   $('lblVA').value = S.labels.veh[0]; $('lblVB').value = S.labels.veh[1];
   $('lblPA').value = S.labels.ped[0]; $('lblPB').value = S.labels.ped[1];
   const num = (id, f) => $(id).addEventListener('change', e => { f(+e.target.value); save(); renderStats(); });
@@ -772,7 +850,9 @@ function bindCfg(){
   num('inpScore', v => c.score = Math.min(.95, Math.max(.1, v)));
   num('inpW', v => c.inputW = Math.min(1280, Math.max(320, v)));
   num('inpDist', v => c.maxDist = Math.max(1, v)/100);
-  num('inpMiss', v => c.maxMiss = Math.max(1, v));
+  num('inpLostPed', v => c.lostPed = Math.max(1, v));
+  num('inpLostVeh', v => c.lostVeh = Math.max(0.5, v));
+  num('selTiles', v => c.tiles = v);
   $('chkBoxes').onchange = e => { c.boxes = e.target.checked; save(); };
   $('selModel').onchange = e => { S.modelBase = e.target.value; save(); loadModel(); };
   const lbl = (id, g, i) => $(id).addEventListener('input', e => { S.labels[g][i] = e.target.value || (i ? 'B→A' : 'A→B'); updateHeaders(); save(); renderStats(); });
