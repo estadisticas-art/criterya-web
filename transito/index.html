@@ -68,7 +68,7 @@
 <body>
 <header>
   <a href="/" style="display:flex"><img src="/logo-blanco.png" alt="Criterya" style="height:26px"></a><h1>Contador de tránsito · vehículos y peatones</h1>
-  <div id="status">Modelo: <b id="stModel">cargando…</b> · Fuente: <b id="stSrc">ninguna</b> · Detección: <b id="stFps">–</b> · Conteo: <b id="stRun">detenido</b> <span id="stTimer"></span></div>
+  <div id="status">Modelo: <b id="stModel">cargando…</b> · Fuente: <b id="stSrc">ninguna</b> · Hora del video: <b id="stClock">–</b> · Detección: <b id="stFps">–</b> · Conteo: <b id="stRun">detenido</b> <span id="stTimer"></span></div>
 </header>
 
 <main>
@@ -728,10 +728,28 @@ function applyMatch(t, d, vt){
 }
 
 // Hora real del cuadro analizado (los streams en vivo llegan con 20–60 s de retraso)
-function eventTime(){
+// Hora de grabación del cuadro que se está viendo (null si la fuente no la informa)
+function videoClock(){
   const f = S.fragClock;
-  if(f && S.hls){ const t = f.wall + (video.currentTime - f.start)*1000; if(Math.abs(t - Date.now()) < 10*60000) return Math.round(t); }
-  return Date.now();
+  if(!f || !S.hls) return null;
+  const t = f.wall + (video.currentTime - f.start)*1000;
+  // Se acepta hasta 6 h de atraso (la cámara puede quedar congelada) y nada en el futuro
+  return (t > Date.now() - 6*3600000 && t < Date.now() + 120000) ? Math.round(t) : null;
+}
+function eventTime(){ return videoClock() ?? Date.now(); }
+const fmtLag = ms => { const s = Math.max(0, Math.round(ms/1000)); return s < 60 ? `${s} s` : s < 3600 ? `${Math.floor(s/60)} min ${String(s%60).padStart(2,'0')} s` : `${Math.floor(s/3600)} h ${Math.floor(s%3600/60)} min`; };
+function drawClock(W, k){
+  const vc = videoClock();
+  const txt = vc ? `📹 ${new Date(vc).toLocaleTimeString('es-AR')}  ·  retraso ${fmtLag(Date.now() - vc)}` : '📹 hora del video no disponible';
+  const lag = vc ? Date.now() - vc : null;
+  const col = lag == null ? '#8aa0b4' : lag < 60000 ? '#4ade80' : lag < 300000 ? '#facc15' : '#ff6b6b';
+  ctx.font = `bold ${15*k}px system-ui`; ctx.textAlign = 'right'; ctx.textBaseline = 'top';
+  const w = ctx.measureText(txt).width + 16*k;
+  ctx.fillStyle = 'rgba(0,0,0,.7)'; ctx.fillRect(W - w - 10*k, 10*k, w, 26*k);
+  ctx.fillStyle = col; ctx.fillText(txt, W - 18*k, 15*k);
+  const el = $('stClock');
+  el.textContent = vc ? `${new Date(vc).toLocaleTimeString('es-AR')} (retraso ${fmtLag(lag)})` : '–';
+  el.style.color = lag == null ? '' : col;
 }
 // Segundos de video efectivamente analizados por minuto (para saber qué tan completo es cada intervalo)
 function addCoverage(wall, sec){
@@ -840,6 +858,7 @@ function render(){
   if(S.lines.veh) drawLine(S.lines.veh, COLORS.veh);
   if(S.lines.ped) drawLine(S.lines.ped, COLORS.ped);
   drawZones(W, H, k);
+  drawClock(W, k);
 
   if(S.cfg.boxes){
     ctx.lineWidth = 2*k; ctx.font = `${12*k}px system-ui`; ctx.textAlign='left'; ctx.textBaseline='bottom';
