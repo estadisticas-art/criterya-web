@@ -395,6 +395,8 @@ async function startCapture(){
 }
 async function openUrl(){
   const url = $('inpUrl').value.trim(); if(!url) return;
+  if(url !== S.srcUrl) S.maxWall = 0;   // otra cámara: otro reloj
+  S.srcUrl = url;
   resetSource(); video.crossOrigin = 'anonymous';
   S.fragClock = null;
   if(/\.m3u8(\?|$)/i.test(url) && window.Hls && Hls.isSupported()){
@@ -424,7 +426,8 @@ async function openUrl(){
     });
     hls.on(Hls.Events.FRAG_LOADED, () => { retries = 0; });
   } else video.src = url;
-  try{ await video.play(); }catch(e){ /* en vivo puede tardar: el vigilante lo reintenta */ }
+  // No esperar indefinidamente si la cámara está caída: el vigilante sigue intentando
+  await Promise.race([video.play().catch(() => {}), new Promise(res => setTimeout(res, 8000))]);
   const name = /tandil\.gov\.ar/.test(url) ? 'Cámara Tandil' : 'URL';
   if(!S.hasSource) onSourceReady(name); else { S.srcName = name; }
 }
@@ -437,11 +440,27 @@ let restarting = false;
 async function restartStream(why){
   if(restarting || !S.hls) return; restarting = true;
   console.warn('Reiniciando stream:', why);
+  S.restarts = (S.restarts || 0) + 1; S.lastRestartAt = Date.now();
   const wasCounting = S.counting;
   S.tracks = [];
-  await openUrl();
+  // Nunca quedar esperando: si la cámara sigue caída, el próximo intento lo hace el vigilante
+  try{ await Promise.race([openUrl(), new Promise(res => setTimeout(res, 15000))]); }catch(e){}
   S.counting = wasCounting; updateButtons();
   restarting = false;
+}
+// Consulta directa al servidor (independiente del reproductor): ¿hay video nuevo?
+async function probeServer(){
+  const g = S.sig; if(!g || g.probing || !S.srcUrl) return;
+  g.probing = true; g.lastProbeAt = Date.now();
+  try{
+    const u = S.srcUrl + (S.srcUrl.includes('?') ? '&' : '?') + '_=' + Date.now();
+    const txt = await (await fetch(u, {cache:'no-store'})).text();
+    const lines = txt.split(/\r?\n/).map(l => l.trim()).filter(l => l && !l.startsWith('#'));
+    const last = lines[lines.length - 1] || null;
+    if(last && last !== g.probeLast){ g.probeLast = last; g.probeChangedAt = Date.now(); }
+    g.probeWall = last ? parseSegWall(last) : null;
+  }catch(e){ /* servidor caído: se reintenta en la próxima vuelta */ }
+  g.probing = false;
 }
 // Vigilante de señal: detecta cuando la cámara deja de mandar video y se recupera sola
 setInterval(() => {
@@ -450,14 +469,22 @@ setInterval(() => {
   if(video.currentTime > g.lastVT + 0.05){ g.lastVT = video.currentTime; g.lastProgressAt = now; g.stalledSince = null; }
   else if(!g.stalledSince) g.stalledSince = now;
   const stalledFor = g.stalledSince ? now - g.stalledSince : 0;
-  const noNewFor = now - g.lastNewSegAt;
   if(video.paused && video.readyState >= 2) video.play().catch(() => {});
-  // Hay video nuevo en el servidor pero el reproductor quedó trabado → saltar al vivo o reiniciar
-  if(stalledFor > 20000 && noNewFor < stalledFor - 5000){
+  // Mientras está detenido, preguntar al servidor cada 10 s si ya hay video nuevo
+  if(stalledFor > 8000 && (!g.lastProbeAt || now - g.lastProbeAt > 10000)) probeServer();
+  if(g.probeChangedAt > (g.lastNewSegAt || 0)) g.lastNewSegAt = g.probeChangedAt;
+  const noNewFor = now - g.lastNewSegAt;
+  const vc = videoClock();
+  const serverHasNew = (g.probeChangedAt && g.stalledSince && g.probeChangedAt > g.stalledSince) ||
+                       (g.probeWall && vc && g.probeWall > vc + 30000);
+  // Hay video nuevo en el servidor pero el reproductor quedó trabado → saltar adelante y, si no alcanza, reconectar
+  if(stalledFor > 15000 && (serverHasNew || noNewFor < stalledFor - 5000)){
     const end = video.buffered.length ? video.buffered.end(video.buffered.length-1) : 0;
     if(end > video.currentTime + 1) video.currentTime = Math.min(end - 0.5, video.currentTime + 2);
-    if(stalledFor > 60000) restartStream('trabado');
+    if(stalledFor > 25000) restartStream('hay video nuevo en el servidor');
   }
+  // Red de seguridad: detenido más de 5 min → reconexión completa cada 5 min aunque no se detecte nada
+  else if(stalledFor > 300000 && now - (S.lastRestartAt || 0) > 300000) restartStream('detenido hace más de 5 min');
   setSignal(stalledFor > 8000
     ? (noNewFor > 30000 ? `sin señal de la cámara (último video ${g.lastSegWall ? fmtT(g.lastSegWall) : '–'})` : 'esperando video…')
     : 'en vivo', stalledFor > 8000);
@@ -501,14 +528,27 @@ async function detectOnce(){
   if(!S.model || !S.hasSource || S.busy || video.readyState < 2 || !video.videoWidth) return;
   // Continuidad del video: si no avanzó, no hay cuadro nuevo; si saltó, se reinicia el seguimiento
   const vt = video.currentTime, wall = eventTime();
+  // Video ya analizado (al reconectar, el servidor repite los últimos segundos): no se vuelve a contar
+  const hasClock = videoClock() != null;
+  if(hasClock && S.maxWall){
+    // Más de 5 s hacia atrás = repetición; se saltea hasta pasar lo ya visto.
+    // (Diferencias menores son imprecisión de los nombres de archivo, no repetición.)
+    if(S.maxWall - wall > 5000) S.replaying = true;
+    if(S.replaying){
+      if(wall <= S.maxWall){ S.lastVT = null; S.tracks = []; S.lastZoneVT = null; return; }
+      S.replaying = false;
+    }
+  }
   if(S.lastVT != null){
     const dVT = vt - S.lastVT, dWall = wall - S.lastWall;
     if(Math.abs(dVT) < 0.02) return;
-    const jump = dVT < 0 || dVT > 2.5 || Math.abs(dWall - dVT*1000) > 2500;
+    // Salto real de reproducción, o hueco grande en la grabación (los nombres de archivo tienen ±4 s de imprecisión)
+    const jump = dVT < 0 || dVT > 2.5 || Math.abs(dWall - dVT*1000) > 6000;
     if(jump){ S.tracks = []; S.lastZoneVT = null; }
     else if(S.counting) addCoverage(wall, dVT);
   }
   S.lastVT = vt; S.lastWall = wall;
+  if(hasClock) S.maxWall = Math.max(S.maxWall || 0, wall);
   S.busy = true;
   const t0 = performance.now();
   try{
