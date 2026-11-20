@@ -8,6 +8,7 @@
 <meta name="description" content="Conteo automático de vehículos y peatones sobre la cámara pública de la Municipalidad de Tandil.">
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3/dist/coco-ssd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.22.0/dist/ort.webgpu.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script>
 <style>
   :root{
@@ -129,12 +130,13 @@
         <label class="f">Contar durante (min, 0 = sin límite)<input id="inpDur" type="number" min="0" value="0"></label>
         <label class="f">Modelo
           <select id="selModel">
-            <option value="mobilenet_v2" selected>Preciso (mobilenet_v2)</option>
-            <option value="lite_mobilenet_v2">Rápido (lite)</option>
+            <option value="yolo11n" selected>YOLO11 (recomendado)</option>
+            <option value="mobilenet_v2">COCO-SSD preciso (anterior)</option>
+            <option value="lite_mobilenet_v2">COCO-SSD rápido (anterior)</option>
           </select></label>
         <label class="f">Detecciones / seg<input id="inpFps" type="number" min="1" max="20" value="6"></label>
         <label class="f">Confianza mínima<input id="inpScore" type="number" min="0.1" max="0.95" step="0.05" value="0.40"></label>
-        <label class="f">Resolución de análisis (px)<input id="inpW" type="number" min="320" max="1280" step="32" value="640"></label>
+        <label class="f">Resolución COCO-SSD (px)<input id="inpW" type="number" min="320" max="1280" step="32" value="640"></label>
         <label class="f">Detección de personas lejanas
           <select id="selTiles"><option value="1">Normal</option><option value="2">Mejorada ×2 (más lento)</option><option value="4">Máxima ×4 (mucho más lento)</option></select></label>
       </div>
@@ -199,7 +201,7 @@ const COLORS = {veh:'#f5a524', ped:'#2fbf9b', roi:'#5aa9ff'};
 const STORE_KEY = 'contadorTransito.v1';
 
 const S = {
-  model:null, modelBase:'mobilenet_v2', modelLoading:false,
+  model:null, modelBase:'yolo11n', modelLoading:false,
   hasSource:false, srcName:'ninguna', hls:null, stream:null,
   counting:false, startedAt:null, accumMs:0,
   roi:null, lines:{veh:null, ped:null},
@@ -222,7 +224,7 @@ function save(){
   try{
     localStorage.setItem(STORE_KEY, JSON.stringify({
       roi:S.roi, lines:S.lines, labels:S.labels, events:S.events, cov:S.cov,
-      sessionStart:S.sessionStart, cfg:S.cfg, modelBase:S.modelBase
+      sessionStart:S.sessionStart, cfg:S.cfg, modelBase:S.modelBase, v:3
     }));
   }catch(e){ /* almacenamiento no disponible */ }
 }
@@ -233,25 +235,89 @@ function load(){
     Object.assign(S.cfg, d.cfg || {});
     S.roi = d.roi || null; S.lines = d.lines || {veh:null, ped:null};
     S.labels = d.labels || S.labels; S.events = d.events || [];
-    S.sessionStart = d.sessionStart || null; S.modelBase = d.modelBase || S.modelBase; S.cov = d.cov || {};
+    S.sessionStart = d.sessionStart || null; S.modelBase = (d.v >= 3 && d.modelBase) || S.modelBase; S.cov = d.cov || {};
   }catch(e){}
 }
 
 // ---------------------------------------------------------------------------
 // Modelo
 // ---------------------------------------------------------------------------
+// Modelos: YOLO11 (ONNX, corre en WebGPU o WebAssembly) o COCO-SSD (TensorFlow.js)
+const YOLO_URL = '/transito/yolo11n.onnx', YOLO_SIZE = 640;
+const YOLO_CLS = {0:'person', 1:'bicycle', 2:'car', 3:'motorcycle', 5:'bus', 7:'truck'};
+const YOLO_IDX = Object.keys(YOLO_CLS).map(Number);
+const ycan = document.createElement('canvas'); ycan.width = ycan.height = YOLO_SIZE;
+const yctx = ycan.getContext('2d', {willReadFrequently:true});
+
 async function loadModel(){
-  S.modelLoading = true; S.model = null;
+  S.modelLoading = true; S.model = null; S.yolo = null;
   $('stModel').textContent = 'cargando…';
   try{
-    await tf.ready();
-    S.model = await cocoSsd.load({base:S.modelBase});
-    $('stModel').textContent = (S.modelBase === 'mobilenet_v2' ? 'preciso' : 'rápido') + ' (' + tf.getBackend() + ')';
+    if(S.modelBase === 'yolo11n'){
+      ort.env.wasm.wasmPaths = 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.22.0/dist/';
+      let session = null, ep = null;
+      for(const p of (navigator.gpu ? ['webgpu', 'wasm'] : ['wasm'])){
+        try{ session = await ort.InferenceSession.create(YOLO_URL, {executionProviders:[p], graphOptimizationLevel:'all'}); ep = p; break; }
+        catch(e){ console.warn('YOLO no pudo usar', p, e); }
+      }
+      if(!session) throw new Error('No se pudo iniciar YOLO11');
+      S.yolo = session; S.model = {kind:'yolo'};
+      // Primera inferencia de calentamiento (compila el modelo)
+      await yoloRun();
+      $('stModel').textContent = 'YOLO11 (' + (ep === 'webgpu' ? 'GPU' : 'CPU') + ')';
+    } else {
+      await tf.ready();
+      S.model = await cocoSsd.load({base:S.modelBase}); S.model.kind = 'coco';
+      $('stModel').textContent = 'COCO-SSD ' + (S.modelBase === 'mobilenet_v2' ? 'preciso' : 'rápido') + ' (' + tf.getBackend() + ')';
+    }
   }catch(e){
-    $('stModel').textContent = 'error'; console.error(e);
-    alert('No se pudo cargar el modelo de detección. Revisá la conexión a Internet (se descarga de jsdelivr la primera vez).');
+    console.error(e);
+    if(S.modelBase === 'yolo11n'){ // respaldo automático
+      S.modelBase = 'mobilenet_v2'; $('selModel').value = S.modelBase; S.modelLoading = false;
+      return loadModel();
+    }
+    $('stModel').textContent = 'error';
+    alert('No se pudo cargar el modelo de detección. Revisá la conexión a Internet.');
   }
   S.modelLoading = false; updateButtons();
+}
+
+// Corre YOLO sobre lo que haya en ycan (640×640) y devuelve la salida cruda
+async function yoloRun(){
+  const px = yctx.getImageData(0, 0, YOLO_SIZE, YOLO_SIZE).data, n = YOLO_SIZE*YOLO_SIZE;
+  const input = new Float32Array(3*n);
+  for(let i = 0, j = 0; i < n; i++, j += 4){ input[i] = px[j]/255; input[n+i] = px[j+1]/255; input[2*n+i] = px[j+2]/255; }
+  const res = await S.yolo.run({images: new ort.Tensor('float32', input, [1, 3, YOLO_SIZE, YOLO_SIZE])});
+  const out = res.output0;
+  return {data: out.data, n: out.dims[2]};
+}
+
+function yoloDecode(data, n, scale, minScore, ox, oy){
+  const out = [];
+  for(let i = 0; i < n; i++){
+    let best = -1, bs = minScore;
+    for(const c of YOLO_IDX){ const s = data[(4 + c)*n + i]; if(s > bs){ bs = s; best = c; } }
+    if(best < 0) continue;
+    const cx = data[i], cy = data[n + i], w = data[2*n + i], h = data[3*n + i];
+    out.push({class:YOLO_CLS[best], score:bs, x:ox + (cx - w/2)/scale, y:oy + (cy - h/2)/scale, w:w/scale, h:h/scale});
+  }
+  return out;
+}
+
+// Detecta en un recorte del video (coordenadas en px del video) → lista de objetos en px del video
+async function detectTile(tx, ty, tw, th, minScore){
+  if(S.model.kind === 'yolo'){
+    const scale = YOLO_SIZE / Math.max(tw, th);
+    yctx.fillStyle = 'rgb(114,114,114)'; yctx.fillRect(0, 0, YOLO_SIZE, YOLO_SIZE);
+    yctx.drawImage(video, tx, ty, tw, th, 0, 0, Math.round(tw*scale), Math.round(th*scale));
+    const {data, n} = await yoloRun();
+    return yoloDecode(data, n, scale, minScore, tx, ty);
+  }
+  const ow = S.cfg.inputW, oh = Math.round(ow * th / tw);
+  if(off.width !== ow || off.height !== oh){ off.width = ow; off.height = oh; }
+  offCtx.drawImage(video, tx, ty, tw, th, 0, 0, ow, oh);
+  const preds = await S.model.detect(off, 100, minScore);
+  return preds.map(p => ({class:p.class, score:p.score, x:tx + p.bbox[0]*tw/ow, y:ty + p.bbox[1]*th/oh, w:p.bbox[2]*tw/ow, h:p.bbox[3]*th/oh}));
 }
 
 // ---------------------------------------------------------------------------
@@ -417,22 +483,18 @@ async function detectOnce(){
     // Mosaico: dividir la zona en partes agranda a las personas lejanas para el modelo
     const nx = S.cfg.tiles >= 2 ? 2 : 1, ny = S.cfg.tiles >= 4 ? 2 : 1, ovl = 0.15;
     const tw = sw / (nx - (nx-1)*ovl), th = sh / (ny - (ny-1)*ovl);
-    const ow = S.cfg.inputW, oh = Math.round(ow * th / tw);
-    if(off.width !== ow || off.height !== oh){ off.width = ow; off.height = oh; }
     const minScore = Math.min(0.2, S.cfg.score);
     let dets = [];
     for(let iy = 0; iy < ny; iy++) for(let ix = 0; ix < nx; ix++){
       const tx = sx + ix*tw*(1-ovl), ty = sy + iy*th*(1-ovl);
-      offCtx.drawImage(video, tx, ty, tw, th, 0, 0, ow, oh);
-      const preds = await S.model.detect(off, 100, minScore);
+      const preds = await detectTile(tx, ty, tw, th, minScore);
       for(const p of preds){
         const g = CLASS_GROUP[p.class]; if(!g) continue;
-        const [bx,by,bw,bh] = p.bbox;
-        const x = tx + bx*tw/ow, y = ty + by*th/oh, w = bw*tw/ow, h = bh*th/oh;
+        const {x, y, w, h} = p;
         dets.push({cls:p.class, group:g, score:p.score, x, y, w, h, cx:x+w/2, cy:y+h}); // punto = pies / base
       }
     }
-    if(nx*ny > 1) dets = nms(dets, 0.45);
+    dets = nms(dets, S.model.kind === 'yolo' ? 0.6 : 0.45);
     S.lastDets = dets;
     updateTracks(dets, vt);
   }catch(e){
