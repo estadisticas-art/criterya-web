@@ -85,7 +85,12 @@
       <button id="btnRoi">▭ Zona de análisis</button>
       <button id="btnLineVeh">━ Línea vehículos</button>
       <button id="btnLinePed">━ Línea peatones</button>
+      <button id="btnZone">⬠ Zona</button>
       <button id="btnClearGeo">Borrar dibujo</button>
+      <select id="selHeat" title="Mapa de calor: por dónde circula la gente o los vehículos">
+        <option value="off">🔥 Mapa de calor: no</option><option value="ped">🔥 Personas</option><option value="veh">🔥 Vehículos</option>
+      </select>
+      <button id="btnPng" title="Descargar la imagen actual con mapa de calor, líneas y zonas">📷</button>
       <span class="sep"></span>
       <button id="btnStart" class="primary" disabled>▶ Iniciar conteo</button>
       <button id="btnStop" disabled>⏸ Pausar</button>
@@ -116,6 +121,12 @@
         <thead><tr><th>Categoría</th><th id="hVehA">A→B</th><th id="hVehB">B→A</th><th>Total</th></tr></thead>
         <tbody id="tbTot"></tbody>
       </table>
+    </div>
+
+    <div class="card">
+      <h2>Zonas</h2>
+      <div id="zoneList" style="font-size:12.5px"></div>
+      <div class="hint">Tocá <b>⬠ Zona</b> y hacé clic en cada esquina; doble clic (o clic en el primer punto) para cerrar. Mide cuántas personas y vehículos hay adentro y cuánto tiempo permanecen.</div>
     </div>
 
     <div class="card">
@@ -164,6 +175,7 @@
       <div class="row">
         <button id="btnCsvBuckets">CSV por intervalo</button>
         <button id="btnCsvEvents">CSV de eventos</button>
+        <button id="btnCsvZones">CSV de zonas</button>
       </div>
       <div class="hint">Separador “;” para que Excel en español lo abra directamente.</div>
     </div>
@@ -176,6 +188,15 @@
         <table>
           <thead><tr><th>Desde – Hasta</th><th>Autos</th><th>Motos</th><th>Camiones</th><th>Colectivos</th><th>Total veh.</th><th>Personas</th><th>Bicicletas</th><th title="Porcentaje del intervalo con video analizado. Bajo 80% hubo cortes de la cámara.">Video</th></tr></thead>
           <tbody id="tbBuckets"></tbody>
+        </table>
+      </div>
+    </section>
+    <section class="card" id="zoneCard" hidden style="grid-column:1/-1">
+      <h2>Zonas por intervalo</h2>
+      <div style="max-height:300px;overflow:auto">
+        <table>
+          <thead><tr><th>Zona</th><th>Desde – Hasta</th><th title="Promedio de personas dentro de la zona">Personas prom.</th><th>Máx.</th><th title="Personas distintas que entraron">Ingresos</th><th title="Tiempo medio que permanece cada persona">Permanencia media</th><th>Vehículos prom.</th><th>Máx.</th><th>Ingresos</th><th>Permanencia media</th></tr></thead>
+          <tbody id="tbZones"></tbody>
         </table>
       </div>
     </section>
@@ -207,6 +228,7 @@ const S = {
   roi:null, lines:{veh:null, ped:null},
   labels:{veh:['A→B','B→A'], ped:['A→B','B→A']},
   events:[], sessionStart:null, cov:{}, lastVT:null, lastWall:null,
+  zones:[], zstats:{}, zoneDraft:null, heat:null, heatShow:'off', lastZoneVT:null,
   tracks:[], nextId:1, lastDets:[],
   drawMode:null, dragStart:null, dragCur:null,
   busy:false, fpsMeasured:0, lastDetectAt:0,
@@ -224,6 +246,8 @@ function save(){
   try{
     localStorage.setItem(STORE_KEY, JSON.stringify({
       roi:S.roi, lines:S.lines, labels:S.labels, events:S.events, cov:S.cov,
+      zones:S.zones, zstats:S.zstats, heatShow:S.heatShow, heat:S.heat && {gw:S.heat.gw, gh:S.heat.gh,
+        ped:Array.from(S.heat.ped, v => Math.round(v*10)/10), veh:Array.from(S.heat.veh, v => Math.round(v*10)/10)},
       sessionStart:S.sessionStart, cfg:S.cfg, modelBase:S.modelBase, v:3
     }));
   }catch(e){ /* almacenamiento no disponible */ }
@@ -236,6 +260,8 @@ function load(){
     S.roi = d.roi || null; S.lines = d.lines || {veh:null, ped:null};
     S.labels = d.labels || S.labels; S.events = d.events || [];
     S.sessionStart = d.sessionStart || null; S.modelBase = (d.v >= 3 && d.modelBase) || S.modelBase; S.cov = d.cov || {};
+    S.zones = d.zones || []; S.zstats = d.zstats || {}; S.heatShow = d.heatShow || 'off';
+    if(d.heat) S.heat = {gw:d.heat.gw, gh:d.heat.gh, ped:Float32Array.from(d.heat.ped), veh:Float32Array.from(d.heat.veh)};
   }catch(e){}
 }
 
@@ -476,7 +502,7 @@ async function detectOnce(){
     const dVT = vt - S.lastVT, dWall = wall - S.lastWall;
     if(Math.abs(dVT) < 0.02) return;
     const jump = dVT < 0 || dVT > 2.5 || Math.abs(dWall - dVT*1000) > 2500;
-    if(jump){ S.tracks = []; }
+    if(jump){ S.tracks = []; S.lastZoneVT = null; }
     else if(S.counting) addCoverage(wall, dVT);
   }
   S.lastVT = vt; S.lastWall = wall;
@@ -503,6 +529,8 @@ async function detectOnce(){
     dets = nms(dets, S.model.kind === 'yolo' ? 0.6 : 0.45);
     S.lastDets = dets;
     updateTracks(dets, vt);
+    updateZones(vt, S.pendingRemoved || []); S.pendingRemoved = null;
+    if(++heatDirty % 5 === 0 && S.heatShow !== 'off') renderHeat();
   }catch(e){
     console.error(e);
     if(e.name === 'SecurityError'){
@@ -577,7 +605,9 @@ function updateTracks(dets, vt){
   a2.mt.forEach((di, k) => { applyMatch(S.tracks[rest[k]], low[di], vt); matched.add(rest[k]); });
 
   S.tracks.forEach((t, i) => { if(!matched.has(i)) t.miss++; });
+  const removed = S.tracks.filter(t => vt - t.lastT > lostLimit(t));
   S.tracks = S.tracks.filter(t => vt - t.lastT <= lostLimit(t));
+  S.pendingRemoved = removed;
 
   // 3) Rastros nuevos (solo con detecciones seguras, dentro de la zona y sin duplicar uno activo)
   high.forEach((d, di) => {
@@ -587,6 +617,92 @@ function updateTracks(dets, vt){
       w:d.w, h:d.h, bx:d.x, by:d.y, miss:0, hits:1, votes:{[d.cls]:1}, counted:false, side:null, trail:[[d.cx, d.cy]]};
     S.tracks.push(t); updateSide(t);
   });
+}
+
+// ---------------------------------------------------------------------------
+// Mapa de calor: acumula por dónde pasan los rastros (punto de apoyo en el piso)
+// ---------------------------------------------------------------------------
+function heatAdd(t){
+  if(!S.counting) return;
+  if(!S.heat){ const gw = 192, gh = Math.max(16, Math.round(192*VH()/VW())); S.heat = {gw, gh, ped:new Float32Array(gw*gh), veh:new Float32Array(gw*gh)}; }
+  const H = S.heat, g = H[t.group]; if(!g) return;
+  const gx = t.lx/VW()*H.gw, gy = t.ly/VH()*H.gh;
+  for(let dy = -2; dy <= 2; dy++) for(let dx = -2; dx <= 2; dx++){
+    const x = Math.floor(gx)+dx, y = Math.floor(gy)+dy;
+    if(x < 0 || y < 0 || x >= H.gw || y >= H.gh) continue;
+    g[y*H.gw + x] += Math.exp(-(dx*dx + dy*dy)/2.5);
+  }
+}
+const heatCan = document.createElement('canvas'); let heatDirty = 0;
+const HEAT_STOPS = [[0,[40,60,255]], [0.35,[0,200,255]], [0.6,[60,230,90]], [0.8,[255,220,0]], [1,[255,40,20]]];
+function heatColor(v){
+  for(let i = 1; i < HEAT_STOPS.length; i++){
+    const [a, ca] = HEAT_STOPS[i-1], [b, cb] = HEAT_STOPS[i];
+    if(v <= b){ const f = (v - a)/(b - a); return ca.map((c, j) => Math.round(c + f*(cb[j] - c))); }
+  }
+  return HEAT_STOPS[HEAT_STOPS.length-1][1];
+}
+function renderHeat(){
+  const H = S.heat, g = H && H[S.heatShow]; if(!g) return false;
+  if(heatCan.width !== H.gw || heatCan.height !== H.gh){ heatCan.width = H.gw; heatCan.height = H.gh; }
+  let max = 0; for(const v of g) if(v > max) max = v;
+  const hc = heatCan.getContext('2d'), img = hc.createImageData(H.gw, H.gh);
+  for(let i = 0; i < g.length; i++){
+    const v = max ? Math.sqrt(g[i]/max) : 0; if(v < 0.03) continue;
+    // azul → verde → amarillo → rojo
+    const [r, gg, b] = heatColor(v);
+    img.data[4*i] = r; img.data[4*i+1] = gg; img.data[4*i+2] = b; img.data[4*i+3] = Math.min(220, 60 + 200*v);
+  }
+  hc.putImageData(img, 0, 0); return true;
+}
+
+// ---------------------------------------------------------------------------
+// Zonas: ocupación, ingresos y permanencia
+// ---------------------------------------------------------------------------
+function inPoly(pts, x, y){ // pts normalizados, x/y en px del video
+  const nx = x/VW(), ny = y/VH(); let inside = false;
+  for(let i = 0, j = pts.length-1; i < pts.length; j = i++){
+    const [xi, yi] = pts[i], [xj, yj] = pts[j];
+    if(((yi > ny) !== (yj > ny)) && (nx < (xj-xi)*(ny-yi)/(yj-yi) + xi)) inside = !inside;
+  }
+  return inside;
+}
+function zBucket(z, wall){
+  const k = Math.floor(wall/60000)*60000;
+  const zs = S.zstats[z.id] = S.zstats[z.id] || {};
+  return zs[k] = zs[k] || {sec:0, ps:0, vs:0, pmax:0, vmax:0, pin:0, vin:0, pdw:0, pdn:0, vdw:0, vdn:0};
+}
+function zoneDwellEnd(t, z){
+  const enteredAt = t.zin && t.zin[z.id]; if(enteredAt == null) return;
+  delete t.zin[z.id];
+  if(!S.counting) return;
+  const dwell = Math.max(0, t.lastT - enteredAt); if(dwell < 0.5) return;
+  const b = zBucket(z, eventTime());
+  if(t.group === 'ped'){ b.pdw += dwell; b.pdn++; } else { b.vdw += dwell; b.vdn++; }
+}
+function updateZones(vt, removed){
+  for(const t of removed) for(const z of S.zones) zoneDwellEnd(t, z);
+  if(!S.zones.length) return;
+  const dt = S.lastZoneVT == null ? 0 : vt - S.lastZoneVT; S.lastZoneVT = vt;
+  const live = S.tracks.filter(t => t.hits >= 3 && vt - t.lastT < 0.6);
+  for(const z of S.zones){
+    let np = 0, nv = 0;
+    for(const t of live){
+      const inside = inPoly(z.pts, t.lx, t.ly);
+      t.zin = t.zin || {};
+      if(inside){
+        t.group === 'ped' ? np++ : nv++;
+        if(t.zin[z.id] == null){ t.zin[z.id] = t.lastT; if(S.counting){ const b = zBucket(z, eventTime()); t.group === 'ped' ? b.pin++ : b.vin++; } }
+      } else if(t.zin[z.id] != null && S.counting) zoneDwellEnd(t, z);
+      else if(t.zin[z.id] != null) delete t.zin[z.id];
+    }
+    z.nowP = np; z.nowV = nv;
+    if(S.counting && dt > 0 && dt < 2.5){
+      const b = zBucket(z, eventTime());
+      b.sec += dt; b.ps += np*dt; b.vs += nv*dt; b.pmax = Math.max(b.pmax, np); b.vmax = Math.max(b.vmax, nv);
+    }
+  }
+  renderZoneList();
 }
 
 function applyMatch(t, d, vt){
@@ -600,6 +716,7 @@ function applyMatch(t, d, vt){
   t.votes[d.cls] = (t.votes[d.cls] || 0) + d.score;
   t.trail.push([d.cx, d.cy]); if(t.trail.length > 60) t.trail.shift();
   updateSide(t);
+  if(t.hits >= 3) heatAdd(t);
 }
 
 // Hora real del cuadro analizado (los streams en vivo llegan con 20–60 s de retraso)
@@ -665,6 +782,29 @@ function drawLine(L, color, labels){
   tag('B', mx + nx*off, my + ny*off);
 }
 
+const ZCOL = ['#c084fc', '#38bdf8', '#f472b6', '#facc15'];
+function drawZones(W, H, k){
+  S.zones.forEach((z, i) => {
+    const col = ZCOL[i % ZCOL.length];
+    ctx.beginPath(); z.pts.forEach(([x,y], j) => j ? ctx.lineTo(x*W, y*H) : ctx.moveTo(x*W, y*H)); ctx.closePath();
+    ctx.fillStyle = col + '22'; ctx.fill(); ctx.strokeStyle = col; ctx.lineWidth = 2.5*k; ctx.stroke();
+    const cx = z.pts.reduce((a,p) => a+p[0], 0)/z.pts.length*W, cy = Math.min(...z.pts.map(p => p[1]))*H;
+    const txt = `${z.name}: ${z.nowP || 0} pers · ${z.nowV || 0} veh`;
+    ctx.font = `bold ${14*k}px system-ui`; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+    const w = ctx.measureText(txt).width + 12*k;
+    ctx.fillStyle = 'rgba(0,0,0,.65)'; ctx.fillRect(cx - w/2, cy - 22*k, w, 20*k);
+    ctx.fillStyle = col; ctx.fillText(txt, cx, cy - 5*k);
+  });
+  const d = S.zoneDraft;
+  if(S.drawMode === 'zone' && d && d.length){
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 2*k; ctx.setLineDash([6*k,4*k]); ctx.beginPath();
+    d.forEach(([x,y], j) => j ? ctx.lineTo(x*W, y*H) : ctx.moveTo(x*W, y*H));
+    if(S.dragCur) ctx.lineTo(S.dragCur.x*W, S.dragCur.y*H);
+    ctx.stroke(); ctx.setLineDash([]);
+    d.forEach(([x,y], j) => { ctx.fillStyle = j ? '#fff' : '#facc15'; ctx.beginPath(); ctx.arc(x*W, y*H, (j ? 4 : 7)*k, 0, 7); ctx.fill(); });
+  }
+}
+
 function render(){
   requestAnimationFrame(render);
   if(!S.hasSource || !video.videoWidth) return;
@@ -682,8 +822,12 @@ function render(){
     ctx.strokeStyle = COLORS.roi; ctx.lineWidth = 2*k; ctx.setLineDash([8*k,6*k]);
     ctx.strokeRect(r.x*W, r.y*H, r.w*W, r.h*H); ctx.setLineDash([]);
   }
+  if(S.heatShow !== 'off' && S.heat && heatCan.width){
+    ctx.save(); ctx.imageSmoothingEnabled = true; ctx.globalAlpha = 0.85; ctx.drawImage(heatCan, 0, 0, W, H); ctx.restore();
+  }
   if(S.lines.veh) drawLine(S.lines.veh, COLORS.veh);
   if(S.lines.ped) drawLine(S.lines.ped, COLORS.ped);
+  drawZones(W, H, k);
 
   if(S.cfg.boxes){
     ctx.lineWidth = 2*k; ctx.font = `${12*k}px system-ui`; ctx.textAlign='left'; ctx.textBaseline='bottom';
@@ -728,17 +872,59 @@ function setMode(m){
   $('btnRoi').classList.toggle('on', S.drawMode === 'roi');
   $('btnLineVeh').classList.toggle('on', S.drawMode === 'veh');
   $('btnLinePed').classList.toggle('on', S.drawMode === 'ped');
+  $('btnZone').classList.toggle('on', S.drawMode === 'zone');
+  if(S.drawMode !== 'zone') S.zoneDraft = null;
   updateGuide();
   $('hint').innerHTML = S.drawMode
-    ? (S.drawMode === 'roi' ? 'Arrastrá un rectángulo sobre la imagen útil de la cámara.' :
+    ? (S.drawMode === 'zone' ? 'Hacé clic en cada esquina de la zona. Doble clic o clic en el primer punto (amarillo) para cerrar. Esc cancela.' :
+       S.drawMode === 'roi' ? 'Arrastrá un rectángulo sobre la imagen útil de la cámara.' :
        'Arrastrá una línea que <b>atraviese</b> ' + (S.drawMode === 'veh' ? 'todos los carriles de la avenida.' : 'la senda peatonal de lado a lado.'))
     : 'Arrastrá con el mouse sobre la imagen para dibujar. El sentido de cada línea define los lados <b>A</b> y <b>B</b>.';
 }
 canvas.addEventListener('pointerdown', e => {
-  if(!S.drawMode) return; canvas.setPointerCapture(e.pointerId);
+  if(!S.drawMode || S.drawMode === 'zone') return; canvas.setPointerCapture(e.pointerId);
   S.dragStart = normPos(e); S.dragCur = S.dragStart;
 });
-canvas.addEventListener('pointermove', e => { if(S.dragStart) S.dragCur = normPos(e); });
+canvas.addEventListener('pointermove', e => { if(S.dragStart || S.drawMode === 'zone') S.dragCur = normPos(e); });
+canvas.addEventListener('click', e => {
+  if(S.drawMode !== 'zone') return;
+  const p = normPos(e), d = S.zoneDraft = S.zoneDraft || [];
+  if(d.length >= 3 && Math.hypot(p.x - d[0][0], p.y - d[0][1]) < 0.025) return closeZone();
+  d.push([p.x, p.y]);
+});
+canvas.addEventListener('dblclick', e => { if(S.drawMode === 'zone'){ e.preventDefault(); closeZone(); } });
+document.addEventListener('keydown', e => { if(e.key === 'Escape' && S.drawMode === 'zone'){ S.zoneDraft = null; setMode(null); } });
+function closeZone(){
+  let d = S.zoneDraft || [];
+  // el doble clic agrega dos puntos casi iguales al final: se depuran
+  d = d.filter((p, i) => i === 0 || Math.hypot(p[0]-d[i-1][0], p[1]-d[i-1][1]) > 0.01);
+  if(d.length >= 3){
+    const id = 'z' + Date.now().toString(36);
+    S.zones.push({id, name:'Zona ' + (S.zones.length + 1), pts:d});
+    save(); renderZoneList(); renderStats();
+  }
+  S.zoneDraft = null; setMode(null);
+}
+function renderZoneList(){
+  const el = $('zoneList');
+  if(!S.zones.length){ el.innerHTML = '<span style="color:var(--mut)">Sin zonas.</span>'; return; }
+  if(el.dataset.n == S.zones.length){ // solo actualizar los números, sin redibujar la lista
+    S.zones.forEach((z, i) => { const c = el.querySelector(`[data-now="${i}"]`); if(c) c.textContent = `${z.nowP||0} pers · ${z.nowV||0} veh`; });
+    return;
+  }
+  el.dataset.n = S.zones.length;
+  el.innerHTML = S.zones.map((z, i) => `<div class="row" style="margin:4px 0;gap:6px">
+    <span class="dot" style="background:${ZCOL[i % ZCOL.length]}"></span>
+    <input type="text" value="${z.name.replace(/"/g,'&quot;')}" data-zi="${i}" style="width:110px;padding:3px 6px">
+    <span data-now="${i}" style="color:var(--mut);flex:1">${z.nowP||0} pers · ${z.nowV||0} veh</span>
+    <button data-zdel="${i}" title="Borrar zona" style="padding:2px 8px">×</button></div>`).join('');
+  el.querySelectorAll('input[data-zi]').forEach(inp => inp.oninput = () => { S.zones[+inp.dataset.zi].name = inp.value || 'Zona'; save(); });
+  el.querySelectorAll('[data-zdel]').forEach(b => b.onclick = () => {
+    const z = S.zones[+b.dataset.zdel];
+    if(!confirm(`¿Borrar ${z.name} y sus mediciones?`)) return;
+    S.zones.splice(+b.dataset.zdel, 1); delete S.zstats[z.id]; el.dataset.n = -1; save(); renderZoneList(); renderStats();
+  });
+}
 canvas.addEventListener('pointerup', e => {
   if(!S.dragStart) return;
   const a = S.dragStart, b = normPos(e); S.dragStart = S.dragCur = null;
@@ -784,8 +970,8 @@ function checkTimer(){
   if(S.counting && S.cfg.durationMin > 0 && ms >= S.cfg.durationMin*60000){ stopCounting(); renderStats(); }
 }
 function resetData(){
-  if(!confirm('¿Borrar todos los conteos registrados? (las líneas y la zona se mantienen)')) return;
-  stopCounting(); S.events = []; S.cov = {}; S.sessionStart = null; S.accumMs = 0; S.tracks = [];
+  if(!confirm('¿Borrar todos los conteos, zonas medidas y el mapa de calor? (lo dibujado se mantiene)')) return;
+  stopCounting(); S.events = []; S.cov = {}; S.zstats = {}; S.heat = null; S.sessionStart = null; S.accumMs = 0; S.tracks = [];
   $('log').innerHTML = ''; save(); renderStats();
 }
 function updateButtons(){
@@ -847,6 +1033,34 @@ function renderStats(){
   ).join('') || '<tr><td colspan="9" style="text-align:left;color:var(--mut)">Todavía no hay conteos.</td></tr>';
   $('peakInfo').textContent = peak && peak.veh > 0 ? ` · pico vehicular ${fmtT(peak.from)}–${fmtT(peak.to)} (${peak.veh})` : '';
   drawChart(buckets);
+  renderZoneTable();
+}
+
+function zoneBuckets(){
+  const size = S.cfg.bucket*60000, rows = [];
+  S.zones.forEach(z => {
+    const zs = S.zstats[z.id] || {}, map = new Map();
+    for(const k in zs){
+      const bk = Math.floor(k/size)*size, a = zs[k];
+      const b = map.get(bk) || {zone:z.name, from:bk, to:bk+size, sec:0, ps:0, vs:0, pmax:0, vmax:0, pin:0, vin:0, pdw:0, pdn:0, vdw:0, vdn:0};
+      for(const f of ['sec','ps','vs','pin','vin','pdw','pdn','vdw','vdn']) b[f] += a[f];
+      b.pmax = Math.max(b.pmax, a.pmax); b.vmax = Math.max(b.vmax, a.vmax);
+      map.set(bk, b);
+    }
+    rows.push(...map.values());
+  });
+  return rows.sort((a,b) => b.from - a.from || a.zone.localeCompare(b.zone));
+}
+const fmtDur = s => s >= 60 ? `${Math.floor(s/60)} min ${Math.round(s%60)} s` : `${Math.round(s)} s`;
+function renderZoneTable(){
+  $('zoneCard').hidden = !S.zones.length;
+  if(!S.zones.length) return;
+  const rows = zoneBuckets();
+  const avg = (x, b) => b.sec ? (x/b.sec).toFixed(1).replace('.', ',') : '–';
+  $('tbZones').innerHTML = rows.map(b => `<tr><td>${b.zone}</td><td>${fmtD(b.from)} ${fmtT(b.from)} – ${fmtT(b.to)}</td>
+    <td><b>${avg(b.ps, b)}</b></td><td>${b.pmax}</td><td>${b.pin}</td><td>${b.pdn ? fmtDur(b.pdw/b.pdn) : '–'}</td>
+    <td>${avg(b.vs, b)}</td><td>${b.vmax}</td><td>${b.vin}</td><td>${b.vdn ? fmtDur(b.vdw/b.vdn) : '–'}</td></tr>`).join('')
+    || '<tr><td colspan="10" style="text-align:left;color:var(--mut)">Iniciá el conteo para medir las zonas.</td></tr>';
 }
 
 function drawChart(buckets){
@@ -893,6 +1107,24 @@ $('btnCsvBuckets').onclick = () => {
   for(const b of buildBuckets()) rows.push([fmtD(b.from), fmtT(b.from), fmtT(b.to), b.car, b.motorcycle, b.truck, b.bus, b.veh, b.person, b.bicycle, pct(b.cov), perH(b.veh, b), perH(b.person, b)]);
   downloadCsv(`conteo_intervalos_${S.cfg.bucket}min_${stamp()}.csv`, rows);
 };
+$('btnCsvZones').onclick = () => {
+  const n = v => String(Math.round(v*10)/10).replace('.', ',');
+  const rows = [['Zona','Fecha','Desde','Hasta','Segundos medidos','Personas promedio','Personas máx.','Ingresos personas','Permanencia media personas (s)','Vehículos promedio','Vehículos máx.','Ingresos vehículos','Permanencia media vehículos (s)']];
+  for(const b of zoneBuckets().reverse()) rows.push([b.zone, fmtD(b.from), fmtT(b.from), fmtT(b.to), Math.round(b.sec),
+    b.sec ? n(b.ps/b.sec) : '', b.pmax, b.pin, b.pdn ? n(b.pdw/b.pdn) : '', b.sec ? n(b.vs/b.sec) : '', b.vmax, b.vin, b.vdn ? n(b.vdw/b.vdn) : '']);
+  downloadCsv(`zonas_${S.cfg.bucket}min_${stamp()}.csv`, rows);
+};
+$('btnPng').onclick = () => {
+  if(!S.hasSource || !video.videoWidth) return alert('Primero abrí una cámara.');
+  if(S.heatShow !== 'off') renderHeat();
+  const c = document.createElement('canvas'); c.width = video.videoWidth; c.height = video.videoHeight;
+  const g = c.getContext('2d'); g.drawImage(video, 0, 0); g.drawImage(canvas, 0, 0);
+  c.toBlob(b => { const a = document.createElement('a'); a.href = URL.createObjectURL(b);
+    a.download = `transito_${S.heatShow !== 'off' ? 'calor_' + S.heatShow + '_' : ''}${stamp()}.png`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); }, 'image/png');
+};
+$('btnZone').onclick = () => setMode('zone');
+$('selHeat').onchange = e => { S.heatShow = e.target.value; if(S.heatShow !== 'off') renderHeat(); save(); };
+
 $('btnCsvEvents').onclick = () => {
   const rows = [['Fecha','Hora','Línea','Categoría','Sentido']];
   for(const ev of S.events) rows.push([fmtD(ev.t), new Date(ev.t).toLocaleTimeString('es-AR'), ev.line === 'veh' ? 'Avenida' : 'Senda', CAT_NAME[ev.cls], dirLabel(ev)]);
@@ -936,14 +1168,16 @@ $('inpFile').onchange = e => openFile(e.target.files[0]);
 $('btnRoi').onclick = () => setMode('roi');
 $('btnLineVeh').onclick = () => setMode('veh');
 $('btnLinePed').onclick = () => setMode('ped');
-$('btnClearGeo').onclick = () => { S.roi = null; S.lines = {veh:null, ped:null}; S.tracks = []; save(); updateButtons(); if(S.hasSource) setMode('roi'); updateGuide(); };
+$('btnClearGeo').onclick = () => { if(S.zones.length && !confirm('¿Borrar también las zonas?')) {} else { S.zones = []; S.zstats = {}; renderZoneList(); }
+  S.roi = null; S.lines = {veh:null, ped:null}; S.tracks = []; save(); renderStats(); updateButtons(); if(S.hasSource) setMode('roi'); updateGuide(); };
 $('btnStart').onclick = startCounting;
 $('btnStop').onclick = () => { stopCounting(); save(); };
 $('btnReset').onclick = resetData;
 window.addEventListener('resize', () => renderStats());
 
 // Inicio
-load(); bindCfg(); updateHeaders(); renderStats();
+load(); bindCfg(); updateHeaders(); renderStats(); renderZoneList();
+$('selHeat').value = S.heatShow; if(S.heatShow !== 'off') renderHeat();
 S.events.slice(-50).forEach(addLog);
 setTicker(); requestAnimationFrame(render); loadModel();
 setInterval(renderStats, 30000); // refresca intervalos vacíos
