@@ -460,14 +460,195 @@ body{background:var(--paper);color:var(--ink)}
 .wa:focus-visible{outline:2.5px solid #fff;outline-offset:3px}
 @media (max-width:620px){.wa{right:14px;bottom:14px;padding:14px} .wa span{display:none}}
 @media print{.wa{display:none}}
+
+/* =====================================================================
+   Rediseño nov 2026 · correcciones del diagnóstico
+   ===================================================================== */
+
+/* 1 · contraste: textos secundarios, etiquetas y links legibles en oscuro */
+:root{ --muted:#A7B6C3; --link:#8ED0DC; }
+.tag{color:#A7B6C3;border-color:#2E3844}
+.tag--free{color:#F29A73;border-color:#B84A22}
+.hero__note{color:rgba(255,255,255,.66)}
+.show__note{color:rgba(255,255,255,.6)}
+.slide__pie{color:rgba(255,255,255,.78)}
+.dl a,.bio__li{color:var(--link)}
+.bio__li{border-bottom-color:#2E3844;min-height:44px;align-items:center;padding:0;margin-top:4px}
+.wa{background:#0E7A3E}
+.wa:hover{background:#0B6633}
+
+/* 2 · el contenido se ve aunque falle el script: solo se oculta con html.js */
+.rv,.rv.in{opacity:1;transform:none;transition:none}  /* sin fundido al hacer scroll: todo visible siempre */
+
+/* 3 · carrusel: todas las láminas en la misma celda, el alto lo da la más alta (nada se corta) */
+.show__stage{display:grid;min-height:0}
+.slide{position:relative;inset:auto;grid-area:1/1}
+@media (max-width:760px){.show__stage{min-height:0}}
+
+/* 4 · franja de números dentro de la grilla del sitio
+   (el error original: ".proof div" también le pisaba el margen al contenedor) */
+.proof .proof__in{padding:0 24px}
+.proof__in > div{padding:22px 16px 24px 0}
+.proof__in > div + div{padding-left:20px}
+@media (max-width:760px){
+  .proof__in > div{padding:18px 12px 20px 0}
+  .proof__in > div:nth-child(2n){padding-left:16px;border-left:1px solid rgba(255,255,255,.12)}
+  .proof__in > div:nth-child(2n+1){padding-left:0;border-left:none}
+}
+
+/* 5 · nada se sale de pantalla a 320 px */
+.contact{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.f2{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.fld{min-width:0}
+.fld input,.fld textarea,.fld select{width:100%;min-width:0}
+@media(max-width:960px){.contact{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:640px){.f2{grid-template-columns:minmax(0,1fr)}}
+.dl dd{min-width:0;overflow-wrap:anywhere}
+
+/* 6 · teléfonos: dos botones separados, fáciles de tocar */
+.tels{display:flex;flex-direction:column;gap:8px}
+.tels a{display:flex;align-items:center;min-height:44px;padding:0 14px;border:1px solid #2E3844;
+  border-radius:6px;text-decoration:none;color:var(--ink);transition:border-color .15s}
+.tels a:hover{border-color:var(--link)}
+.tels a{gap:12px}
+.tels small{color:var(--muted);margin-left:auto;font-size:.76rem}
+
+/* 7 · WhatsApp: botón redondo compacto y aire al final para que no tape texto */
+.wa{padding:14px;border-radius:50%}
+.wa span{display:none}
+.foot{padding-bottom:96px}
+
+/* 8 · socios con foto real, a tamaño de lectura */
+.socios{gap:28px}
+.bio{grid-template-columns:168px 1fr;gap:24px}
+.bio__ph{padding:0;background:none;border:none;border-radius:10px}
+.bio__ph img{width:100%;height:100%;object-fit:cover;opacity:1;border-radius:10px}
+@media(max-width:640px){.bio{grid-template-columns:120px 1fr;gap:16px}.bio__ph{max-width:none}}
+
+/* 9 · menos tarjetas: listas abiertas con línea divisoria */
+.list2{display:grid;grid-template-columns:1fr 1fr;column-gap:56px;border-top:1.5px solid var(--act)}
+.li2{display:grid;grid-template-columns:44px 1fr;gap:6px 14px;padding:22px 0 24px;border-bottom:1px solid var(--line)}
+.li2__n{font-family:var(--mono);font-size:.74rem;font-weight:600;color:var(--cyan);padding-top:4px}
+.li2 h3{font-family:var(--disp);font-weight:700;font-size:1.08rem;color:var(--navy);margin:0 0 6px;letter-spacing:-.012em}
+.li2 p{margin:0;font-size:.92rem;color:var(--muted)}
+.li2 ul{margin:12px 0 0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:6px}
+.li2 li{font-size:.78rem;color:#C9D4DD;border:1px solid #2E3844;border-radius:999px;padding:3px 11px}
+@media(max-width:760px){.list2{grid-template-columns:1fr}}
+
+/* 10 · fotos de sección */
+.mercado__grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:56px;align-items:start}
+.foto{position:relative;margin:0;border-radius:10px;overflow:hidden;background:
+  linear-gradient(135deg,rgba(79,195,208,.10),rgba(184,74,34,.10)),#10161E;border:1.5px dashed #3A4655;
+  display:grid;place-items:center;text-align:center;padding:20px}
+.foto span{font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:#A7B6C3;max-width:26ch;line-height:1.6}
+.foto--alta{aspect-ratio:1/1}
+.list1{grid-template-columns:1fr}
+.who3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.who3 .foto{aspect-ratio:4/3;margin-bottom:16px}
+.who3 h3{font-family:var(--disp);font-weight:700;font-size:1.02rem;color:var(--navy);margin:0 0 6px}
+.who3 p{margin:0;font-size:.9rem;color:var(--muted)}
+@media(max-width:960px){.mercado__grid{grid-template-columns:1fr;gap:32px}.foto--alta{aspect-ratio:4/3}}
+@media(max-width:760px){.who3{grid-template-columns:1fr;gap:28px}}
+
+/* foco con teclado: nunca queda escondido bajo la barra fija */
+html{scroll-padding-top:64px;scroll-padding-bottom:90px}
+/* al saltar desde el menú, el título queda cerca de la barra: se "come" parte del margen superior de la sección */
+.sec,.diag{scroll-margin-top:-50px}
+@media(max-width:760px){.sec,.diag{scroll-margin-top:-34px}}
+@media(max-width:400px){.nav__in{gap:12px;padding:10px 16px}.nav .btn--sm{padding:9px 11px;font-size:.74rem}}
+.foto--img{padding:0;border:none;background:#10161E;display:block}
+.foto--img img{width:100%;height:100%;object-fit:cover;display:block}
+/* lámina 1 · relevamiento de precios (rediseño) */
+.pc__kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.pc__kpis div{border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:10px 12px;background:rgba(255,255,255,.02)}
+.pc__kpis span{display:block;font-size:.68rem;color:rgba(255,255,255,.62);line-height:1.3}
+.pc__kpis b{display:block;font-family:var(--disp);font-weight:800;font-size:1.45rem;letter-spacing:-.03em;color:#fff;margin-top:4px;font-variant-numeric:tabular-nums}
+.pc__kpis b i{font-style:normal;font-size:.8rem;font-weight:600;color:rgba(255,255,255,.55);margin-left:2px}
+.pc__kpis em{display:block;font-style:normal;font-family:var(--mono);font-size:.64rem;color:rgba(255,255,255,.6);margin-top:2px}
+.pc__kpis em[data-alto],.pc__distl [data-alto]{color:#F29A73}
+.pc__svg{width:100%;height:auto;display:block}
+.pc__grid line{stroke:rgba(255,255,255,.08);stroke-width:1}
+.pc__grid text,.pc__x text{fill:rgba(255,255,255,.6);font-family:var(--mono);font-size:10px}
+@media(max-width:560px){.pc__grid text,.pc__x text{font-size:12.5px}}
+.pc__grid text{text-anchor:end}.pc__x text{text-anchor:middle}
+.pc__grid .pc__100{fill:rgba(255,255,255,.85)}
+.pc__band{fill:rgba(79,195,208,.14);stroke:rgba(79,195,208,.35);stroke-width:1}
+.pc__mkt{stroke:rgba(255,255,255,.7);stroke-width:1.3;stroke-dasharray:4 4}
+.pc__tu{fill:none;stroke:#E8835A;stroke-width:2.6;stroke-linejoin:round;stroke-linecap:round}
+.pc__dot{fill:#E8835A;stroke:#0b0e12;stroke-width:2}
+.pc__leg{display:flex;flex-wrap:wrap;gap:6px 16px;margin:8px 0 14px;font-size:.68rem;color:rgba(255,255,255,.66)}
+.pc__leg i{display:inline-block;width:14px;height:3px;border-radius:2px;margin-right:6px;vertical-align:middle}
+.pc__leg i[data-tu]{background:#E8835A}
+.pc__leg i[data-mk]{background:repeating-linear-gradient(90deg,rgba(255,255,255,.75) 0 4px,transparent 4px 7px)}
+.pc__leg i[data-bd]{height:8px;background:rgba(79,195,208,.25);border:1px solid rgba(79,195,208,.5)}
+.pc__dist{display:flex;gap:2px;height:8px;border-radius:4px;overflow:hidden}
+.pc__dist i[data-k=mb]{background:#2C8F9C}.pc__dist i[data-k=b]{background:#4FC3D0}
+.pc__dist i[data-k=l]{background:#5FB894}.pc__dist i[data-k=a]{background:#E8835A}.pc__dist i[data-k=ma]{background:#B84A22}
+.pc__distl{display:flex;justify-content:space-between;margin-top:6px;font-family:var(--mono);font-size:.64rem;color:rgba(255,255,255,.62)}
+@media(max-width:420px){.pc__kpis{gap:6px}.pc__kpis div{padding:8px}.pc__kpis b{font-size:1.15rem}}
+/* lámina 2 · mercado por zona (rediseño) */
+.zn__h,.zn__r{display:grid;grid-template-columns:92px 1fr 42px 30px 78px;gap:10px;align-items:center}
+.zn__h{font-family:var(--mono);font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.5);
+  padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.1);margin-bottom:4px}
+.zn__h span:nth-child(n+3){text-align:right}
+.zn{display:grid}
+.zn__r{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.zn__n{font-size:.82rem;color:rgba(255,255,255,.9)}
+.zn__b{display:block}
+.zn__m{display:block;height:12px;background:rgba(255,255,255,.12);border-radius:3px;overflow:hidden}
+.zn__m i{display:block;height:100%;background:linear-gradient(90deg,#2C8F9C,#8ED0DC)}
+.zn__r b{font-family:var(--disp);font-weight:700;font-size:.9rem;color:#fff;text-align:right;font-variant-numeric:tabular-nums}
+.zn__r b small{font-size:.7rem;opacity:.6}
+.zn__r em{font-style:normal;font-family:var(--mono);font-size:.68rem;text-align:right;color:rgba(255,255,255,.55)}
+.zn__r em[data-up]{color:#7FD4B0}.zn__r em[data-dn]{color:#F29A73}
+.zn__s{font-family:var(--mono);font-size:.7rem;text-align:right;color:rgba(255,255,255,.72);white-space:nowrap}
+.pc__leg i[data-tu2]{height:8px;background:linear-gradient(90deg,#2C8F9C,#8ED0DC)}
+.pc__leg i[data-mk2]{height:8px;background:rgba(255,255,255,.18)}
+@media(max-width:520px){
+  .zn__h,.zn__r{grid-template-columns:74px 1fr 36px 28px;gap:7px}
+  .zn__h span:last-child,.zn__s{display:none}
+  .zn__n{font-size:.74rem}
+}
+.pc__kpis b{white-space:nowrap}
+@media(max-width:520px){.pc__kpis b{font-size:1.08rem}.zn__h,.zn__r{grid-template-columns:86px 1fr 36px 28px}.zn__n{font-size:.72rem}}
+/* lámina 3 · tablero (rediseño) */
+.tb__kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.tb__kpis div{border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:9px 10px;background:rgba(255,255,255,.02)}
+.tb__kpis span{display:block;font-size:.64rem;color:rgba(255,255,255,.62);line-height:1.25;min-height:2.5em}
+.tb__kpis b{display:block;font-family:var(--disp);font-weight:800;font-size:1.2rem;color:#fff;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.tb__kpis b i{font-style:normal;font-size:.72rem;opacity:.6;margin-left:1px}
+.tb__kpis em{display:block;font-style:normal;font-family:var(--mono);font-size:.62rem;margin-top:2px}
+.tb__kpis em[data-up]{color:#7FD4B0}.tb__kpis em[data-dn]{color:#F29A73}
+.tb__sp{display:block;width:100%;height:18px;margin-top:5px;overflow:visible}
+.tb__sp polyline{fill:none;stroke:#7FD4B0;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}
+.tb__sp[data-dn] polyline{stroke:#E8835A}
+.tb__ch{display:flex;justify-content:space-between;font-size:.7rem;color:rgba(255,255,255,.62);margin-bottom:4px}
+.tb__ch span:first-child{color:rgba(255,255,255,.9);font-weight:600}
+.tb__obj{stroke:rgba(255,255,255,.7);stroke-width:1.3;stroke-dasharray:4 4}
+.tb__ant{fill:none;stroke:rgba(255,255,255,.38);stroke-width:1.6;stroke-linejoin:round}
+.tb__mg{fill:none;stroke:#5FB894;stroke-width:2.6;stroke-linejoin:round;stroke-linecap:round}
+.tb__dot{fill:#5FB894;stroke:#0b0e12;stroke-width:2}
+.pc__leg i[data-mg]{background:#5FB894}.pc__leg i[data-an]{background:rgba(255,255,255,.4)}
+.pc__leg i[data-ob]{background:repeating-linear-gradient(90deg,rgba(255,255,255,.75) 0 4px,transparent 4px 7px)}
+.tb__alert{display:flex;gap:10px;align-items:baseline;border:1px solid rgba(232,131,90,.45);background:rgba(232,131,90,.08);
+  border-radius:6px;padding:8px 11px;font-size:.74rem;color:rgba(255,255,255,.86);line-height:1.4}
+.tb__alert b{font-family:var(--mono);font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:#F29A73;flex:none}
+@media(max-width:520px){.tb__kpis{grid-template-columns:1fr 1fr}.tb__kpis span{min-height:0}}
+/* investigación de mercado: la foto acompaña el alto de la lista */
+@media(min-width:961px){
+  .mercado__grid{align-items:stretch;grid-template-columns:1fr 1fr;gap:48px}
+  .mercado__grid .foto--alta{aspect-ratio:auto;height:auto;min-height:100%;position:relative;border-top:1.5px solid var(--act);border-radius:0 0 10px 10px}
+  .mercado__grid .foto--alta img{position:absolute;inset:0}
+}
 </style>
 <meta name="robots" content="index,follow">
+<script>document.documentElement.classList.add("js")</script>
 </head>
 <body>
 
 <header class="nav" id="nav">
   <div class="nav__in">
-    <a class="nav__brand" href="#top"><img src="/logomark.png" alt=""><b>CRITERYA</b></a>
+    <a class="nav__brand" href="#top"><img src="/logomark.png" alt="" width="27" height="27"><b>CRITERYA</b></a>
     <nav class="nav__links">
       <a href="#diagnosticos">Diagnósticos</a>
       <a href="#mercado">Mercado</a>
@@ -512,52 +693,84 @@ body{background:var(--paper);color:var(--ink)}
 
           <figure class="slide" data-on>
             <figcaption class="slide__cap"><b>Relevamiento de precios</b>
-              <span>Cincuenta referencias comparadas contra la competencia</span></figcaption>
-            <div class="hist">
-              <div class="hist__c"><b>3</b><i style="height:13%"></i><span>Muy por<br>debajo</span></div>
-              <div class="hist__c"><b>8</b><i style="height:33%"></i><span>Por<br>debajo</span></div>
-              <div class="hist__c" data-eje><b>24</b><i style="height:100%"></i><span>En línea<br>con el mercado</span></div>
-              <div class="hist__c" data-alto><b>11</b><i style="height:46%"></i><span>Por<br>encima</span></div>
-              <div class="hist__c" data-alto><b>4</b><i style="height:17%"></i><span>Muy por<br>encima</span></div>
+              <span>Tu índice de precio contra 6 competidores · últimos 12 meses</span></figcaption>
+            <div class="pc__kpis">
+              <div><span>Tu índice hoy</span><b>104,6</b><em data-alto>+7,4 pts en 12 meses</em></div>
+              <div><span>Por encima del mercado</span><b>15<i>/50</i></b><em>referencias</em></div>
+              <div><span>Brecha con el más barato</span><b>8,8<i>%</i></b><em>promedio ponderado</em></div>
             </div>
-            <p class="slide__pie">Quince de cincuenta: tres de cada diez referencias están por encima
-            del mercado. El relevamiento dice cuáles, para decidir una por una.</p>
+            <svg class="pc__svg" viewBox="0 0 400 172" role="img" aria-label="Índice de precio propio contra el promedio del mercado, diciembre a noviembre: pasa de 97,2 a 104,6 mientras la competencia se mueve entre 94 y 108">
+              <g class="pc__grid"><line x1="34" x2="376" y1="136.2" y2="136.2"/><text x="26" y="139.7">92</text><line x1="34" x2="376" y1="108.6" y2="108.6"/><text x="26" y="112.1">96</text><line x1="34" x2="376" y1="53.4" y2="53.4"/><text x="26" y="56.9">104</text><line x1="34" x2="376" y1="25.8" y2="25.8"/><text x="26" y="29.3">108</text><text x="26" y="84.5" class="pc__100">100</text></g>
+              <polygon class="pc__band" points="34.0,43.0 65.1,41.0 96.2,39.6 127.3,41.7 158.4,37.5 189.5,35.5 220.5,38.2 251.6,34.1 282.7,32.0 313.8,32.7 344.9,29.9 376.0,28.6 376.0,110.0 344.9,111.4 313.8,114.8 282.7,112.7 251.6,114.1 220.5,117.6 189.5,115.5 158.4,116.9 127.3,118.3 96.2,121.7 65.1,120.3 34.0,122.4"/>
+              <line class="pc__mkt" x1="34" x2="376" y1="81.0" y2="81.0"/>
+              <polyline class="pc__tu" points="34.0,100.3 65.1,96.2 96.2,94.1 127.3,87.9 158.4,85.1 189.5,76.9 220.5,72.7 251.6,67.9 282.7,61.7 313.8,58.2 344.9,52.7 376.0,49.3"/>
+              <circle class="pc__dot" cx="376.0" cy="49.3" r="4"/>
+              <g class="pc__x"><text x="34.0" y="166">dic</text><text x="127.3" y="166">mar</text><text x="220.5" y="166">jun</text><text x="313.8" y="166">sep</text><text x="376.0" y="166">nov</text></g>
+            </svg>
+            <div class="pc__leg"><span><i data-tu></i>Tu precio</span><span><i data-mk></i>Promedio del mercado = 100</span><span><i data-bd></i>Rango de la competencia</span></div>
+            <div class="pc__dist" aria-label="Distribución de las 50 referencias: 3 muy por debajo, 8 por debajo, 24 en línea, 11 por encima, 4 muy por encima">
+              <i style="flex:3" data-k="mb"></i><i style="flex:8" data-k="b"></i><i style="flex:24" data-k="l"></i><i style="flex:11" data-k="a"></i><i style="flex:4" data-k="ma"></i>
+            </div>
+            <div class="pc__distl"><span>11 por debajo</span><span>24 en línea</span><span data-alto>15 por encima</span></div>
+            <p class="slide__pie">En un año los precios se fueron despegando del mercado sin que nadie lo decidiera.
+            El relevamiento dice en qué referencias, para corregir una por una.</p>
           </figure>
 
           <figure class="slide">
             <figcaption class="slide__cap"><b>Cuánto mercado hay en tu zona</b>
-              <span>Participación estimada y potencial sin tomar</span></figcaption>
-            <div class="zon">
-              <div class="zon__r"><span>Tandil</span><span class="zon__b"><i style="width:38%"></i></span><b>38%</b></div>
-              <div class="zon__r"><span>Rauch</span><span class="zon__b"><i style="width:47%"></i></span><b>47%</b></div>
-              <div class="zon__r"><span>Azul</span><span class="zon__b"><i style="width:22%"></i></span><b>22%</b></div>
-              <div class="zon__r"><span>Olavarría</span><span class="zon__b"><i style="width:11%"></i></span><b>11%</b></div>
-              <div class="zon__r"><span>Benito Juárez</span><span class="zon__b"><i style="width:6%"></i></span><b>6%</b></div>
+              <span>Mercado estimado por plaza y tu participación · millones de pesos por año</span></figcaption>
+            <div class="pc__kpis">
+              <div><span>Tu participación regional</span><b>25,5<i>%</i></b><em data-up>+2,1 pts en 12 meses</em></div>
+              <div><span>Mercado estimado</span><b>$&nbsp;2.520<i>M</i></b><em>5 plazas relevadas</em></div>
+              <div><span>Potencial sin tomar</span><b>$&nbsp;1.877<i>M</i></b><em data-alto>36 % está en Olavarría</em></div>
             </div>
-            <div class="zon__leg"><span><i data-f></i>Tu participación</span><span><i></i>Mercado sin tomar</span></div>
-            <p class="slide__pie">Dónde ya sos fuerte y dónde hay mercado disponible, con nombre y
-            con número. No la misma estrategia para todas las plazas.</p>
+            <div class="zn__h"><span>Plaza</span><span>Mercado y tu parte</span><span>Part.</span><span>12 m</span><span>Sin tomar</span></div>
+            <div class="zn">
+<div class="zn__r"><span class="zn__n">Tandil</span>
+                <span class="zn__b"><span class="zn__m" style="width:100.0%"><i style="width:38%"></i></span></span>
+                <b>38<small>%</small></b><em data-up>+3</em><span class="zn__s">$ 608 M</span></div>
+<div class="zn__r"><span class="zn__n">Olavarría</span>
+                <span class="zn__b"><span class="zn__m" style="width:77.6%"><i style="width:11%"></i></span></span>
+                <b>11<small>%</small></b><em data-up>+4</em><span class="zn__s">$ 676 M</span></div>
+<div class="zn__r"><span class="zn__n">Azul</span>
+                <span class="zn__b"><span class="zn__m" style="width:53.1%"><i style="width:22%"></i></span></span>
+                <b>22<small>%</small></b><em data-dn>−2</em><span class="zn__s">$ 406 M</span></div>
+<div class="zn__r"><span class="zn__n">Rauch</span>
+                <span class="zn__b"><span class="zn__m" style="width:14.3%"><i style="width:47%"></i></span></span>
+                <b>47<small>%</small></b><em data-up>+1</em><span class="zn__s">$ 74 M</span></div>
+<div class="zn__r"><span class="zn__n">Benito&nbsp;Juárez</span>
+                <span class="zn__b"><span class="zn__m" style="width:12.2%"><i style="width:6%"></i></span></span>
+                <b>6<small>%</small></b><em>±0</em><span class="zn__s">$ 113 M</span></div>
+            </div>
+            <div class="pc__leg"><span><i data-tu2></i>Tus ventas</span><span><i data-mk2></i>Resto del mercado</span><span>Largo de la barra = tamaño de la plaza</span></div>
+            <p class="slide__pie">Olavarría es la segunda plaza en tamaño y ahí tenés el 11 %. No es la misma
+            estrategia que en Rauch, donde ya sos casi la mitad del mercado.</p>
           </figure>
 
           <figure class="slide">
             <figcaption class="slide__cap"><b>Tablero de indicadores</b>
-              <span>Lo que deberías poder mirar cualquier lunes</span></figcaption>
-            <div class="kpis">
-              <div class="kpi3"><span>Margen bruto</span><b>31,4<i>%</i></b>
-                <svg class="spark" viewBox="0 0 90 26" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,20 15,18 30,19 45,14 60,12 75,9 90,6"/></svg>
-                <em data-up>+1,2 pts</em></div>
-              <div class="kpi3"><span>Mora a 60 días</span><b>7,8<i>%</i></b>
-                <svg class="spark" data-dn viewBox="0 0 90 26" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,6 15,9 30,8 45,13 60,15 75,18 90,20"/></svg>
-                <em data-up>−2,1 pts</em></div>
-              <div class="kpi3"><span>Rotación de stock</span><b>4,6<i>×</i></b>
-                <svg class="spark" viewBox="0 0 90 26" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,18 15,16 30,17 45,13 60,11 75,10 90,7"/></svg>
-                <em data-up>+0,4</em></div>
-              <div class="kpi3"><span>Entregas en fecha</span><b>86<i>%</i></b>
-                <svg class="spark" data-dn viewBox="0 0 90 26" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,7 15,6 30,10 45,9 60,14 75,13 90,17"/></svg>
-                <em data-dn>−3 pts</em></div>
+              <span>Lo que deberías poder mirar cualquier lunes · noviembre</span></figcaption>
+            <div class="tb__kpis">
+              <div><span>Margen bruto</span><b>31,4<i>%</i></b><svg class="tb__sp" viewBox="0 0 60 18" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,14 10,13 20,15 30,11 40,9 50,7 60,5"/></svg><em data-up>+2,3 pts</em></div>
+              <div><span>Mora a 60 días</span><b>7,8<i>%</i></b><svg class="tb__sp" viewBox="0 0 60 18" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,4 10,6 20,5 30,9 40,11 50,13 60,15"/></svg><em data-up>−2,1 pts</em></div>
+              <div><span>Rotación de stock</span><b>4,6<i>×</i></b><svg class="tb__sp" viewBox="0 0 60 18" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,14 10,12 20,13 30,10 40,8 50,8 60,5"/></svg><em data-up>+0,4</em></div>
+              <div><span>Entregas en fecha</span><b>86<i>%</i></b><svg class="tb__sp" data-dn viewBox="0 0 60 18" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,5 10,4 20,7 30,6 40,10 50,11 60,14"/></svg><em data-dn>−3 pts</em></div>
             </div>
-            <p class="slide__pie">Actualizado sobre tu propio sistema de gestión. Uno se mueve hacia
-            el lado equivocado: eso es lo que hay que mirar el lunes.</p>
+            <div class="tb__ch"><span>Margen bruto mensual</span><span>vs. objetivo y año anterior</span></div>
+            <svg class="pc__svg" viewBox="0 0 400 140" role="img" aria-label="Margen bruto mensual de diciembre a noviembre: sube de 29,1 % a 31,4 %, por encima del objetivo de 30 % desde junio y por encima del año anterior">
+              <defs><linearGradient id="tbg" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#5FB894" stop-opacity=".28"/><stop offset="1" stop-color="#5FB894" stop-opacity="0"/></linearGradient></defs>
+              <g class="pc__grid"><line x1="34" x2="376" y1="100.0" y2="100.0"/><text x="26" y="103.5">28%</text><line x1="34" x2="376" y1="28.0" y2="28.0"/><text x="26" y="31.5">32%</text><text x="26" y="67.5" class="pc__100">30%</text></g>
+              <polygon points="34.0,118 34.0,80.2 65.1,74.8 96.2,85.6 127.3,71.2 158.4,60.4 189.5,65.8 220.5,56.8 251.6,49.6 282.7,55.0 313.8,46.0 344.9,42.4 376.0,38.8 376.0,118" fill="url(#tbg)"/>
+              <line class="tb__obj" x1="34" x2="376" y1="64.0" y2="64.0"/>
+              <polyline class="tb__ant" points="34.0,89.2 65.1,83.8 96.2,92.8 127.3,87.4 158.4,82.0 189.5,85.6 220.5,80.2 251.6,76.6 282.7,82.0 313.8,78.4 344.9,74.8 376.0,80.2"/>
+              <polyline class="tb__mg" points="34.0,80.2 65.1,74.8 96.2,85.6 127.3,71.2 158.4,60.4 189.5,65.8 220.5,56.8 251.6,49.6 282.7,55.0 313.8,46.0 344.9,42.4 376.0,38.8"/>
+              <circle class="tb__dot" cx="376.0" cy="38.8" r="4"/>
+              <g class="pc__x"><text x="34.0" y="134">dic</text><text x="127.3" y="134">mar</text><text x="220.5" y="134">jun</text><text x="313.8" y="134">sep</text><text x="376.0" y="134">nov</text></g>
+            </svg>
+            <div class="pc__leg"><span><i data-mg></i>Este año</span><span><i data-an></i>Año anterior</span><span><i data-ob></i>Objetivo 30 %</span></div>
+            <div class="tb__alert"><b>Alerta</b><span>Entregas en fecha bajó por tercer mes seguido: de 92 % a 86 %.</span></div>
+            <p class="slide__pie">Armado sobre tu propio sistema de gestión. Tres indicadores mejoran y uno se
+            mueve hacia el lado equivocado: eso es lo que hay que mirar el lunes.</p>
           </figure>
         </div>
         <div class="show__nav">
@@ -649,31 +862,22 @@ body{background:var(--paper);color:var(--ink)}
         <p>El diagnóstico mira la empresa por dentro. Para decidir dónde abrir, qué línea sumar o
         cómo mover los precios hace falta salir a buscar el dato afuera.</p>
       </div>
-      <div class="svcs">
-        <article class="svc">
-          <span class="svc__tag">Competencia</span>
-          <h3>Quién más juega y a qué precio</h3>
-          <p>Relevamiento sistemático de competidores directos: surtido, precios, condiciones de
-          venta y posicionamiento. Comparado contra tu propia estructura.</p>
-        </article>
-        <article class="svc">
-          <span class="svc__tag">Clientes</span>
-          <h3>Por qué compran y por qué dejaron de comprar</h3>
-          <p>Encuestas y entrevistas a clientes activos y perdidos. Los que se fueron suelen
-          explicar mejor el problema que los que se quedaron.</p>
-        </article>
-        <article class="svc">
-          <span class="svc__tag">Demanda</span>
-          <h3>Cuánto mercado hay en tu zona</h3>
-          <p>Dimensionamiento por zona y segmento con datos públicos y relevamiento propio, para
-          saber qué participación tenés y cuánto queda por tomar.</p>
-        </article>
-        <article class="svc">
-          <span class="svc__tag">Decisión</span>
-          <h3>Un informe que se pueda usar</h3>
-          <p>Conclusiones accionables con su fundamento a la vista, no un documento de cien
-          páginas que termina en un cajón.</p>
-        </article>
+      <div class="mercado__grid">
+        <figure class="foto foto--alta foto--img"><img src="/f-mercado.jpg" alt="Pasillo de supermercado con mapa de calor del recorrido de los clientes y paneles de tránsito y productos más comprados" width="960" height="960" loading="lazy" decoding="async"></figure>
+        <div class="list2 list1">
+          <div class="li2"><span class="li2__n">01</span><div><h3>Quién más juega y a qué precio</h3>
+            <p>Relevamiento sistemático de competidores directos: surtido, precios, condiciones de
+            venta y posicionamiento. Comparado contra tu propia estructura.</p></div></div>
+          <div class="li2"><span class="li2__n">02</span><div><h3>Por qué compran y por qué dejaron de comprar</h3>
+            <p>Encuestas y entrevistas a clientes activos y perdidos. Los que se fueron suelen
+            explicar mejor el problema que los que se quedaron.</p></div></div>
+          <div class="li2"><span class="li2__n">03</span><div><h3>Cuánto mercado hay en tu zona</h3>
+            <p>Dimensionamiento por zona y segmento con datos públicos y relevamiento propio, para
+            saber qué participación tenés y cuánto queda por tomar.</p></div></div>
+          <div class="li2"><span class="li2__n">04</span><div><h3>Un informe que se pueda usar</h3>
+            <p>Conclusiones accionables con su fundamento a la vista, no un documento de cien
+            páginas que termina en un cajón.</p></div></div>
+        </div>
       </div>
     </div>
   </section>
@@ -687,10 +891,13 @@ body{background:var(--paper);color:var(--ink)}
         <p>Estructuras de entre cinco y cien personas, con volumen suficiente para que un error
         de gestión cueste caro y con margen suficiente para corregirlo a tiempo.</p>
       </div>
-      <div class="who">
-        <div><h3>PyMEs</h3><p>Industria y servicios que crecieron más rápido que su organización interna.</p></div>
-        <div><h3>Distribuidoras</h3><p>Donde el stock, la logística y los proveedores definen la rentabilidad.</p></div>
-        <div><h3>Comercios</h3><p>Puntos de venta que necesitan ordenar compras, precios y capital de trabajo.</p></div>
+      <div class="who3">
+        <div><figure class="foto foto--img"><img src="/f-pyme.jpg" alt="Taller metalúrgico con operarios cortando y soldando chapa" width="800" height="600" loading="lazy" decoding="async"></figure>
+          <h3>PyMEs</h3><p>Industria y servicios que crecieron más rápido que su organización interna.</p></div>
+        <div><figure class="foto foto--img"><img src="/f-distri.jpg" alt="Depósito con autoelevadores y operarios descargando un camión" width="800" height="600" loading="lazy" decoding="async"></figure>
+          <h3>Distribuidoras</h3><p>Donde el stock, la logística y los proveedores definen la rentabilidad.</p></div>
+        <div><figure class="foto foto--img"><img src="/f-comercio.jpg" alt="Mostrador de una casa de repuestos atendiendo a un cliente" width="800" height="600" loading="lazy" decoding="async"></figure>
+          <h3>Comercios</h3><p>Puntos de venta que necesitan ordenar compras, precios y capital de trabajo.</p></div>
       </div>
     </div>
   </section>
@@ -704,75 +911,19 @@ body{background:var(--paper);color:var(--ink)}
         <p>Se contratan por separado o como un programa continuo. En todos los casos el punto de
         partida es el mismo: entender cómo se trabaja hoy, no cómo debería trabajarse.</p>
       </div>
-      <div class="svcs">
-
-        <article class="svc">
-          <span class="svc__tag">01 · Punto de partida</span>
-          <h3>Diagnóstico de gestión</h3>
-          <p>Relevamiento de las nueve áreas, FODA, problemática priorizada y las acciones de mayor impacto.</p>
-          <ul>
-            <li>Autodiagnóstico en línea o relevamiento asistido</li>
-            <li>Puntaje por área con peso según el rubro</li>
-            <li>Informe con responsable, plazo y esfuerzo estimado</li>
-          </ul>
-        </article>
-
-        <article class="svc">
-          <span class="svc__tag">02 · Números a la vista</span>
-          <h3>Tableros de indicadores</h3>
-          <p>Poner en pantalla lo que hoy se intuye: márgenes reales, rotación, morosidad, capital de trabajo.</p>
-          <ul>
-            <li>Definición de los indicadores que importan en tu rubro</li>
-            <li>Tablero automático con datos de tus propios sistemas</li>
-            <li>Presupuesto anual y seguimiento de desvíos</li>
-          </ul>
-        </article>
-
-        <article class="svc">
-          <span class="svc__tag">03 · Tecnología</span>
-          <h3>Inteligencia artificial aplicada</h3>
-          <p>Dónde conviene usarla en una PyME y dónde es humo. Casos concretos, no promesas.</p>
-          <ul>
-            <li>Automatización de tareas administrativas repetitivas</li>
-            <li>Análisis de ventas, compras y comportamiento de clientes</li>
-            <li>Capacitación al equipo en herramientas de uso diario</li>
-          </ul>
-        </article>
-
-        <article class="svc">
-          <span class="svc__tag">04 · Afuera</span>
-          <h3>Investigación de mercado</h3>
-          <p>Qué está pasando fuera de la empresa: competencia, precios, clientes y demanda potencial.</p>
-          <ul>
-            <li>Relevamiento de competidores y comparación de precios</li>
-            <li>Encuestas a clientes y a clientes perdidos</li>
-            <li>Dimensionamiento de mercado por zona y segmento</li>
-          </ul>
-        </article>
-
-        <article class="svc">
-          <span class="svc__tag">05 · Operación</span>
-          <h3>Comercial, compras y stock</h3>
-          <p>El circuito donde una distribuidora gana o pierde plata todos los días.</p>
-          <ul>
-            <li>Política de precios, descuentos y condiciones de venta</li>
-            <li>Reposición, quiebres y capital inmovilizado en depósito</li>
-            <li>Negociación y evaluación de proveedores</li>
-          </ul>
-        </article>
-
-        <article class="svc">
-          <span class="svc__tag">06 · Estructura</span>
-          <h3>Organización y empresa familiar</h3>
-          <p>Que la empresa funcione cuando el dueño no está, y que el paso a la próxima generación
-          no la parta al medio.</p>
-          <ul>
-            <li>Roles, responsabilidades y delegación efectiva</li>
-            <li>Procesos escritos y sistemas de información</li>
-            <li>Protocolo familiar y ordenamiento societario</li>
-          </ul>
-        </article>
-
+      <div class="list2">
+        <div class="li2"><span class="li2__n">01</span><div><h3>Diagnóstico de gestión</h3>
+          <p>Relevamiento de las nueve áreas, FODA, problemática priorizada y las acciones de mayor impacto.</p><ul><li>Autodiagnóstico en línea o relevamiento asistido</li><li>Puntaje por área con peso según el rubro</li><li>Informe con responsable, plazo y esfuerzo estimado</li></ul></div></div>
+        <div class="li2"><span class="li2__n">02</span><div><h3>Tableros de indicadores</h3>
+          <p>Poner en pantalla lo que hoy se intuye: márgenes reales, rotación, morosidad, capital de trabajo.</p><ul><li>Definición de los indicadores que importan en tu rubro</li><li>Tablero automático con datos de tus propios sistemas</li><li>Presupuesto anual y seguimiento de desvíos</li></ul></div></div>
+        <div class="li2"><span class="li2__n">03</span><div><h3>Inteligencia artificial aplicada</h3>
+          <p>Dónde conviene usarla en una PyME y dónde es humo. Casos concretos, no promesas.</p><ul><li>Automatización de tareas administrativas repetitivas</li><li>Análisis de ventas, compras y comportamiento de clientes</li><li>Capacitación al equipo en herramientas de uso diario</li></ul></div></div>
+        <div class="li2"><span class="li2__n">04</span><div><h3>Investigación de mercado</h3>
+          <p>Qué está pasando fuera de la empresa: competencia, precios, clientes y demanda potencial.</p><ul><li>Relevamiento de competidores y comparación de precios</li><li>Encuestas a clientes y a clientes perdidos</li><li>Dimensionamiento de mercado por zona y segmento</li></ul></div></div>
+        <div class="li2"><span class="li2__n">05</span><div><h3>Comercial, compras y stock</h3>
+          <p>El circuito donde una distribuidora gana o pierde plata todos los días.</p><ul><li>Política de precios, descuentos y condiciones de venta</li><li>Reposición, quiebres y capital inmovilizado en depósito</li><li>Negociación y evaluación de proveedores</li></ul></div></div>
+        <div class="li2"><span class="li2__n">06</span><div><h3>Organización y empresa familiar</h3>
+          <p>Que la empresa funcione cuando el dueño no está, y que el paso a la próxima generación no la parta al medio.</p><ul><li>Roles, responsabilidades y delegación efectiva</li><li>Procesos escritos y sistemas de información</li><li>Protocolo familiar y ordenamiento societario</li></ul></div></div>
       </div>
     </div>
   </section>
@@ -864,7 +1015,7 @@ body{background:var(--paper);color:var(--ink)}
       </div>
       <div class="socios">
         <article class="bio">
-          <div class="bio__ph"><img src="/Adrian_perfil.png" alt=""></div>
+          <div class="bio__ph"><img src="/ph-adrian.jpg" alt="Adrián Pagés" width="440" height="440" loading="lazy" decoding="async"></div>
           <div>
             <h3>Cr. Adrián Pagés</h3>
             <p class="bio__role">Contador público · Socio</p>
@@ -876,7 +1027,7 @@ body{background:var(--paper);color:var(--ink)}
           </div>
         </article>
         <article class="bio">
-          <div class="bio__ph"><img src="/Eduardo_perfil.jpg" alt=""></div>
+          <div class="bio__ph"><img src="/ph-eduardo.jpg" alt="Eduardo Rinaldi" width="440" height="440" loading="lazy" decoding="async"></div>
           <div>
             <h3>Lic. Eduardo Rinaldi</h3>
             <p class="bio__role">Licenciado en administración · Socio</p>
@@ -934,9 +1085,9 @@ body{background:var(--paper);color:var(--ink)}
             <h3>Datos de contacto</h3>
             <dl class="dl">
               <div><dt>Correo</dt><dd><a href="mailto:contacto@criterya.com.ar">contacto@criterya.com.ar</a></dd></div>
-              <div><dt>Teléfonos</dt><dd>
-                <a href="tel:+542494614411">2494 61-4411</a><br>
-                <a href="tel:+542494492344">249 449-2344</a></dd></div>
+              <div><dt>Teléfonos</dt><dd class="tels">
+                <a href="tel:+542494614411">2494 61-4411</a>
+                <a href="tel:+542494492344">249 449-2344 <small>también WhatsApp</small></a></dd></div>
               <div><dt>Ubicación</dt><dd>Tandil, Buenos Aires<br>
                 <span style="color:var(--muted);font-size:.86rem">Trabajo presencial y remoto</span></dd></div>
               <div><dt>Instagram</dt><dd>
@@ -961,7 +1112,7 @@ body{background:var(--paper);color:var(--ink)}
 
 <footer class="foot">
   <div class="wrap foot__in">
-    <img src="/logo-blanco.png" alt="Criterya">
+    <img src="/logo-blanco.png" alt="Criterya" width="148" height="102" loading="lazy">
     <nav>
       <a href="#diagnosticos">Diagnósticos</a>
       <a href="#servicios">Servicios</a>
@@ -1152,7 +1303,8 @@ document.getElementById("anio").textContent = new Date().getFullYear();
     slides.forEach((s,k)=> k===i ? s.setAttribute("data-on","") : s.removeAttribute("data-on"));
     dots.forEach((d,k)=> k===i ? d.setAttribute("data-on","") : d.removeAttribute("data-on"));
   }
-  function arrancar(){ parar(); t = setInterval(()=>ver(i+1), quieto ? 7500 : 5200); }
+  /* con "reducir movimiento" no rota sola: se cambia con los puntos */
+  function arrancar(){ parar(); if(!quieto) t = setInterval(()=>ver(i+1), 5200); }
   function parar(){ if(t){ clearInterval(t); t = null; } }
 
   dots.forEach(d => d.addEventListener("click", ()=>{ ver(+d.dataset.i); arrancar(); }));
