@@ -355,13 +355,14 @@ const stageObs=new ResizeObserver(()=>show(current()));stageObs.observe($('stage
 /* ---------- análisis ---------- */
 function reset(){results=[];tracks=[];nextId=1;lastT=null;heat={w:48,h:27,a:new Float32Array(48*27)};show(null);drawChart();$('prog').style.width='0';$('dl').disabled=$('cp').disabled=true}
 function snap(){grab.width=vid.videoWidth;grab.height=vid.videoHeight;gctx.drawImage(vid,0,0)}
-const seek=t=>new Promise(res=>{vid.addEventListener('seeked',res,{once:true});vid.currentTime=t});
+let gen=0; // cada análisis y cada cambio de fuente abre una «generación» nueva; los bucles viejos se cortan solos
+const seek=t=>new Promise(res=>{const done=()=>{clearTimeout(to);vid.removeEventListener('seeked',done);res()};const to=setTimeout(done,3000);vid.addEventListener('seeked',done);vid.currentTime=t});
 async function runFile(){
-  reset();running=true;refreshButtons();vid.pause();
+  reset();running=true;const my=++gen;refreshButtons();vid.pause();
   const step=+$('step').value,dur=vid.duration;
-  for(let t=0;t<dur&&running;t+=step){
-    await seek(t);snap();const t0=performance.now();
-    let r;try{r=analyse(await detect(),t)}catch(e){status('Error al analizar: '+e.message);break}
+  for(let t=0;t<dur&&running&&my===gen;t+=step){
+    await seek(t);if(my!==gen)return;snap();const t0=performance.now();
+    let r;try{const d=await detect();if(my!==gen)return;r=analyse(d,t)}catch(e){status('Error al analizar: '+e.message);break}
     results.push(r);show(r);drawChart();emit(r);
     $('prog').style.width=(100*Math.min(1,(t+step)/dur))+'%';
     const [c,rw]=gridFor(grab.width,grab.height);
@@ -371,15 +372,16 @@ async function runFile(){
   if(results.length){status(`Listo: ${results.length} cuadros analizados. Reproducí el video para ver las detecciones.`);$('dl').disabled=$('cp').disabled=false}
 }
 async function runLive(){
-  reset();running=true;refreshButtons();
+  reset();running=true;const my=++gen;refreshButtons();
   const step=+$('step').value*1000;
-  while(running){
+  while(running&&my===gen){
     const t0=performance.now();
     if(vid.paused)vid.play().catch(()=>{});
     if(!(vid.readyState>=2&&vid.videoWidth)){$('busy').textContent='Esperando imagen de la transmisión…'}
     else{
       try{snap();}catch(e){status('El navegador no permite leer los cuadros de esta fuente (falta CORS en el servidor).');break}
-      const r=analyse(await detect(),Date.now()/1000);results.push(r);if(results.length>3600)results.shift();emit(r);
+      const d=await detect();if(my!==gen)return;
+      const r=analyse(d,Date.now()/1000);results.push(r);if(results.length>3600)results.shift();emit(r);
       show(r);drawChart();$('dl').disabled=$('cp').disabled=false;
       $('busy').textContent=`En vivo · ${((performance.now()-t0)/1000).toFixed(1)} s por cuadro`;
     }
@@ -393,14 +395,19 @@ const onFrame=()=>{if(src==='file'&&!running)show(current());vid.requestVideoFra
 vid.requestVideoFrameCallback?vid.requestVideoFrameCallback(onFrame):vid.addEventListener('timeupdate',onFrame);
 
 /* ---------- fuentes ---------- */
-function stopSources(){running=false;if(hls){hls.destroy();hls=null}if(liveStream){liveStream.getTracks().forEach(t=>t.stop());liveStream=null}vid.srcObject=null}
+function stopSources(){running=false;gen++;$('busy').textContent='';if(hls){hls.destroy();hls=null}if(liveStream){liveStream.getTracks().forEach(t=>t.stop());liveStream=null}vid.srcObject=null}
 function setVideo(url,label){
-  stopSources();vid.removeAttribute('src');vid.loop=false;vid.controls=true;vid.src=url;
-  $('empty').hidden=true;reset();status(label);
+  stopSources();vid.onerror=null;vid.srcObject=null;vid.removeAttribute('src');vid.loop=false;vid.controls=true;src='file';
+  vid.src=url;vid.load();vid.addEventListener('loadeddata',()=>{try{vid.currentTime=0.01}catch(e){}},{once:true});
+  $('ytbox').hidden=true;$('empty').hidden=true;reset();status(label);refreshButtons();
 }
+let sampleURL=null;
 async function loadSample(){
-  try{const b=await (await fetch('muestra_tambo.mp4')).blob();setVideo(URL.createObjectURL(b),'Video de muestra cargado: drone sobre un rodeo Holando, 19 s.')}
-  catch(e){$('empty').textContent='Subí un video o arrastralo acá.';$('empty').hidden=false}
+  status('Cargando el video de muestra…');
+  try{
+    if(!sampleURL){const res=await fetch('muestra_tambo.mp4');if(!res.ok)throw new Error('HTTP '+res.status);sampleURL=URL.createObjectURL(await res.blob())}
+    setVideo(sampleURL,'Video de muestra cargado: drone sobre un rodeo Holando, 19 s.')}
+  catch(e){$('empty').textContent='No se pudo cargar la muestra. Subí un video o arrastralo acá.';$('empty').hidden=false;status('No se pudo cargar la muestra ('+e.message+').')}
 }
 function useFile(f){if(f&&f.type.startsWith('video/'))setVideo(URL.createObjectURL(f),'Video cargado: '+f.name)}
 $('pick').onclick=()=>$('file').click();
@@ -412,7 +419,7 @@ function selectTab(s){
   document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.src===s));
   ['file','url','cam'].forEach(k=>$('src-'+k).hidden=k!==s);
 }
-document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>selectTab(b.dataset.src));
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{selectTab(b.dataset.src);if(b.dataset.src==='file'&&src!=='file')loadSample()});
 $('goUrl').onclick=async()=>{
   const u=$('url').value.trim();if(!/^https?:\/\//.test(u)){status('Ingresá una dirección que empiece con http:// o https://');return}
   if(/(^|\.)(youtube\.com|youtu\.be)$/i.test(new URL(u).hostname)){
@@ -432,7 +439,7 @@ async function useStream(get,label){
   let st;
   try{st=await get()}
   catch(e){status(e.name==='NotAllowedError'?'No se compartió nada: se canceló la ventana de Chrome o el sitio no tiene permiso. Probá de nuevo y elegí la pestaña de YouTube.':'El navegador no permitió la captura ('+e.name+': '+e.message+').');refreshButtons();return}
-  stopSources();liveStream=st;src='live';
+  stopSources();vid.onerror=null;liveStream=st;src='live';
   st.getVideoTracks()[0].addEventListener('ended',()=>{running=false;liveStream=null;status('Se dejó de compartir la pestaña. Para seguir, capturala de nuevo.');refreshButtons()});
   vid.removeAttribute('src');vid.srcObject=st;vid.controls=false;$('empty').hidden=true;reset();status(label);refreshButtons();
   vid.play().catch(()=>{});
