@@ -45,6 +45,8 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .src{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px}
 .src input[type=url]{flex:1 1 260px;font:16px Barlow,system-ui,sans-serif;min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
 .src .hint{flex-basis:100%;font-size:14px;color:var(--mute);margin:0}
+.yt{flex-basis:100%;display:flex;flex-wrap:wrap;gap:8px;align-items:center;border-top:1px solid var(--line);padding-top:10px}.yt p{flex-basis:100%;margin:0}
+a.btn{display:inline-flex;align-items:center;text-decoration:none}
 .ctl{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:end;margin-top:12px}
 .ctl label{display:grid;gap:2px;font-size:14px;color:var(--mute)}
 .ctl select,.ctl input[type=range]{font:16px Barlow,system-ui,sans-serif;min-height:40px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);padding:0 8px}
@@ -106,7 +108,13 @@ ul.more{padding-left:18px;margin:0}ul.more li{margin-bottom:6px}
    <div class="src" id="src-url" hidden>
     <input type="url" id="url" placeholder="https://servidor/camara/potrero.m3u8" aria-label="Dirección de la transmisión">
     <button type="button" id="goUrl">Conectar</button>
-    <p class="hint">Acepta HLS (.m3u8) o MP4 con CORS habilitado. Las cámaras IP (RTSP) se publican primero como HLS con un gateway como MediaMTX o go2rtc. YouTube no entrega los cuadros al navegador.</p>
+    <p class="hint">Acepta HLS (.m3u8) o MP4 con CORS habilitado. Las cámaras IP (RTSP) se publican primero como HLS con un gateway como MediaMTX o go2rtc. Para YouTube, pegá el enlace y seguí los dos pasos que aparecen.</p>
+    <div class="yt" id="ytbox" hidden>
+     <p><b>YouTube no deja leer sus videos desde otra página.</b> Se analiza capturando la pestaña donde se reproduce:</p>
+     <a class="btn" id="ytopen" href="#" target="_blank" rel="noopener">1. Abrir el video en otra pestaña</a>
+     <button type="button" id="ytcap">2. Capturar esa pestaña</button>
+     <p class="hint">En el paso 2, Chrome pregunta qué compartir: elegí la pestaña de YouTube. Conviene poner el video en modo cine y en 720p o más. No cierres ni minimices esa pestaña mientras se analiza.</p>
+    </div>
    </div>
    <div class="src" id="src-cam" hidden>
     <button type="button" id="goCam">Usar cámara</button>
@@ -405,6 +413,9 @@ function selectTab(s){
 document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>selectTab(b.dataset.src));
 $('goUrl').onclick=async()=>{
   const u=$('url').value.trim();if(!/^https?:\/\//.test(u)){status('Ingresá una dirección que empiece con http:// o https://');return}
+  if(/(^|\.)(youtube\.com|youtu\.be)$/i.test(new URL(u).hostname)){
+    $('ytopen').href=u;$('ytbox').hidden=false;status('Enlace de YouTube: seguí los pasos 1 y 2 de abajo.');return}
+  $('ytbox').hidden=true;
   stopSources();src='live';vid.controls=false;vid.muted=true;$('empty').hidden=true;reset();
   vid.onerror=()=>status('No se pudo abrir la transmisión. Revisá la dirección y que el servidor permita CORS.');
   if(/\.m3u8(\?|$)/.test(u)&&!vid.canPlayType('application/vnd.apple.mpegurl')){
@@ -416,11 +427,13 @@ $('goUrl').onclick=async()=>{
   vid.addEventListener('playing',()=>{status('Transmisión en vivo. Tocá «Analizar en vivo».');refreshButtons()},{once:true});
 };
 async function useStream(get,label){
-  try{stopSources();liveStream=await get();src='live';vid.removeAttribute('src');vid.srcObject=liveStream;vid.controls=false;await vid.play();$('empty').hidden=true;reset();status(label);refreshButtons()}
+  try{stopSources();liveStream=await get();liveStream.getVideoTracks()[0].addEventListener('ended',()=>{running=false;status('Se dejó de compartir la pestaña.');refreshButtons()});src='live';vid.removeAttribute('src');vid.srcObject=liveStream;vid.controls=false;await vid.play();$('empty').hidden=true;reset();status(label);refreshButtons()}
   catch(e){status('El navegador no dio acceso ('+e.name+'). Revisá los permisos del sitio en el navegador.')}
 }
 $('goCam').onclick=()=>useStream(()=>navigator.mediaDevices.getUserMedia({video:{width:{ideal:1920}}}),'Cámara conectada.');
-$('goScreen').onclick=()=>useStream(()=>navigator.mediaDevices.getDisplayMedia({video:true}),'Capturando la pestaña elegida.');
+const capture=()=>navigator.mediaDevices.getDisplayMedia({video:{width:{ideal:1920},height:{ideal:1080},frameRate:{ideal:10}},audio:false,preferCurrentTab:false,selfBrowserSurface:'exclude',surfaceSwitching:'include'});
+$('goScreen').onclick=()=>useStream(capture,'Capturando la pestaña elegida. Tocá «Analizar en vivo».');
+$('ytcap').onclick=()=>useStream(capture,'Capturando YouTube. Tocá «Analizar en vivo».');
 vid.addEventListener('loadedmetadata',()=>{if(!vid.srcObject&&!hls&&vid.src.startsWith('blob:'))src='file';$('stage').style.aspectRatio=vid.videoWidth+'/'+vid.videoHeight;refreshButtons()});
 
 function refreshButtons(){
