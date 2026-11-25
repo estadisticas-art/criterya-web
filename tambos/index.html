@@ -15,7 +15,7 @@
 :root{color-scheme:light dark;
 --bg:light-dark(#f3f5f0,#0f1a12);--panel:light-dark(#ffffff,#16241a);--ink:light-dark(#141714,#eef2ec);
 --mute:light-dark(#5a6459,#9fb09f);--line:light-dark(#dde3da,#263a2b);--green:light-dark(#1f5f2c,#2f7a3d);
---tag:#ffd21f;--tagink:#1a1600;--alert:#e0115f}
+--tag:#ffd21f;--tagdark:light-dark(#b38f00,#ffd21f);--tagink:#1a1600;--alert:#e0115f}
 :root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
 *{box-sizing:border-box;min-width:0}
 [hidden]{display:none!important}
@@ -123,19 +123,17 @@ ul.more{padding-left:18px;margin:0}ul.more li{margin-bottom:6px}
      <select id="tiles"><option value="auto" selected>Automático</option><option value="1x1">1×1 (rápido)</option><option value="2x2">2×2</option><option value="3x2">3×2</option><option value="4x3">4×3 (vacas lejanas)</option></select></label>
     <label>Confianza mínima <span id="confv">0,25</span>
      <input type="range" id="conf" min="0.1" max="0.7" step="0.05" value="0.25"></label>
-    <span class="chk"><input type="checkbox" id="fixed"><label for="fixed">Cámara fija (seguir a cada animal)</label></span>
     <span class="chk"><input type="checkbox" id="heat"><label for="heat">Mapa de calor</label></span>
    </div>
   </section>
 
   <aside class="side">
-   <div class="tagbig"><span class="num" id="kNow">–</span><small>vacas en el cuadro</small></div>
+   <div class="tagbig"><span class="num" id="kTotal">–</span><small>vacas en total</small></div>
    <div class="kpis">
+    <div class="kpi"><span class="num" id="kNow">–</span><span>en el cuadro ahora</span></div>
     <div class="kpi"><span class="num" id="kMax">–</span><span>máximo en un cuadro</span></div>
-    <div class="kpi"><span class="num" id="kAvg">–</span><span>promedio por cuadro</span></div>
     <div class="kpi alert"><span class="num" id="kIso">–</span><span>apartadas del grupo ahora</span></div>
     <div class="kpi"><span class="num" id="kSpread">–</span><span>dispersión (cuerpos entre vecinas)</span></div>
-    <div class="kpi" id="kUniqBox" hidden><span class="num" id="kUniq">–</span><span>animales distintos (estimado)</span></div>
     <div class="kpi" id="kStillBox" hidden><span class="num" id="kStill">–</span><span>quietas más de 60 s</span></div>
    </div>
    <div class="bar" aria-hidden="true"><i id="prog"></i></div>
@@ -148,7 +146,7 @@ ul.more{padding-left:18px;margin:0}ul.more li{margin-bottom:6px}
  <div>
   <h2>Vacas detectadas a lo largo del video</h2>
   <div class="fig"><svg id="chart" role="img" aria-label="Gráfico de vacas detectadas por segundo"></svg></div>
-  <div class="legend"><span><i style="background:var(--green)"></i>vacas en el cuadro</span><span><i style="background:var(--alert)"></i>apartadas</span></div>
+  <div class="legend"><span><i style="background:var(--tagdark)"></i>total acumulado</span><span><i style="background:var(--green)"></i>vacas en el cuadro</span><span><i style="background:var(--alert)"></i>apartadas</span></div>
   <div class="exp">
    <button type="button" class="sec" id="dl" disabled>Descargar CSV</button>
    <button type="button" class="sec" id="cp" disabled>Copiar CSV</button>
@@ -158,10 +156,11 @@ ul.more{padding-left:18px;margin:0}ul.more li{margin-bottom:6px}
  <div>
   <h2>Cómo leer los números</h2>
   <ul class="more note">
-   <li><b>Vacas en el cuadro</b> es lo que se ve en ese instante. Con drone o cámara que se mueve, el total del rodeo se aproxima con el máximo.</li>
+   <li><b>Vacas en total</b>: cada vaca se sigue de un cuadro al siguiente, compensando el movimiento de la cámara, y se cuenta una sola vez. Una vaca entra al total recién cuando se la vio en 2 o 3 cuadros seguidos, así no suman detecciones sueltas. Conviene analizar cada 0,5 o 1 s.</li>
+   <li><b>En el cuadro ahora</b> es lo que se ve en ese instante; el <b>máximo</b> sirve de piso para el total.</li>
    <li><b>Apartada</b>: su vecina más cercana está a más de 6 largos de cuerpo. Una vaca que se aparta del rodeo puede estar enferma, en celo o por parir.</li>
    <li><b>Dispersión</b>: distancia típica entre vecinas, medida en largos de cuerpo. Sube cuando el rodeo se abre a pastorear y baja cuando se amontona.</li>
-   <li>Con <b>cámara fija</b> se sigue a cada animal: estima cuántos distintos pasaron y cuáles llevan más de un minuto sin moverse.</li>
+   <li>En <b>transmisiones en vivo</b> también se marcan las vacas que llevan más de un minuto sin moverse.</li>
   </ul>
  </div>
 </div></section>
@@ -172,7 +171,7 @@ ul.more{padding-left:18px;margin:0}ul.more li{margin-bottom:6px}
 const $=id=>document.getElementById(id);
 const vid=$('vid'),ov=$('ov'),octx=ov.getContext('2d');
 const S=640, COW=19, ISO=6;
-let sess=null, src='file', running=false, results=[], tracks=[], nextId=1, heat=null, hls=null, liveStream=null;
+let sess=null, src='file', running=false, results=[], tracks=[], nextId=1, lastT=null, heat=null, hls=null, liveStream=null, CLS=19;
 const grab=document.createElement('canvas'), gctx=grab.getContext('2d',{willReadFrequently:true});
 const tile=document.createElement('canvas'); tile.width=tile.height=S; const tctx=tile.getContext('2d',{willReadFrequently:true});
 const fmt=(n,d=0)=>Number.isFinite(n)?n.toLocaleString('es-AR',{maximumFractionDigits:d,minimumFractionDigits:d}):'–';
@@ -218,11 +217,11 @@ async function detect(){
       for(let p=0,q=0;p<plane;p++,q+=4){data[o+p]=px[q]/255;data[o+plane+p]=px[q+1]/255;data[o+2*plane+p]=px[q+2]/255}
     });
     const out=(await sess.run({images:new ort.Tensor('float32',data,[part.length,3,S,S])})).output0;
-    const A=out.dims[2],od=out.data,stride=84*A;
+    const A=out.dims[2],od=out.data,NC=out.dims[1],stride=NC*A;CLS=NC===5?0:COW;
     part.forEach((t,k)=>{
       const b=k*stride;
       for(let a=0;a<A;a++){
-        const sc=od[b+(4+COW)*A+a]; if(sc<conf)continue;
+        const sc=od[b+(4+CLS)*A+a]; if(sc<conf)continue;
         const cx=od[b+a]/t.s+t.x0,cy=od[b+A+a]/t.s+t.y0,w=od[b+2*A+a]/t.s,h=od[b+3*A+a]/t.s;
         boxes.push({x:cx-w/2,y:cy-h/2,w,h,c:sc});
       }
@@ -250,26 +249,56 @@ function analyse(boxes,t){
   });
   nn.sort((a,b)=>a-b);
   const spread=nn.length?nn[Math.floor(nn.length/2)]:NaN;
-  if($('fixed').checked)track(boxes,t);
+  track(boxes,t);
   if(heat)boxes.forEach(p=>{const gx=Math.min(heat.w-1,Math.floor(p.cx/grab.width*heat.w)),gy=Math.min(heat.h-1,Math.floor(p.cy/grab.height*heat.h));heat.a[gy*heat.w+gx]++});
-  return {t,n,iso:boxes.filter(p=>p.iso).length,spread,boxes,W:grab.width,H:grab.height};
+  return {t,n,iso:boxes.filter(p=>p.iso).length,spread,total:totalCows(),boxes,W:grab.width,H:grab.height};
 }
 function iou(p,q){const ix=Math.max(0,Math.min(p.x+p.w,q.x+q.w)-Math.max(p.x,q.x)),iy=Math.max(0,Math.min(p.y+p.h,q.y+q.h)-Math.max(p.y,q.y)),I=ix*iy;return I/(p.w*p.h+q.w*q.h-I)}
-function track(boxes,t){
-  const live=tracks.filter(k=>t-k.last<=Math.max(3,+$('step').value*3)), used=new Set();
-  const pairs=[];
-  boxes.forEach((p,i)=>live.forEach(k=>{const s=iou(p,k.box),d=Math.hypot(p.cx-k.box.cx,p.cy-k.box.cy)/p.size;if(s>0.15||d<0.8)pairs.push([s-d*0.1,i,k])}));
-  pairs.sort((a,b)=>b[0]-a[0]);
-  for(const [,i,k] of pairs){
-    if(used.has(i)||k.seen===t)continue;
-    const p=boxes[i],mv=Math.hypot(p.cx-k.box.cx,p.cy-k.box.cy)/p.size;
-    if(mv>0.15)k.moved=t;
-    k.box=p;k.last=t;k.seen=t;k.hits++;p.id=k.id;used.add(i);
+function hungarian(A){
+  const n=A.length,m=A[0].length,N=Math.max(n,m),INF=1e15,get=(i,j)=>(i<n&&j<m)?A[i][j]:1e6;
+  const u=new Float64Array(N+1),v=new Float64Array(N+1),p=new Int32Array(N+1),way=new Int32Array(N+1);
+  for(let i=1;i<=N;i++){
+    p[0]=i;let j0=0;const minv=new Float64Array(N+1).fill(INF),used=new Uint8Array(N+1);
+    do{used[j0]=1;const i0=p[j0];let delta=INF,j1=0;
+      for(let j=1;j<=N;j++)if(!used[j]){const cur=get(i0-1,j-1)-u[i0]-v[j];if(cur<minv[j]){minv[j]=cur;way[j]=j0}if(minv[j]<delta){delta=minv[j];j1=j}}
+      for(let j=0;j<=N;j++){if(used[j]){u[p[j]]+=delta;v[j]-=delta}else minv[j]-=delta}
+      j0=j1}while(p[j0]!==0);
+    do{const j1=way[j0];p[j0]=p[j1];j0=j1}while(j0);
   }
-  boxes.forEach((p,i)=>{if(!used.has(i)){const k={id:nextId++,box:p,first:t,last:t,seen:t,moved:t,hits:1};tracks.push(k);p.id=k.id}});
-  boxes.forEach(p=>{const k=tracks.find(k=>k.id===p.id);p.still=t-k.moved})
+  const res=new Int32Array(n).fill(-1);
+  for(let j=1;j<=N;j++)if(p[j]&&p[j]<=n&&j<=m)res[p[j]-1]=j-1;
+  return res;
 }
-
+const minHits=()=>+$('step').value<=0.5?3:2;
+function track(boxes,t){
+  const step=+$('step').value,maxAge=Math.max(4,step*4)+1e-6,px=grab.width/1920;
+  const live=tracks.filter(k=>t-k.last<=maxAge);
+  // movimiento de la cámara: mediana del corrimiento entre vecinas mutuas más cercanas
+  const prev=live.filter(k=>k.last===lastT);
+  if(boxes.length>=3&&prev.length>=3){
+    const near=(x,y,arr,fx,fy)=>{let bi=-1,bd=Infinity;arr.forEach((q,i)=>{const d=Math.hypot(x-fx(q),y-fy(q));if(d<bd){bd=d;bi=i}});return [bi,bd]};
+    const dx=[],dy=[];
+    boxes.forEach((b,i)=>{const [j,d]=near(b.cx,b.cy,prev,q=>q.cx,q=>q.cy);if(j<0||d>80*px)return;const [i2]=near(prev[j].cx,prev[j].cy,boxes,q=>q.cx,q=>q.cy);if(i2===i){dx.push(b.cx-prev[j].cx);dy.push(b.cy-prev[j].cy)}});
+    if(dx.length>=3){const med=a=>a.sort((x,y)=>x-y)[a.length>>1];const mx=med(dx),my=med(dy);live.forEach(k=>{k.cx+=mx;k.cy+=my})}
+  }
+  const assign=new Int32Array(boxes.length).fill(-1);
+  if(boxes.length&&live.length){
+    const C=boxes.map(b=>live.map(k=>{
+      const ts=Math.sqrt(k.w*k.h),d=Math.hypot(b.cx-k.cx,b.cy-k.cy),R=Math.max(1.5*(b.size+ts)/2,18*px),ratio=b.size/Math.max(ts,1);
+      return d<R&&ratio>0.4&&ratio<2.5?d/R+0.05*(t-k.last)/step:1e6}));
+    const a=hungarian(C);
+    a.forEach((j,i)=>{if(j>=0&&C[i][j]<1e6)assign[i]=j});
+  }
+  boxes.forEach((b,i)=>{
+    let k;
+    if(assign[i]>=0){k=live[assign[i]];if(Math.hypot(b.cx-k.cx,b.cy-k.cy)>0.15*b.size)k.moved=t;k.hits++}
+    else{k={id:nextId++,first:t,moved:t,hits:1};tracks.push(k)}
+    Object.assign(k,{cx:b.cx,cy:b.cy,w:b.w,h:b.h,last:t});
+    b.id=k.id;b.still=t-k.moved;b.ok=k.hits>=minHits();
+  });
+  lastT=t;
+}
+const totalCows=()=>{const h=minHits();return tracks.filter(k=>k.hits>=h).length};
 /* ---------- dibujo ---------- */
 function draw(r){
   const W=r?r.W:(vid.videoWidth||1280),H=r?r.H:(vid.videoHeight||720);
@@ -286,36 +315,37 @@ function draw(r){
   for(const p of r.boxes){
     const x=ox+p.x*sc,y=oy+p.y*sc,w=p.w*sc,h=p.h*sc,col=p.iso?'#e0115f':'#ffd21f';
     octx.strokeStyle=col;octx.strokeRect(x,y,w,h);
-    const lab=p.id?('#'+p.id+(p.still>60?' quieta':'')):(p.iso?'apartada':'');
+    const quieta=src!=='file'&&p.still>60, lab=p.iso?'apartada':(quieta?'quieta':'');
     if(lab&&w>14*dpr){const tw=octx.measureText(lab).width+8*dpr,th=16*dpr;octx.fillStyle=col;octx.fillRect(x,y-th,tw,th);octx.fillStyle=p.iso?'#fff':'#1a1600';octx.fillText(lab,x+4*dpr,y-4*dpr)}
   }
 }
 function show(r){
   draw(r);
   $('kNow').textContent=r?r.n:'–';$('kIso').textContent=r?r.iso:'–';$('kSpread').textContent=r?fmt(r.spread,1):'–';
-  if(results.length){$('kMax').textContent=Math.max(...results.map(x=>x.n));$('kAvg').textContent=fmt(results.reduce((s,x)=>s+x.n,0)/results.length,1)}
-  const fx=$('fixed').checked;$('kUniqBox').hidden=!fx;$('kStillBox').hidden=!fx;
-  if(fx){$('kUniq').textContent=tracks.filter(k=>k.hits>=2).length;$('kStill').textContent=r?r.boxes.filter(p=>p.still>60).length:'–'}
+  $('kTotal').textContent=r?r.total:'–';
+  $('kMax').textContent=results.length?Math.max(...results.map(x=>x.n)):'–';
+  const lv=src!=='file';$('kStillBox').hidden=!lv;
+  if(lv)$('kStill').textContent=r?r.boxes.filter(p=>p.still>60).length:'–';
 }
 const chart=$('chart');
 function drawChart(){
   const W=chart.clientWidth,H=chart.clientHeight,P={l:36,r:10,t:12,b:26};
   if(!results.length){chart.innerHTML=`<text x="${W/2}" y="${H/2}" text-anchor="middle" fill="currentColor" opacity=".55" font-size="14">Todavía no hay datos: tocá «Analizar video».</text>`;return}
-  const t0=results[0].t,t1=Math.max(t0+1,results[results.length-1].t),ymax=Math.max(5,...results.map(r=>r.n))*1.1;
+  const t0=results[0].t,t1=Math.max(t0+1,results[results.length-1].t),ymax=Math.max(5,...results.map(r=>Math.max(r.n,r.total)))*1.1;
   const X=t=>P.l+(t-t0)/(t1-t0)*(W-P.l-P.r),Y=v=>H-P.b-v/ymax*(H-P.t-P.b);
   const line=k=>results.map((r,i)=>(i?'L':'M')+X(r.t).toFixed(1)+','+Y(r[k]).toFixed(1)).join('');
   const ticks=[0,Math.round(ymax/2),Math.floor(ymax)];
   const xt=W<520?[t0,t1]:[t0,(t0+t1)/2,t1];
   chart.innerHTML=ticks.map(v=>`<line x1="${P.l}" x2="${W-P.r}" y1="${Y(v)}" y2="${Y(v)}" stroke="currentColor" opacity=".12"/><text x="${P.l-6}" y="${Y(v)+4}" text-anchor="end" font-size="12" fill="currentColor" opacity=".6">${v}</text>`).join('')+
    xt.map(t=>`<text x="${X(t)}" y="${H-8}" text-anchor="middle" font-size="12" fill="currentColor" opacity=".6">${fmtT(t)}</text>`).join('')+
-   `<path d="${line('n')}" fill="none" stroke="var(--green)" stroke-width="2.5"/><path d="${line('iso')}" fill="none" stroke="var(--alert)" stroke-width="2"/>`;
+   `<path d="${line('total')}" fill="none" stroke="var(--tagdark)" stroke-width="3"/><path d="${line('n')}" fill="none" stroke="var(--green)" stroke-width="2.5"/><path d="${line('iso')}" fill="none" stroke="var(--alert)" stroke-width="2"/>`;
 }
 const fmtT=t=>{t=Math.round(t);return src==='file'?`${Math.floor(t/60)}:${String(t%60).padStart(2,'0')}`:new Date(t*1000).toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit',second:'2-digit'})};
 const chartObs=new ResizeObserver(drawChart);chartObs.observe(chart);
 const stageObs=new ResizeObserver(()=>show(current()));stageObs.observe($('stage'));
 
 /* ---------- análisis ---------- */
-function reset(){results=[];tracks=[];nextId=1;heat={w:48,h:27,a:new Float32Array(48*27)};show(null);drawChart();$('prog').style.width='0';$('dl').disabled=$('cp').disabled=true}
+function reset(){results=[];tracks=[];nextId=1;lastT=null;heat={w:48,h:27,a:new Float32Array(48*27)};show(null);drawChart();$('prog').style.width='0';$('dl').disabled=$('cp').disabled=true}
 function snap(){grab.width=vid.videoWidth;grab.height=vid.videoHeight;gctx.drawImage(vid,0,0)}
 const seek=t=>new Promise(res=>{vid.addEventListener('seeked',res,{once:true});vid.currentTime=t});
 async function runFile(){
@@ -347,7 +377,7 @@ async function runLive(){
   }
   running=false;$('busy').textContent='';refreshButtons();
 }
-const emit=r=>window.dispatchEvent(new CustomEvent('conteo',{detail:{t:r.t,vacas:r.n,apartadas:r.iso,dispersion:r.spread}}));
+const emit=r=>window.dispatchEvent(new CustomEvent('conteo',{detail:{t:r.t,total:r.total,vacas:r.n,apartadas:r.iso,dispersion:r.spread}}));
 function current(){if(!results.length)return null;if(src!=='file')return results[results.length-1];let b=results[0];for(const r of results)if(Math.abs(r.t-vid.currentTime)<Math.abs(b.t-vid.currentTime))b=r;return b}
 const onFrame=()=>{if(src==='file'&&!running)show(current());vid.requestVideoFrameCallback?.(onFrame)};
 vid.requestVideoFrameCallback?vid.requestVideoFrameCallback(onFrame):vid.addEventListener('timeupdate',onFrame);
@@ -402,15 +432,14 @@ $('run').onclick=()=>src==='file'?runFile():runLive();
 $('stop').onclick=()=>{running=false};
 $('conf').oninput=e=>$('confv').textContent=fmt(+e.target.value,2);
 $('heat').onchange=()=>show(current());
-$('fixed').onchange=()=>show(current());
 
 /* ---------- exportar ---------- */
 function csv(){
-  const rows=[['segundo_o_hora','vacas','apartadas','dispersion_cuerpos','id','x','y','ancho','alto','confianza','apartada']];
+  const rows=[['segundo_o_hora','total_acumulado','vacas_en_cuadro','apartadas','dispersion_cuerpos','id','x','y','ancho','alto','confianza','apartada']];
   for(const r of results){
     const when=src==='file'?r.t.toFixed(1):new Date(r.t*1000).toISOString();
-    if(!r.boxes.length)rows.push([when,0,0,'','','','','','','','']);
-    for(const p of r.boxes)rows.push([when,r.n,r.iso,Number.isFinite(r.spread)?r.spread.toFixed(2):'',p.id||'',p.x.toFixed(0),p.y.toFixed(0),p.w.toFixed(0),p.h.toFixed(0),p.c.toFixed(2),p.iso?1:0]);
+    if(!r.boxes.length)rows.push([when,r.total,0,0,'','','','','','','','']);
+    for(const p of r.boxes)rows.push([when,r.total,r.n,r.iso,Number.isFinite(r.spread)?r.spread.toFixed(2):'',p.id||'',p.x.toFixed(0),p.y.toFixed(0),p.w.toFixed(0),p.h.toFixed(0),p.c.toFixed(2),p.iso?1:0]);
   }
   return rows.map(r=>r.join(';')).join('\n');
 }
