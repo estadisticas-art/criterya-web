@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
+<script>/* /tambos y /tambos/ deben cargar los mismos archivos */if(!/\/$|\.\w+$/.test(location.pathname))history.replaceState(null,"",location.pathname+"/"+location.search+location.hash)</script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Conteo de rodeo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -179,6 +180,7 @@ ul.more{padding-left:18px;margin:0}ul.more li{margin-bottom:6px}
 const $=id=>document.getElementById(id);
 const vid=$('vid'),ov=$('ov'),octx=ov.getContext('2d');
 const S=640, COW=19, ISO=6;
+const asset=f=>{const pth=location.pathname,dir=/\.\w+$/.test(pth)?pth.replace(/[^/]*$/,''):pth.replace(/\/?$/,'/');return new URL(f,location.origin+dir).href}; // archivos de la carpeta /tambos/
 let sess=null, src='file', running=false, results=[], tracks=[], nextId=1, lastT=null, heat=null, hls=null, liveStream=null, CLS=19;
 const grab=document.createElement('canvas'), gctx=grab.getContext('2d',{willReadFrequently:true});
 const tile=document.createElement('canvas'); tile.width=tile.height=S; const tctx=tile.getContext('2d',{willReadFrequently:true});
@@ -191,7 +193,7 @@ async function loadModel(){
     ort.env.wasm.wasmPaths='https://cdn.jsdelivr.net/npm/onnxruntime-web@1.22.0/dist/';
     ort.env.wasm.numThreads=self.crossOriginIsolated?Math.min(4,navigator.hardwareConcurrency||1):1;
     status('Descargando el detector (11 MB)…');
-    const buf=await (await fetch('yolo11n.onnx')).arrayBuffer();
+    const res=await fetch(asset('yolo11n.onnx'));if(!res.ok)throw new Error('modelo HTTP '+res.status);const buf=await res.arrayBuffer();
     let ep=null;
     for(const p of (navigator.gpu?['webgpu','wasm']:['wasm'])){
       try{sess=await ort.InferenceSession.create(buf,{executionProviders:[p],graphOptimizationLevel:'all'});ep=p;break}catch(e){console.warn('YOLO no pudo usar',p,e)}
@@ -405,7 +407,7 @@ let sampleURL=null;
 async function loadSample(){
   status('Cargando el video de muestra…');
   try{
-    if(!sampleURL){const res=await fetch('muestra_tambo.mp4');if(!res.ok)throw new Error('HTTP '+res.status);sampleURL=URL.createObjectURL(await res.blob())}
+    if(!sampleURL){const res=await fetch(asset('muestra_tambo.mp4'));if(!res.ok)throw new Error('HTTP '+res.status);sampleURL=URL.createObjectURL(await res.blob())}
     setVideo(sampleURL,'Video de muestra cargado: drone sobre un rodeo Holando, 19 s.')}
   catch(e){$('empty').textContent='No se pudo cargar la muestra. Subí un video o arrastralo acá.';$('empty').hidden=false;status('No se pudo cargar la muestra ('+e.message+').')}
 }
