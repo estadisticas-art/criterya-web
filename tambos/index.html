@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Conteo de rodeo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* VOICE: herramienta de campo, directa, para el encargado del tambo.
+   IDEA: la caravana amarilla: cada vaca detectada lleva su chapa, y el conteo es una caravana grande.
+   PICTURE: el video del potrero con las caravanas encima, ocupando el primer plano.
+   COLOUR and TYPE: verde potrero oscuro de fondo, blanco y negro Holando, amarillo caravana de acento; Barlow Condensed para cifras.
+   LAYOUT: video grande a la izquierda, tablero de cifras a la derecha; debajo gráfico y exportación. Se apila en celular. */
+:root{color-scheme:light dark;
+--bg:light-dark(#f3f5f0,#0f1a12);--panel:light-dark(#ffffff,#16241a);--ink:light-dark(#141714,#eef2ec);
+--mute:light-dark(#5a6459,#9fb09f);--line:light-dark(#dde3da,#263a2b);--green:light-dark(#1f5f2c,#2f7a3d);
+--tag:#ffd21f;--tagink:#1a1600;--alert:#e0115f}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Barlow,system-ui,sans-serif;overflow-x:clip}
+h1,h2,.num{font-family:"Barlow Condensed",Barlow,sans-serif;font-weight:700;line-height:1.05;margin:0}
+h1{font-size:clamp(30px,4vw,44px);text-wrap:balance}
+h2{font-size:24px;margin-bottom:10px}
+.band{padding:clamp(18px,3vw,40px) max(4vw,16px)}
+.top{background:var(--green);color:#fff;padding-bottom:clamp(18px,2.5vw,28px)}
+.top p{margin:6px 0 0;color:#d9ead9;max-width:70ch}
+.wrap{max-width:1240px;margin:0 auto}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;grid-template-areas:'stage side' 'ctl side';gap:0 20px;align-items:start}
+.a-stage{grid-area:stage}.a-ctl{grid-area:ctl}.side{grid-area:side}
+@media(max-width:900px){.grid{grid-template-columns:minmax(0,1fr);grid-template-areas:'stage' 'side' 'ctl';gap:14px}.tagbig{display:flex;align-items:baseline;justify-content:center;gap:12px;padding:20px 16px 12px}.tagbig .num{font-size:64px}}
+.stage{position:relative;background:#0a0f0b;border-radius:10px;overflow:hidden;aspect-ratio:16/9;box-shadow:0 10px 30px #0003}
+.stage video,.stage canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.stage .empty{position:absolute;inset:0;display:grid;place-items:center;color:#cfe0cf;text-align:center;padding:20px}
+.busy{position:absolute;left:12px;bottom:12px;background:#000b;color:#fff;font-size:14px;padding:6px 10px;border-radius:6px}
+.busy:empty{display:none}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 10px}
+.tabs button{background:var(--panel);color:var(--ink);border:1px solid var(--line)}
+.tabs button[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button,.btn{font:600 15px Barlow,sans-serif;min-height:44px;padding:0 16px;border-radius:8px;border:0;cursor:pointer;background:var(--tag);color:var(--tagink)}
+button:disabled{opacity:.45;cursor:not-allowed}
+button.sec{background:var(--panel);color:var(--ink);border:1px solid var(--line)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--tag);outline-offset:2px}
+.src{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px}
+.src input[type=url]{flex:1 1 260px;font:16px Barlow,system-ui,sans-serif;min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+.src .hint{flex-basis:100%;font-size:14px;color:var(--mute);margin:0}
+.ctl{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:end;margin-top:12px}
+.ctl label{display:grid;gap:2px;font-size:14px;color:var(--mute)}
+.ctl select,.ctl input[type=range]{font:16px Barlow,system-ui,sans-serif;min-height:40px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);padding:0 8px}
+.ctl .chk{display:flex;align-items:center;gap:6px;min-height:44px;color:var(--ink);font-size:15px}
+.ctl .chk input{width:20px;height:20px}
+.side{display:grid;gap:12px}
+.tagbig{position:relative;background:var(--tag);color:var(--tagink);border-radius:22px 22px 30px 30px;padding:26px 18px 16px;text-align:center}
+.tagbig:before{content:"";position:absolute;top:10px;left:50%;width:16px;height:16px;margin-left:-8px;border-radius:50%;background:var(--bg)}
+.tagbig .num{font-size:clamp(64px,9vw,96px)}
+.tagbig small{display:block;font-weight:600;font-size:15px}
+.kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.kpi .num{font-size:34px}.kpi span{font-size:13px;color:var(--mute);display:block}
+.kpi.alert .num{color:var(--alert)}
+.meta{font-size:13px;color:var(--mute);margin:0}
+.bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden}.bar i{display:block;height:100%;width:0;background:var(--tag)}
+.fig{position:relative;min-height:220px;background:var(--panel);border:1px solid var(--line);border-radius:10px}
+.fig>svg{position:absolute;inset:0;width:100%;height:100%}
+.row2{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:20px}
+@media(max-width:900px){.row2{grid-template-columns:minmax(0,1fr)}}
+.exp{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.note{font-size:14px;color:var(--mute)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:14px;color:var(--mute);margin-top:6px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+ul.more{padding-left:18px;margin:0}ul.more li{margin-bottom:6px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header class="band top"><div class="wrap">
+  <h1>Conteo de rodeo por video</h1>
+  <p>Detecta las vacas en cada cuadro, las cuenta y marca las que están apartadas del grupo. Todo corre en el navegador: el video no sale de tu equipo.</p>
+</div></header>
+
+<main class="band"><div class="wrap">
+ <div class="grid">
+  <section class="a-stage">
+   <div class="stage" id="stage">
+    <video id="vid" playsinline muted crossorigin="anonymous"></video>
+    <canvas id="ov"></canvas>
+    <div class="empty" id="empty">Cargando video de muestra…</div>
+    <div class="busy" id="busy"></div>
+   </div>
+  </section>
+  <section class="a-ctl">
+
+   <div class="tabs" role="group" aria-label="Fuente de video">
+    <button type="button" data-src="file" aria-pressed="true">Video grabado</button>
+    <button type="button" data-src="url" aria-pressed="false">Transmisión en vivo (URL)</button>
+    <button type="button" data-src="cam" aria-pressed="false">Cámara del equipo</button>
+   </div>
+
+   <div class="src" id="src-file">
+    <button type="button" class="sec" id="pick">Subir otro video…</button>
+    <button type="button" class="sec" id="loadSample">Volver a la muestra</button>
+    <input type="file" id="file" accept="video/*" hidden>
+    <p class="hint">MP4, MOV o WebM. También podés arrastrar el archivo sobre el video.</p>
+   </div>
+   <div class="src" id="src-url" hidden>
+    <input type="url" id="url" placeholder="https://servidor/camara/potrero.m3u8" aria-label="Dirección de la transmisión">
+    <button type="button" id="goUrl">Conectar</button>
+    <p class="hint">Acepta HLS (.m3u8) o MP4 con CORS habilitado. Las cámaras IP (RTSP) se publican primero como HLS con un gateway como MediaMTX o go2rtc. YouTube no entrega los cuadros al navegador.</p>
+   </div>
+   <div class="src" id="src-cam" hidden>
+    <button type="button" id="goCam">Usar cámara</button>
+    <button type="button" class="sec" id="goScreen">Capturar otra pestaña</button>
+    <p class="hint">«Capturar otra pestaña» sirve para analizar un video que se reproduce en otro sitio (por ejemplo YouTube).</p>
+   </div>
+
+   <div class="ctl">
+    <button type="button" id="run" disabled>Analizar video</button>
+    <button type="button" class="sec" id="stop" disabled>Detener</button>
+    <label>Analizar cada
+     <select id="step"><option value="0.5">0,5 s</option><option value="1" selected>1 s</option><option value="2">2 s</option><option value="5">5 s</option></select></label>
+    <label>Mosaico
+     <select id="tiles"><option value="auto" selected>Automático</option><option value="1x1">1×1 (rápido)</option><option value="2x2">2×2</option><option value="3x2">3×2</option><option value="4x3">4×3 (vacas lejanas)</option></select></label>
+    <label>Confianza mínima <span id="confv">0,25</span>
+     <input type="range" id="conf" min="0.1" max="0.7" step="0.05" value="0.25"></label>
+    <span class="chk"><input type="checkbox" id="fixed"><label for="fixed">Cámara fija (seguir a cada animal)</label></span>
+    <span class="chk"><input type="checkbox" id="heat"><label for="heat">Mapa de calor</label></span>
+   </div>
+  </section>
+
+  <aside class="side">
+   <div class="tagbig"><span class="num" id="kNow">–</span><small>vacas en el cuadro</small></div>
+   <div class="kpis">
+    <div class="kpi"><span class="num" id="kMax">–</span><span>máximo en un cuadro</span></div>
+    <div class="kpi"><span class="num" id="kAvg">–</span><span>promedio por cuadro</span></div>
+    <div class="kpi alert"><span class="num" id="kIso">–</span><span>apartadas del grupo ahora</span></div>
+    <div class="kpi"><span class="num" id="kSpread">–</span><span>dispersión (cuerpos entre vecinas)</span></div>
+    <div class="kpi" id="kUniqBox" hidden><span class="num" id="kUniq">–</span><span>animales distintos (estimado)</span></div>
+    <div class="kpi" id="kStillBox" hidden><span class="num" id="kStill">–</span><span>quietas más de 60 s</span></div>
+   </div>
+   <div class="bar" aria-hidden="true"><i id="prog"></i></div>
+   <p class="meta" id="status">Preparando el detector…</p>
+  </aside>
+ </div>
+</div></main>
+
+<section class="band" style="padding-top:0"><div class="wrap row2">
+ <div>
+  <h2>Vacas detectadas a lo largo del video</h2>
+  <div class="fig"><svg id="chart" role="img" aria-label="Gráfico de vacas detectadas por segundo"></svg></div>
+  <div class="legend"><span><i style="background:var(--green)"></i>vacas en el cuadro</span><span><i style="background:var(--alert)"></i>apartadas</span></div>
+  <div class="exp">
+   <button type="button" class="sec" id="dl" disabled>Descargar CSV</button>
+   <button type="button" class="sec" id="cp" disabled>Copiar CSV</button>
+   <span class="note" id="cpmsg"></span>
+  </div>
+ </div>
+ <div>
+  <h2>Cómo leer los números</h2>
+  <ul class="more note">
+   <li><b>Vacas en el cuadro</b> es lo que se ve en ese instante. Con drone o cámara que se mueve, el total del rodeo se aproxima con el máximo.</li>
+   <li><b>Apartada</b>: su vecina más cercana está a más de 6 largos de cuerpo. Una vaca que se aparta del rodeo puede estar enferma, en celo o por parir.</li>
+   <li><b>Dispersión</b>: distancia típica entre vecinas, medida en largos de cuerpo. Sube cuando el rodeo se abre a pastorear y baja cuando se amontona.</li>
+   <li>Con <b>cámara fija</b> se sigue a cada animal: estima cuántos distintos pasaron y cuáles llevan más de un minuto sin moverse.</li>
+  </ul>
+ </div>
+</div></section>
+
+<script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.22.0/dist/ort.webgpu.min.js"></script>
+<script>
+{
+const $=id=>document.getElementById(id);
+const vid=$('vid'),ov=$('ov'),octx=ov.getContext('2d');
+const S=640, COW=19, ISO=6;
+let sess=null, src='file', running=false, results=[], tracks=[], nextId=1, heat=null, hls=null, liveStream=null;
+const grab=document.createElement('canvas'), gctx=grab.getContext('2d',{willReadFrequently:true});
+const tile=document.createElement('canvas'); tile.width=tile.height=S; const tctx=tile.getContext('2d',{willReadFrequently:true});
+const fmt=(n,d=0)=>Number.isFinite(n)?n.toLocaleString('es-AR',{maximumFractionDigits:d,minimumFractionDigits:d}):'–';
+const status=t=>$('status').textContent=t;
+
+/* ---------- modelo ---------- */
+async function loadModel(){
+  try{
+    ort.env.wasm.wasmPaths='https://cdn.jsdelivr.net/npm/onnxruntime-web@1.22.0/dist/';
+    ort.env.wasm.numThreads=self.crossOriginIsolated?Math.min(4,navigator.hardwareConcurrency||1):1;
+    status('Descargando el detector (11 MB)…');
+    const buf=await (await fetch('yolo11n.onnx')).arrayBuffer();
+    let ep=null;
+    for(const p of (navigator.gpu?['webgpu','wasm']:['wasm'])){
+      try{sess=await ort.InferenceSession.create(buf,{executionProviders:[p],graphOptimizationLevel:'all'});ep=p;break}catch(e){console.warn('YOLO no pudo usar',p,e)}
+    }
+    if(!sess)throw new Error('el navegador no pudo iniciar el modelo');
+    status('Detector listo (YOLO11n en '+(ep==='webgpu'?'placa de video':'procesador')+').');
+    refreshButtons();
+  }catch(e){status('No se pudo cargar el detector: '+e.message)}
+}
+
+/* ---------- detección por mosaico ---------- */
+function gridFor(W,H){
+  const v=$('tiles').value;
+  if(v!=='auto'){const [c,r]=v.split('x').map(Number);return [c,r]}
+  return [Math.min(4,Math.max(1,Math.round(W/480))),Math.min(3,Math.max(1,Math.round(H/400)))];
+}
+async function detect(){
+  const W=grab.width,H=grab.height,[cols,rows]=gridFor(W,H),tw=W/cols,th=H/rows,ov_=0.15;
+  const tl=[];
+  for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
+    const x0=Math.max(0,c*tw-tw*ov_),y0=Math.max(0,r*th-th*ov_),x1=Math.min(W,(c+1)*tw+tw*ov_),y1=Math.min(H,(r+1)*th+th*ov_);
+    tl.push({x0,y0,w:x1-x0,h:y1-y0,s:S/Math.max(x1-x0,y1-y0)});
+  }
+  const conf=+$('conf').value, boxes=[], plane=S*S, B=4;
+  for(let i=0;i<tl.length;i+=B){
+    const part=tl.slice(i,i+B), data=new Float32Array(part.length*3*plane);
+    part.forEach((t,k)=>{
+      tctx.fillStyle='#727272';tctx.fillRect(0,0,S,S);
+      tctx.drawImage(grab,t.x0,t.y0,t.w,t.h,0,0,t.w*t.s,t.h*t.s);
+      const px=tctx.getImageData(0,0,S,S).data,o=k*3*plane;
+      for(let p=0,q=0;p<plane;p++,q+=4){data[o+p]=px[q]/255;data[o+plane+p]=px[q+1]/255;data[o+2*plane+p]=px[q+2]/255}
+    });
+    const out=(await sess.run({images:new ort.Tensor('float32',data,[part.length,3,S,S])})).output0;
+    const A=out.dims[2],od=out.data,stride=84*A;
+    part.forEach((t,k)=>{
+      const b=k*stride;
+      for(let a=0;a<A;a++){
+        const sc=od[b+(4+COW)*A+a]; if(sc<conf)continue;
+        const cx=od[b+a]/t.s+t.x0,cy=od[b+A+a]/t.s+t.y0,w=od[b+2*A+a]/t.s,h=od[b+3*A+a]/t.s;
+        boxes.push({x:cx-w/2,y:cy-h/2,w,h,c:sc});
+      }
+    });
+  }
+  return nms(boxes);
+}
+function nms(b){
+  b.sort((p,q)=>q.c-p.c);const keep=[];
+  for(const p of b){
+    if(keep.every(q=>{const ix=Math.max(0,Math.min(p.x+p.w,q.x+q.w)-Math.max(p.x,q.x)),iy=Math.max(0,Math.min(p.y+p.h,q.y+q.h)-Math.max(p.y,q.y)),I=ix*iy;
+      return I/(p.w*p.h+q.w*q.h-I)<0.45 && I/Math.min(p.w*p.h,q.w*q.h)<0.7}))keep.push(p);
+  }
+  return keep;
+}
+
+/* ---------- métricas ---------- */
+function analyse(boxes,t){
+  const n=boxes.length, nn=[];
+  boxes.forEach(p=>{p.cx=p.x+p.w/2;p.cy=p.y+p.h/2;p.size=Math.sqrt(p.w*p.h)});
+  boxes.forEach((p,i)=>{
+    let best=Infinity;
+    boxes.forEach((q,j)=>{if(i!==j){const d=Math.hypot(p.cx-q.cx,p.cy-q.cy)/((p.size+q.size)/2);if(d<best)best=d}});
+    p.nn=best;p.iso=n>=3&&best>ISO;if(Number.isFinite(best))nn.push(best);
+  });
+  nn.sort((a,b)=>a-b);
+  const spread=nn.length?nn[Math.floor(nn.length/2)]:NaN;
+  if($('fixed').checked)track(boxes,t);
+  if(heat)boxes.forEach(p=>{const gx=Math.min(heat.w-1,Math.floor(p.cx/grab.width*heat.w)),gy=Math.min(heat.h-1,Math.floor(p.cy/grab.height*heat.h));heat.a[gy*heat.w+gx]++});
+  return {t,n,iso:boxes.filter(p=>p.iso).length,spread,boxes,W:grab.width,H:grab.height};
+}
+function iou(p,q){const ix=Math.max(0,Math.min(p.x+p.w,q.x+q.w)-Math.max(p.x,q.x)),iy=Math.max(0,Math.min(p.y+p.h,q.y+q.h)-Math.max(p.y,q.y)),I=ix*iy;return I/(p.w*p.h+q.w*q.h-I)}
+function track(boxes,t){
+  const live=tracks.filter(k=>t-k.last<=Math.max(3,+$('step').value*3)), used=new Set();
+  const pairs=[];
+  boxes.forEach((p,i)=>live.forEach(k=>{const s=iou(p,k.box),d=Math.hypot(p.cx-k.box.cx,p.cy-k.box.cy)/p.size;if(s>0.15||d<0.8)pairs.push([s-d*0.1,i,k])}));
+  pairs.sort((a,b)=>b[0]-a[0]);
+  for(const [,i,k] of pairs){
+    if(used.has(i)||k.seen===t)continue;
+    const p=boxes[i],mv=Math.hypot(p.cx-k.box.cx,p.cy-k.box.cy)/p.size;
+    if(mv>0.15)k.moved=t;
+    k.box=p;k.last=t;k.seen=t;k.hits++;p.id=k.id;used.add(i);
+  }
+  boxes.forEach((p,i)=>{if(!used.has(i)){const k={id:nextId++,box:p,first:t,last:t,seen:t,moved:t,hits:1};tracks.push(k);p.id=k.id}});
+  boxes.forEach(p=>{const k=tracks.find(k=>k.id===p.id);p.still=t-k.moved})
+}
+
+/* ---------- dibujo ---------- */
+function draw(r){
+  const W=r?r.W:(vid.videoWidth||1280),H=r?r.H:(vid.videoHeight||720);
+  const rect=ov.getBoundingClientRect(),dpr=devicePixelRatio||1;
+  ov.width=rect.width*dpr;ov.height=rect.height*dpr;
+  const sc=Math.min(ov.width/W,ov.height/H),ox=(ov.width-W*sc)/2,oy=(ov.height-H*sc)/2;
+  octx.clearRect(0,0,ov.width,ov.height);
+  if($('heat').checked&&heat){
+    const mx=Math.max(1,...heat.a);
+    for(let y=0;y<heat.h;y++)for(let x=0;x<heat.w;x++){const v=heat.a[y*heat.w+x]/mx;if(v>0){octx.fillStyle=`rgba(255,${Math.round(210-170*v)},31,${0.15+0.5*v})`;octx.fillRect(ox+x*W/heat.w*sc,oy+y*H/heat.h*sc,W/heat.w*sc+1,H/heat.h*sc+1)}}
+  }
+  if(!r)return;
+  octx.lineWidth=Math.max(1.5,2*dpr);octx.font=`600 ${Math.round(12*dpr)}px Barlow,sans-serif`;
+  for(const p of r.boxes){
+    const x=ox+p.x*sc,y=oy+p.y*sc,w=p.w*sc,h=p.h*sc,col=p.iso?'#e0115f':'#ffd21f';
+    octx.strokeStyle=col;octx.strokeRect(x,y,w,h);
+    const lab=p.id?('#'+p.id+(p.still>60?' quieta':'')):(p.iso?'apartada':'');
+    if(lab&&w>14*dpr){const tw=octx.measureText(lab).width+8*dpr,th=16*dpr;octx.fillStyle=col;octx.fillRect(x,y-th,tw,th);octx.fillStyle=p.iso?'#fff':'#1a1600';octx.fillText(lab,x+4*dpr,y-4*dpr)}
+  }
+}
+function show(r){
+  draw(r);
+  $('kNow').textContent=r?r.n:'–';$('kIso').textContent=r?r.iso:'–';$('kSpread').textContent=r?fmt(r.spread,1):'–';
+  if(results.length){$('kMax').textContent=Math.max(...results.map(x=>x.n));$('kAvg').textContent=fmt(results.reduce((s,x)=>s+x.n,0)/results.length,1)}
+  const fx=$('fixed').checked;$('kUniqBox').hidden=!fx;$('kStillBox').hidden=!fx;
+  if(fx){$('kUniq').textContent=tracks.filter(k=>k.hits>=2).length;$('kStill').textContent=r?r.boxes.filter(p=>p.still>60).length:'–'}
+}
+const chart=$('chart');
+function drawChart(){
+  const W=chart.clientWidth,H=chart.clientHeight,P={l:36,r:10,t:12,b:26};
+  if(!results.length){chart.innerHTML=`<text x="${W/2}" y="${H/2}" text-anchor="middle" fill="currentColor" opacity=".55" font-size="14">Todavía no hay datos: tocá «Analizar video».</text>`;return}
+  const t0=results[0].t,t1=Math.max(t0+1,results[results.length-1].t),ymax=Math.max(5,...results.map(r=>r.n))*1.1;
+  const X=t=>P.l+(t-t0)/(t1-t0)*(W-P.l-P.r),Y=v=>H-P.b-v/ymax*(H-P.t-P.b);
+  const line=k=>results.map((r,i)=>(i?'L':'M')+X(r.t).toFixed(1)+','+Y(r[k]).toFixed(1)).join('');
+  const ticks=[0,Math.round(ymax/2),Math.floor(ymax)];
+  const xt=W<520?[t0,t1]:[t0,(t0+t1)/2,t1];
+  chart.innerHTML=ticks.map(v=>`<line x1="${P.l}" x2="${W-P.r}" y1="${Y(v)}" y2="${Y(v)}" stroke="currentColor" opacity=".12"/><text x="${P.l-6}" y="${Y(v)+4}" text-anchor="end" font-size="12" fill="currentColor" opacity=".6">${v}</text>`).join('')+
+   xt.map(t=>`<text x="${X(t)}" y="${H-8}" text-anchor="middle" font-size="12" fill="currentColor" opacity=".6">${fmtT(t)}</text>`).join('')+
+   `<path d="${line('n')}" fill="none" stroke="var(--green)" stroke-width="2.5"/><path d="${line('iso')}" fill="none" stroke="var(--alert)" stroke-width="2"/>`;
+}
+const fmtT=t=>{t=Math.round(t);return src==='file'?`${Math.floor(t/60)}:${String(t%60).padStart(2,'0')}`:new Date(t*1000).toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit',second:'2-digit'})};
+const chartObs=new ResizeObserver(drawChart);chartObs.observe(chart);
+const stageObs=new ResizeObserver(()=>show(current()));stageObs.observe($('stage'));
+
+/* ---------- análisis ---------- */
+function reset(){results=[];tracks=[];nextId=1;heat={w:48,h:27,a:new Float32Array(48*27)};show(null);drawChart();$('prog').style.width='0';$('dl').disabled=$('cp').disabled=true}
+function snap(){grab.width=vid.videoWidth;grab.height=vid.videoHeight;gctx.drawImage(vid,0,0)}
+const seek=t=>new Promise(res=>{vid.addEventListener('seeked',res,{once:true});vid.currentTime=t});
+async function runFile(){
+  reset();running=true;refreshButtons();vid.pause();
+  const step=+$('step').value,dur=vid.duration;
+  for(let t=0;t<dur&&running;t+=step){
+    await seek(t);snap();const t0=performance.now();
+    let r;try{r=analyse(await detect(),t)}catch(e){status('Error al analizar: '+e.message);break}
+    results.push(r);show(r);drawChart();emit(r);
+    $('prog').style.width=(100*Math.min(1,(t+step)/dur))+'%';
+    const [c,rw]=gridFor(grab.width,grab.height);
+    $('busy').textContent=`${fmtT(t)} de ${fmtT(dur)} · ${((performance.now()-t0)/1000).toFixed(1)} s por cuadro · mosaico ${c}×${rw}`;
+  }
+  running=false;$('busy').textContent='';refreshButtons();
+  if(results.length){status(`Listo: ${results.length} cuadros analizados. Reproducí el video para ver las detecciones.`);$('dl').disabled=$('cp').disabled=false}
+}
+async function runLive(){
+  reset();running=true;refreshButtons();
+  const step=+$('step').value*1000;
+  while(running){
+    const t0=performance.now();
+    if(vid.readyState>=2&&vid.videoWidth){
+      try{snap();}catch(e){status('El navegador no permite leer los cuadros de esta fuente (falta CORS en el servidor).');break}
+      const r=analyse(await detect(),Date.now()/1000);results.push(r);if(results.length>3600)results.shift();emit(r);
+      show(r);drawChart();$('dl').disabled=$('cp').disabled=false;
+      $('busy').textContent=`En vivo · ${((performance.now()-t0)/1000).toFixed(1)} s por cuadro`;
+    }
+    await new Promise(z=>setTimeout(z,Math.max(50,step-(performance.now()-t0))));
+  }
+  running=false;$('busy').textContent='';refreshButtons();
+}
+const emit=r=>window.dispatchEvent(new CustomEvent('conteo',{detail:{t:r.t,vacas:r.n,apartadas:r.iso,dispersion:r.spread}}));
+function current(){if(!results.length)return null;if(src!=='file')return results[results.length-1];let b=results[0];for(const r of results)if(Math.abs(r.t-vid.currentTime)<Math.abs(b.t-vid.currentTime))b=r;return b}
+const onFrame=()=>{if(src==='file'&&!running)show(current());vid.requestVideoFrameCallback?.(onFrame)};
+vid.requestVideoFrameCallback?vid.requestVideoFrameCallback(onFrame):vid.addEventListener('timeupdate',onFrame);
+
+/* ---------- fuentes ---------- */
+function stopSources(){running=false;if(hls){hls.destroy();hls=null}if(liveStream){liveStream.getTracks().forEach(t=>t.stop());liveStream=null}vid.srcObject=null}
+function setVideo(url,label){
+  stopSources();vid.removeAttribute('src');vid.loop=false;vid.controls=true;vid.src=url;
+  $('empty').hidden=true;reset();status(label);
+}
+async function loadSample(){
+  try{const b=await (await fetch('muestra_tambo.mp4')).blob();setVideo(URL.createObjectURL(b),'Video de muestra cargado: drone sobre un rodeo Holando, 19 s.')}
+  catch(e){$('empty').textContent='Subí un video o arrastralo acá.';$('empty').hidden=false}
+}
+function useFile(f){if(f&&f.type.startsWith('video/'))setVideo(URL.createObjectURL(f),'Video cargado: '+f.name)}
+$('pick').onclick=()=>$('file').click();
+$('file').onchange=e=>useFile(e.target.files[0]);
+$('loadSample').onclick=loadSample;
+$('stage').addEventListener('dragover',e=>e.preventDefault());
+$('stage').addEventListener('drop',e=>{e.preventDefault();selectTab('file');useFile(e.dataTransfer.files[0])});
+function selectTab(s){
+  document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.src===s));
+  ['file','url','cam'].forEach(k=>$('src-'+k).hidden=k!==s);
+}
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>selectTab(b.dataset.src));
+$('goUrl').onclick=async()=>{
+  const u=$('url').value.trim();if(!/^https?:\/\//.test(u)){status('Ingresá una dirección que empiece con http:// o https://');return}
+  stopSources();src='live';vid.controls=false;vid.muted=true;$('empty').hidden=true;reset();
+  vid.onerror=()=>status('No se pudo abrir la transmisión. Revisá la dirección y que el servidor permita CORS.');
+  if(/\.m3u8(\?|$)/.test(u)&&!vid.canPlayType('application/vnd.apple.mpegurl')){
+    try{if(!window.Hls)await new Promise((ok,ko)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js';s.onload=ok;s.onerror=ko;document.head.append(s)});
+      hls=new Hls();hls.loadSource(u);hls.attachMedia(vid);hls.on(Hls.Events.ERROR,(e,d)=>{if(d.fatal)vid.onerror()})}
+    catch(e){status('No se pudo cargar el reproductor HLS.');return}
+  }else vid.src=u;
+  vid.play().catch(()=>{});status('Conectando a la transmisión…');
+  vid.addEventListener('playing',()=>{status('Transmisión en vivo. Tocá «Analizar en vivo».');refreshButtons()},{once:true});
+};
+async function useStream(get,label){
+  try{stopSources();liveStream=await get();src='live';vid.removeAttribute('src');vid.srcObject=liveStream;vid.controls=false;await vid.play();$('empty').hidden=true;reset();status(label);refreshButtons()}
+  catch(e){status('El navegador no dio acceso ('+e.name+'). Revisá los permisos del sitio en el navegador.')}
+}
+$('goCam').onclick=()=>useStream(()=>navigator.mediaDevices.getUserMedia({video:{width:{ideal:1920}}}),'Cámara conectada.');
+$('goScreen').onclick=()=>useStream(()=>navigator.mediaDevices.getDisplayMedia({video:true}),'Capturando la pestaña elegida.');
+vid.addEventListener('loadedmetadata',()=>{if(!vid.srcObject&&!hls&&vid.src.startsWith('blob:'))src='file';$('stage').style.aspectRatio=vid.videoWidth+'/'+vid.videoHeight;refreshButtons()});
+
+function refreshButtons(){
+  const ready=!!sess&&vid.readyState>=1&&vid.videoWidth>0;
+  $('run').disabled=!ready||running;$('stop').disabled=!running;
+  $('run').textContent=src==='file'?'Analizar video':'Analizar en vivo';
+}
+$('run').onclick=()=>src==='file'?runFile():runLive();
+$('stop').onclick=()=>{running=false};
+$('conf').oninput=e=>$('confv').textContent=fmt(+e.target.value,2);
+$('heat').onchange=()=>show(current());
+$('fixed').onchange=()=>show(current());
+
+/* ---------- exportar ---------- */
+function csv(){
+  const rows=[['segundo_o_hora','vacas','apartadas','dispersion_cuerpos','id','x','y','ancho','alto','confianza','apartada']];
+  for(const r of results){
+    const when=src==='file'?r.t.toFixed(1):new Date(r.t*1000).toISOString();
+    if(!r.boxes.length)rows.push([when,0,0,'','','','','','','','']);
+    for(const p of r.boxes)rows.push([when,r.n,r.iso,Number.isFinite(r.spread)?r.spread.toFixed(2):'',p.id||'',p.x.toFixed(0),p.y.toFixed(0),p.w.toFixed(0),p.h.toFixed(0),p.c.toFixed(2),p.iso?1:0]);
+  }
+  return rows.map(r=>r.join(';')).join('\n');
+}
+$('dl').onclick=()=>{try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['﻿'+csv()],{type:'text/csv'}));a.download='conteo_rodeo.csv';a.click();$('cpmsg').textContent='Si no se descargó, usá «Copiar CSV».'}catch(e){$('cpmsg').textContent='Descarga bloqueada: usá «Copiar CSV».'}};
+$('cp').onclick=async()=>{try{await navigator.clipboard.writeText(csv());$('cpmsg').textContent='Copiado. Pegalo en Excel.'}catch(e){$('cpmsg').textContent='No se pudo copiar.'}};
+
+/* API para integrar en la web de gestión: window.conteoRodeo.resultados(), .csv(), y el evento 'conteo' por cada cuadro */
+window.conteoRodeo={resultados:()=>results.map(({boxes,...r})=>r),detecciones:()=>results,csv};
+reset();loadSample();loadModel();
+}
+</script>
+</body>
+</html>
