@@ -640,6 +640,22 @@ html{scroll-padding-top:64px;scroll-padding-bottom:90px}
   .mercado__grid .foto--alta{aspect-ratio:auto;height:auto;min-height:100%;position:relative;border-top:1.5px solid var(--act);border-radius:0 0 10px 10px}
   .mercado__grid .foto--alta img{position:absolute;inset:0}
 }
+
+/* ===== franja Medición con cámaras (sección Mercado) ===== */
+.m-band{display:grid;grid-template-columns:1.4fr auto;gap:28px;align-items:center;margin-top:40px;
+  padding:26px 28px;border-radius:12px;text-decoration:none;color:inherit;
+  background:linear-gradient(120deg,#0E1621 0%,#13303B 100%);border:1px solid #24414C;transition:border-color .2s,transform .2s}
+
+.m-band__k{font-family:var(--mono);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:#E8835A;display:inline-flex;align-items:center;gap:8px}
+.m-band__k i{width:8px;height:8px;border-radius:50%;background:#E8835A;animation:m-pulso 1.6s infinite}
+@keyframes m-pulso{50%{opacity:.25}}
+.m-band h3{font-family:var(--disp);font-weight:800;font-size:1.35rem;color:var(--navy);margin:8px 0 6px;letter-spacing:-.015em}
+.m-band p{margin:0;color:var(--muted);font-size:.93rem;max-width:62ch}
+.m-band__cta{display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+.m-band__live{font-size:.8rem;color:#8ED0DC;text-decoration:none}
+.m-band__live:hover{color:#fff}
+.li2 li a{color:inherit;text-decoration:none;border-bottom:1px dotted #8ED0DC}
+@media(max-width:760px){.m-band{grid-template-columns:1fr}.m-band__cta{align-items:flex-start}}
 </style>
 <meta name="robots" content="index,follow">
 <script>document.documentElement.classList.add("js")</script>
@@ -879,6 +895,18 @@ html{scroll-padding-top:64px;scroll-padding-bottom:90px}
             páginas que termina en un cajón.</p></div></div>
         </div>
       </div>
+      <div class="m-band">
+        <div class="m-band__txt">
+          <span class="m-band__k"><i></i> Medición con cámaras</span>
+          <h3>Lo que pasa en tu local, medido</h3>
+          <p>Flujo frente a la puerta, entradas, recorridos, permanencia en góndola y espera en caja,
+          con las cámaras que ya tenés. Sin identificar a nadie.</p>
+        </div>
+        <div class="m-band__cta">
+          <a class="btn btn--act" href="/medicion/">Ver cómo funciona</a>
+          <a class="m-band__live" href="/transito">o probalo en vivo con la cámara de Tandil →</a>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -892,7 +920,7 @@ html{scroll-padding-top:64px;scroll-padding-bottom:90px}
         de gestión cueste caro y con margen suficiente para corregirlo a tiempo.</p>
       </div>
       <div class="who3">
-        <div><figure class="foto foto--img"><img src="/f-pyme.jpg" alt="Taller metalúrgico con operarios cortando y soldando chapa" width="800" height="600" loading="lazy" decoding="async"></figure>
+        <div><figure class="foto foto--img"><img src="/f-pyme.jpg" alt="Operario con casco trabajando junto a una cortadora de chapa por plasma en un taller metalúrgico" width="800" height="600" loading="lazy" decoding="async"></figure>
           <h3>PyMEs</h3><p>Industria y servicios que crecieron más rápido que su organización interna.</p></div>
         <div><figure class="foto foto--img"><img src="/f-distri.jpg" alt="Depósito con autoelevadores y operarios descargando un camión" width="800" height="600" loading="lazy" decoding="async"></figure>
           <h3>Distribuidoras</h3><p>Donde el stock, la logística y los proveedores definen la rentabilidad.</p></div>
@@ -919,7 +947,7 @@ html{scroll-padding-top:64px;scroll-padding-bottom:90px}
         <div class="li2"><span class="li2__n">03</span><div><h3>Inteligencia artificial aplicada</h3>
           <p>Dónde conviene usarla en una PyME y dónde es humo. Casos concretos, no promesas.</p><ul><li>Automatización de tareas administrativas repetitivas</li><li>Análisis de ventas, compras y comportamiento de clientes</li><li>Capacitación al equipo en herramientas de uso diario</li></ul></div></div>
         <div class="li2"><span class="li2__n">04</span><div><h3>Investigación de mercado</h3>
-          <p>Qué está pasando fuera de la empresa: competencia, precios, clientes y demanda potencial.</p><ul><li>Relevamiento de competidores y comparación de precios</li><li>Encuestas a clientes y a clientes perdidos</li><li>Dimensionamiento de mercado por zona y segmento</li></ul></div></div>
+          <p>Qué está pasando fuera de la empresa: competencia, precios, clientes y demanda potencial.</p><ul><li>Relevamiento de competidores y comparación de precios</li><li>Encuestas a clientes y a clientes perdidos</li><li>Dimensionamiento de mercado por zona y segmento</li><li><a href="/medicion/">Medición de flujo y comportamiento con cámaras</a></li></ul></div></div>
         <div class="li2"><span class="li2__n">05</span><div><h3>Comercial, compras y stock</h3>
           <p>El circuito donde una distribuidora gana o pierde plata todos los días.</p><ul><li>Política de precios, descuentos y condiciones de venta</li><li>Reposición, quiebres y capital inmovilizado en depósito</li><li>Negociación y evaluación de proveedores</li></ul></div></div>
         <div class="li2"><span class="li2__n">06</span><div><h3>Organización y empresa familiar</h3>

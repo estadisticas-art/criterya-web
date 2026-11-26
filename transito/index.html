@@ -22,7 +22,7 @@
   #status{margin-left:auto;font-size:12px;color:var(--mut)}
   #status b{color:var(--txt)}
   main{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:14px;padding:14px}
-  @media(max-width:1100px){main{grid-template-columns:1fr}}
+  @media(max-width:1100px){main{grid-template-columns:minmax(0,1fr)}}
   .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px}
   .card h2{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);margin:0 0 10px}
   .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
@@ -57,19 +57,47 @@
   #tblWrap{max-height:340px;overflow:auto}
   #log{max-height:180px;overflow:auto;font-family:ui-monospace,Consolas,monospace;font-size:12px;color:var(--mut)}
   .bottom{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:14px}
-  @media(max-width:1100px){.bottom{grid-template-columns:1fr}}
+  @media(max-width:1100px){.bottom{grid-template-columns:minmax(0,1fr)}}
   #chart{width:100%;height:220px;display:block}
   .dot{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px}
   .sep{width:1px;height:24px;background:var(--line)}
   details summary{cursor:pointer;color:var(--mut);font-size:12px}
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .back{font-size:13px;color:var(--roi);text-decoration:none;white-space:nowrap}
+  .back:hover{color:#fff}
+  @media(max-width:900px){header{flex-wrap:wrap}#status{margin-left:0;width:100%}}
+  .intro{display:flex;flex-wrap:wrap;gap:14px 24px;align-items:center;justify-content:space-between;
+    margin:14px 14px 0;padding:14px 16px;border:1px solid var(--line);border-radius:10px;
+    background:linear-gradient(120deg,#16212c 0%,#13303b 100%)}
+  .intro p{margin:0;max-width:78ch;color:#c9d6e2}
+  .intro b{color:#fff}
+  .intro .row a{font-size:13px;text-decoration:none;border-radius:7px;padding:7px 12px;white-space:nowrap}
+  .intro .cta{background:#B84A22;color:#fff}
+  .intro .cta:hover{background:#993A18}
+  .intro .sec{border:1px solid #3b536a;color:var(--txt)}
+  .intro .sec:hover{border-color:var(--roi)}
+  #mobileNote{margin:10px 14px 0;padding:9px 12px;border:1px solid #6b5a2a;background:#2a2412;border-radius:8px;font-size:13px;color:#f0dca8}
+  #mobileNote[hidden]{display:none}
 </style>
 </head>
 <body>
 <header>
   <a href="/" style="display:flex"><img src="/logo-blanco.png" alt="Criterya" style="height:26px"></a><h1>Contador de tránsito · vehículos y peatones</h1>
+  <a class="back" href="/medicion/">← Medición con cámaras</a>
   <div id="status">Modelo: <b id="stModel">cargando…</b> · Fuente: <b id="stSrc">ninguna</b> · Hora del video: <b id="stClock">–</b> · Detección: <b id="stFps">–</b> · Conteo: <b id="stRun">detenido</b> <span id="stTimer"></span></div>
 </header>
+
+<div class="intro">
+  <p><b>Para qué sirve.</b> Es una demostración en vivo del servicio de <b>medición con cámaras</b> de Criterya.
+  Sobre la cámara pública de Tandil cuenta autos, motos, colectivos, bicicletas y peatones que cruzan una línea,
+  y los agrupa por intervalo. En un comercio, el mismo método mide cuántos entran, por dónde caminan,
+  dónde se detienen y cuánto esperan en la caja.</p>
+  <div class="row">
+    <a class="sec" href="/medicion/">Ver el servicio</a>
+    <a class="cta" href="https://wa.me/5492494492344?text=Hola%20Criterya%2C%20vi%20el%20contador%20de%20tr%C3%A1nsito%20y%20quiero%20medir%20mi%20local." target="_blank" rel="noopener">Quiero medir mi local</a>
+  </div>
+</div>
+<div id="mobileNote" hidden>📱 En el celular el modelo corre más lento y dibujar con el dedo es menos preciso. Para mejores resultados, usá una computadora.</div>
 
 <main>
   <section class="card">
@@ -139,6 +167,10 @@
             <option value="60">60 min</option>
           </select></label>
         <label class="f">Contar durante (min, 0 = sin límite)<input id="inpDur" type="number" min="0" value="0"></label>
+      </div>
+      <details style="margin-top:8px">
+        <summary>Modelo y detección (avanzado)</summary>
+        <div class="grid2" style="margin-top:8px">
         <label class="f">Modelo
           <select id="selModel">
             <option value="yolo11n" selected>YOLO11 (recomendado)</option>
@@ -150,7 +182,8 @@
         <label class="f">Resolución COCO-SSD (px)<input id="inpW" type="number" min="320" max="1280" step="32" value="640"></label>
         <label class="f">Detección de personas lejanas
           <select id="selTiles"><option value="1">Normal</option><option value="2">Mejorada ×2 (más lento)</option><option value="4">Máxima ×4 (mucho más lento)</option></select></label>
-      </div>
+        </div>
+      </details>
       <details style="margin-top:8px">
         <summary>Nombres de los sentidos</summary>
         <div class="grid2" style="margin-top:8px">
@@ -208,7 +241,7 @@
     </section>
   </div>
 </main>
-<footer style="padding:4px 18px 18px;font-size:12px;color:var(--mut)">Imagen: cámara pública de la <a href="https://tandil.gov.ar/camara-vivo" target="_blank" rel="noopener" style="color:var(--roi)">Municipalidad de Tandil</a>. El análisis corre en tu navegador: no se graban ni se envían imágenes. Desarrollado por <a href="/" style="color:var(--roi)">Criterya</a>.</footer>
+<footer style="padding:4px 18px 18px;font-size:12px;color:var(--mut)">Imagen: cámara pública de la <a href="https://tandil.gov.ar/camara-vivo" target="_blank" rel="noopener" style="color:var(--roi)">Municipalidad de Tandil</a>. El análisis corre en tu navegador: no se graban ni se envían imágenes. Desarrollado por <a href="/" style="color:var(--roi)">Criterya</a> · <a href="/medicion/" style="color:var(--roi)">Medición con cámaras</a>.</footer>
 
 <script>
 // ---------------------------------------------------------------------------
@@ -1254,6 +1287,10 @@ $('selHeat').value = S.heatShow; if(S.heatShow !== 'off') renderHeat();
 S.events.slice(-50).forEach(addLog);
 setTicker(); requestAnimationFrame(render); loadModel();
 setInterval(renderStats, 30000); // refresca intervalos vacíos
+</script>
+<script>
+{ const n=document.getElementById("mobileNote");
+  if(n && (matchMedia("(pointer:coarse)").matches || innerWidth<760)) n.hidden=false; }
 </script>
 </body>
 </html>
